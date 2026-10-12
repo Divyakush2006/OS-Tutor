@@ -260,8 +260,17 @@ Every training row is commercially licensed: MIT 8,991 · ODC-BY-1.0 959 · mixe
 | Sampler | **sequential** | Shuffling destroys the engineered order |
 | OOM safety | `--longest-first` through the real trainer | Replaced a `memory_probe()` that bypassed Unsloth's checkpointing and false-alarmed |
 
-**Outcome:** val loss 0.4413 → 0.2713, monotonic. Final train 0.2710 vs val 0.2754 — fitted
-without memorising. Adapter: `outputs/ostutor-lora-v3/ostutor-lora` (PEFT) and
+**Outcome** (`outputs/ostutor-lora-v3/ostutor-lora/train_metrics.json`): validation loss
+0.4413 → **0.2713**, falling at every one of 12 evaluations; OOD loss 0.0385 → 0.0139;
+training loss **0.1773** averaged over the epoch (last logged batches 0.31–0.33).
+
+> **Correction (2026-10-12).** Earlier text here — and in both PDFs in `docs/` — said
+> "final training loss 0.2710 vs validation 0.2754, so no memorisation". No 0.2710 exists
+> in any training artifact, and 0.2754 is the step-590 validation loss, not the final one.
+> The memorisation claim is withdrawn. OOD loss is low because that split is 100%
+> templated procedural text, not because the model generalises: the same model answers
+> only ~60% of the 57-item suite correctly on its own. Teacher-forced loss does not
+> measure free-running correctness. Adapter: `outputs/ostutor-lora-v3/ostutor-lora` (PEFT) and
 `models/gguf/ostutor-v3-lora-f16.gguf` (served).
 
 ---
