@@ -1,0 +1,173 @@
+{
+ "base+solver": {
+  "wrong": 8,
+  "suspects": []
+ },
+ "base": {
+  "wrong": 32,
+  "suspects": [
+   {
+    "id": "lru_classic",
+    "kind": "paging",
+    "expected": 12,
+    "got": 15,
+    "finish": "stop",
+    "tail": "- Step12: 3 \u2192 no\n- Step13: 2 \u2192 no\n- Step14: 1 \u2192 fault (11)\n- Step15: 2 \u2192 fault (12)\n- Step16: 0 \u2192 no\n- Step17: 1 \u2192 no\n- Step18: 7 \u2192 fault (13)\n- Step19: 0 \u2192 fault (14)\n- Step20: 1 \u2192 fault (15)\n\u2705 Total page faults = **15**\n---\n### \u2705 Final Answer:\n**15** page faults occur when using LRU with 3 frames.\n--- \n\u2705 **Answer: 15**"
+   },
+   {
+    "id": "lru_4f",
+    "kind": "paging",
+    "expected": 10,
+    "got": 18,
+    "finish": "stop",
+    "tail": "12. Page 3 \u2192 fault  \n13. Page 7 \u2192 fault  \n14. Page 6 \u2192 fault  \n15. Page 3 \u2192 no  \n16. Page 2 \u2192 no  \n17. Page 1 \u2192 fault  \n18. Page 2 \u2192 no  \n19. Page 3 \u2192 no  \n20. Page 6 \u2192 no  \nSo faults at:  \n- 1, 2, 3, 4, 7, 8, 12, 13, 14, 17 \u2192 total of **10**\n\u2705 Final answer: **10 page faults**\n---\n### \u2705 Final Answer:\n**10**"
+   },
+   {
+    "id": "scan_down",
+    "kind": "disk",
+    "expected": 236,
+    "got": 53.0,
+    "finish": "stop",
+    "tail": "- Head starts at 53  \n- Moves down to 37 \u2192 16  \n- Then to 14 \u2192 23  \n- Then to 0 \u2192 14  \n- Total down: 16 + 23 + 14 = 53  \n- Then moves up to 98 \u2192 98  \n- To 122 \u2192 24  \n- To 124 \u2192 2  \n- To 183 \u2192 59  \n- Total up: 98 + 24 + 2 + 59 = 183  \n- Total: 53 + 183 = **236**\nAll requests are served.\n---\n### \u2705 Final Answer:\n**236**"
+   },
+   {
+    "id": "fcfs_disk",
+    "kind": "disk",
+    "expected": 7081,
+    "got": null,
+    "finish": "stop",
+    "tail": "Total seek distance =  \n57 + 1384 + 557 + 861 + 826 + 561 + 487 + 728 + 1620\nLet\u2019s compute step by step:\n- 57 + 1384 = 1441  \n- 1441 + 557 = 1998  \n- 1998 + 861 = 2859  \n- 2859 + 826 = 3685  \n- 3685 + 561 = 4246  \n- 4246 + 487 = 4733  \n- 4733 + 728 = 5461  \n- 5461 + 1620 = **7081**\n6. **Final answer**:  \nThe total seek distance using FCFS is **7081**.\n\u2705 All steps are auditable, no assumptions made, and the input is fully provided.\n**Final Answer: 7081**"
+   },
+   {
+    "id": "sstf_2",
+    "kind": "disk",
+    "expected": 208,
+    "got": null,
+    "finish": "stop",
+    "tail": "- 170 \u2192 190: 20  \n**Total seek distance = 7 + 19 + 8 + 66 + 58 + 30 + 20**\nLet\u2019s compute:\n- 7 + 19 = 26  \n- 26 + 8 = 34  \n- 34 + 66 = 100  \n- 100 + 58 = 158  \n- 158 + 30 = 188  \n- 188 + 20 = **208**\n---\n### \u2705 Final Answer:\n**208 cylinders**\nThis is the total number of cylinders the head moves under SSTF.\n---\n**Answer: 208** \u2705"
+   },
+   {
+    "id": "translate_4k",
+    "kind": "translate",
+    "expected": 4904,
+    "got": 4.0,
+    "finish": "stop",
+    "tail": "So, **Page number = 2**\n---\n### Step 3: Use the page table to find the frame number\nFrom the page table:\n- Page 2 \u2192 Frame 1\nSo, the **frame number** is **1**\n---\n### Step 4: Compute the physical address\nPhysical address = (Frame number \u00d7 page size) + offset  \n= (1 \u00d7 4096) + 808  \n= 4096 + 808  \n= **4904**\n---\n### \u2705 Final Answer:\n**4904**"
+   }
+  ]
+ },
+ "v2.2+solver": {
+  "wrong": 14,
+  "suspects": []
+ },
+ "v2.2": {
+  "wrong": 38,
+  "suspects": [
+   {
+    "id": "sjf_np_ties",
+    "kind": "scheduling",
+    "expected": 4.0,
+    "got": 4.75,
+    "finish": "stop",
+    "tail": "- t=11: ready={T3(1)} -> pick T3 (shortest burst 1), completes at 11 + 1 = 12\n- t=12: ready={T4(4)} -> pick T4 (shortest burst 4), completes at 12 + 4 = 16\n**Step 2 - Gantt chart:** T1[0-7] T2[7-11] T3[11-12] T4[12-16]\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|------------|\n| T1 | 0 | 7 | 7 | 7 - 0 = 7 | 7 - 7 = 0 |\n| T2 | 2 | 4 | 11 | 11 - 2 = 9 | 9 - 4 = 5 |\n| T3 | 4 | 1 | 12 | 12 - 4 = 8 | 8 - 1 = 7 |\n| T4 | 5 | 4 | 16 | 16 - 5 = 11 | 11 - 4 = 7 |\n**Step 4 - averages**\n- Sum of waiting times: 0 + 5 = 5, 5 + 7 = 12, 12 + 7 = 19\n- Average waiting time = 19 / 4 = **4.75**\n- Sum of turnaround times: 7 + 9 = 16, 16 + 8 = 24, 24 + 11 = 35\n- Average turnaround time = 35 / 4 = **8.75**"
+   },
+   {
+    "id": "hrrn",
+    "kind": "scheduling",
+    "expected": 4.0,
+    "got": 4.6,
+    "finish": "stop",
+    "tail": "**Step 2 - Gantt chart:** A[0-3] B[3-9] C[9-13] D[13-18] E[18-20]\n**Step 3 - per-process times**\n| Process | Arrival | Burst | Completion | Turnaround (Completion - Arrival) | Waiting (Turnaround - Burst) |\n|---------|---------|-------|------------|------------------------|------------------------|\n| A | 0 | 3 | 3 | 3 - 0 = 3 | 3 - 3 = 0 |\n| B | 2 | 6 | 9 | 9 - 2 = 7 | 7 - 6 = 1 |\n| C | 4 | 4 | 13 | 13 - 4 = 9 | 9 - 4 = 5 |\n| D | 6 | 5 | 18 | 18 - 6 = 12 | 12 - 5 = 7 |\n| E | 8 | 2 | 20 | 20 - 8 = 12 | 12 - 2 = 10 |\n**Step 4 - average**\n- Sum of waiting times: 0 + 1 = 1, 1 + 5 = 6, 6 + 7 = 13, 13 + 10 = 23\n- Average waiting time = 23 / 5 = 4.6\n- Sum of turnaround times: 3 + 7 = 10, 10 + 9 = 19, 19 + 12 = 31, 31 + 12 = 43\n- Average turnaround time = 43 / 5 = 8.6\n**Conclusion:** Average waiting time = 4.6; Average turnaround time = 8.6"
+   },
+   {
+    "id": "fifo_classic",
+    "kind": "paging",
+    "expected": 15,
+    "got": 16,
+    "finish": "stop",
+    "tail": "- 3: miss, evict 0, faults = 10, frames {4, 2, 3}\n- 0: miss, evict 4, faults = 11, frames {2, 3, 0}\n- 3: hit, frames {2, 3, 0}\n- 2: hit, frames {2, 3, 0}\n- 1: miss, evict 2, faults = 12, frames {3, 0, 1}\n- 2: miss, evict 3, faults = 13, frames {0, 1, 2}\n- 0: hit, frames {0, 1, 2}\n- 1: hit, frames {0, 1, 2}\n- 7: miss, evict 0, faults = 14, frames {1, 2, 7}\n- 0: miss, evict 1, faults = 15, frames {2, 7, 0}\n- 1: miss, evict 2, faults = 16, frames {7, 0, 1}\n- 7: hit, frames {7, 0, 1}\n- 0: hit, frames {7, 0, 1}\n- 1: hit, frames {7, 0, 1}\n**Total page faults = 16**"
+   },
+   {
+    "id": "belady_3",
+    "kind": "paging",
+    "expected": 9,
+    "got": 2,
+    "finish": "stop",
+    "tail": "**Step-by-step simulation.** FIFO means the oldest page is evicted first.\n- t 0: 3 not in memory, evict 3, fault 3 -> 3 2 1 0 3 2 4 3 2 1 0 4\n- t 1: 2 in memory, good\n- t 2: 1 in memory, good\n- t 3: 0 in memory, good\n- t 4: 3 in memory, good\n- t 5: 2 in memory, good\n- t 6: 4 not in memory, evict 3, fault 4 -> 3 2 1 0 4 3 2 4 3 2 1 0\n- t 7: 3 in memory, good\n- t 8: 2 in memory, good\n- t 9: 1 in memory, good\n- t 10: 0 in memory, good\n- t 11: 4 in memory, good\n**Total page faults = 2.**"
+   },
+   {
+    "id": "clock_small",
+    "kind": "paging",
+    "expected": 8,
+    "got": 12,
+    "finish": "stop",
+    "tail": "**Policy: Second-chance (clock) with 3 frames**\n- t 0: 2 not in memory, evict 2, faults = 1; clock = 2\n- t 1: 3 not in memory, evict 3, faults = 2; clock = 3\n- t 2: 2 not in memory, evict 2, faults = 3; clock = 2\n- t 3: 1 not in memory, evict 1, faults = 4; clock = 1\n- t 4: 5 not in memory, evict 5, faults = 5; clock = 5\n- t 5: 2 not in memory, evict 2, faults = 6; clock = 2\n- t 6: 4 not in memory, evict 4, faults = 7; clock = 4\n- t 7: 5 not in memory, evict 5, faults = 8; clock = 5\n- t 8: 3 not in memory, evict 3, faults = 9; clock = 3\n- t 9: 2 not in memory, evict 2, faults = 10; clock = 2\n- t 10: 5 not in memory, evict 5, faults = 11; clock = 5\n- t 11: 2 not in memory, evict 2, faults = 12; clock = 2\n**Total page faults = 12** (hits = 12 - 12 = 0, hit ratio = 0 / 12 = 0.000)"
+   },
+   {
+    "id": "opt_4f",
+    "kind": "paging",
+    "expected": 6,
+    "got": 10,
+    "finish": "stop",
+    "tail": "| # | Ref | Result | Evicted | Frames (next use shown at each eviction) | Faults |\n|---|-----|--------|---------|--------|--------|\n| 1 | 3 | miss | - | 3 | 1 |\n| 2 | 2 | miss | - | 3 2 | 2 |\n| 3 | 1 | miss | - | 3 2 1 | 3 |\n| 4 | 0 | miss | 3 | 0 2 1 (next use 3@never) | 4 |\n| 5 | 3 | miss | 2 | 0 3 1 (next use 2@never) | 5 |\n| 6 | 2 | miss | 0 | 2 3 1 (next use 0@never) | 6 |\n| 7 | 4 | miss | 3 | 2 4 1 (next use 3@never) | 7 |\n| 8 | 3 | miss | 2 | 3 4 1 (next use 2@never) | 8 |\n| 9 | 2 | miss | 3 | 2 4 1 (next use 3@never) | 9 |\n| 10 | 1 | hit | - | 2 4 1 | 9 |\n| 11 | 0 | miss | 2 | 0 4 1 (next use 2@never) | 10 |\n| 12 | 4 | hit | - | 0 4 1 | 10 |\n**Total page faults = 10** (hits = 12 - 10 = 2, hit ratio = 2 / 12 = 0.1667)"
+   }
+  ]
+ },
+ "v3+solver": {
+  "wrong": 0,
+  "suspects": []
+ },
+ "v3": {
+  "wrong": 23,
+  "suspects": [
+   {
+    "id": "hrrn",
+    "kind": "scheduling",
+    "expected": 4.0,
+    "got": -2.2,
+    "finish": "stop",
+    "tail": "**Step 2 - Gantt chart:** A[0-3] B[3-6] C[6-6] D[6-6] E[6-8]\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| A | 0 | 3 | 3 | 3 - 0 = 3 | 3 - 3 = 0 |\n| B | 2 | 6 | 6 | 6 - 2 = 4 | 4 - 6 = -2 |\n| C | 4 | 4 | 6 | 6 - 4 = 2 | 2 - 4 = -2 |\n| D | 6 | 5 | 6 | 6 - 6 = 0 | 0 - 5 = -5 |\n| E | 8 | 2 | 8 | 8 - 8 = 0 | 0 - 2 = -2 |\n**Step 4 - averages**\n- Sum of waiting times: 0 + (-2) = -2, -2 + (-2) = -4, -4 + (-5) = -9, -9 + (-2) = -11\n- Average waiting time = -11 / 5 = **-2.2**\n- Sum of turnaround times: 3 + 4 = 7, 7 + 2 = 9, 9 + 0 = 9, 9 + 0 = 9\n- Average turnaround time = 9 / 5 = **1.8**\n**Answer: average waiting time = -2.2**"
+   },
+   {
+    "id": "fifo_classic",
+    "kind": "paging",
+    "expected": 15,
+    "got": 20,
+    "finish": "stop",
+    "tail": "ames full; oldest (3) evicted |\n| 10 | 3 | miss | 4 | 9 | frames full; oldest (4) evicted |\n| 11 | 0 | miss | 2 | 10 | frames full; oldest (2) evicted |\n| 12 | 3 | miss | 0 | 11 | frames full; oldest (0) evicted |\n| 13 | 2 | miss | 3 | 12 | frames full; oldest (3) evicted |\n| 14 | 1 | miss | 2 | 13 | frames full; oldest (2) evicted |\n| 15 | 2 | miss | 1 | 14 | frames full; oldest (1) evicted |\n| 16 | 0 | miss | 2 | 15 | frames full; oldest (2) evicted |\n| 17 | 1 | miss | 0 | 16 | frames full; oldest (0) evicted |\n| 18 | 7 | miss | 1 | 17 | frames full; oldest (1) evicted |\n| 19 | 0 | miss | 7 | 18 | frames full; oldest (7) evicted |\n| 20 | 1 | miss | 0 | 19 | frames full; oldest (0) evicted |\n| 21 | 3 | miss | 1 | 20 | frames full; oldest (1) evicted |\n**Total page faults = 20** (hits = 21 - 20 = 1, hit ratio = 1 / 21 = 0.0476, fault ratio = 20 / 21 = 0.9524)\n**Answer: page faults = 20**"
+   },
+   {
+    "id": "opt_classic",
+    "kind": "paging",
+    "expected": 9,
+    "got": 12,
+    "finish": "stop",
+    "tail": "ready in frames | 2 3 1 | 7 |\n| 10 | 3 | hit | - | 3 already in frames | 2 3 1 | 7 |\n| 11 | 0 | miss | 3 | next use 3@12 > 1@14 > 2@13 -> farthest | 2 0 1 | 8 |\n| 12 | 3 | miss | 0 | next use 0@16 > 1@14 > 2@13 -> farthest | 2 3 1 | 9 |\n| 13 | 2 | hit | - | 2 already in frames | 2 3 1 | 9 |\n| 14 | 1 | hit | - | 1 already in frames | 2 3 1 | 9 |\n| 15 | 2 | hit | - | 2 already in frames | 2 3 1 | 9 |\n| 16 | 0 | miss | 2 | next use 2@never > 3@never > 1@17 -> farthest | 0 3 1 | 10 |\n| 17 | 1 | hit | - | 1 already in frames | 0 3 1 | 10 |\n| 18 | 7 | miss | 0 | next use 0@never > 3@never > 1@never -> farthest | 7 3 1 | 11 |\n| 19 | 0 | miss | 7 | next use 7@never > 3@never > 1@never -> farthest | 0 3 1 | 12 |\n| 20 | 1 | hit | - | 1 already in frames | 0 3 1 | 12 |\n**Total page faults = 12** (hits = 20 - 12 = 8, hit ratio = 8 / 20 = 0.4, fault ratio = 12 / 20 = 0.6)\n**Answer: page faults = 12**"
+   },
+   {
+    "id": "belady_3",
+    "kind": "paging",
+    "expected": 9,
+    "got": 12,
+    "finish": "stop",
+    "tail": "| 3 | 1 | miss | - | free frame 2 load 1 |\n| 4 | 0 | miss | 3 | frames full evict oldest 3 |\n| 5 | 3 | miss | 2 | frames full evict oldest 2 |\n| 6 | 2 | miss | 1 | frames full evict oldest 1 |\n| 7 | 4 | miss | 0 | frames full evict oldest 0 |\n| 8 | 3 | miss | 3 | frames full evict oldest 3 |\n| 9 | 2 | miss | 2 | frames full evict oldest 2 |\n| 10 | 1 | miss | 1 | frames full evict oldest 1 |\n| 11 | 0 | miss | 0 | frames full evict oldest 0 |\n| 12 | 4 | hit | - | 4 already in frames |\n**Total page faults = 12**\n Hits = 12 - 12 = 0\n Hit ratio = 0 / 12 = 0 (0%)\n Fault ratio = 12 / 12 = 1 (100%)\n**Answer: page faults = 12**"
+   },
+   {
+    "id": "opt_4f",
+    "kind": "paging",
+    "expected": 6,
+    "got": 8,
+    "finish": "stop",
+    "tail": "| 3 | 1 | fault | - | no frame holds 1 frame 1 loaded |\n| 4 | 0 | fault | - | no frame holds 0 frame 0 loaded |\n| 5 | 3 | hit | - | 3 already in frame 3 |\n| 6 | 2 | hit | - | 2 already in frame 2 |\n| 7 | 4 | fault | 0 | frames: 3,2,1,4 not used 0@#11, 1@#10, 2@#8, 3@#9, 4@#7 0 not used again 11 > 10 > 9 > 8 0 will be used in 11 > 10 > 9 > 8 evict 0 |\n| 8 | 3 | hit | - | 3 already in frame 3 |\n| 9 | 2 | hit | - | 2 already in frame 2 |\n| 10 | 1 | hit | - | 1 already in frame 1 |\n| 11 | 0 | fault | 1 | frames: 3,2,4,1 not used 1@#10, 2@#9, 3@#8, 4@#7 1 not used again 2@#9, 3@#8, 4@#7 9 > 8 > 7 1 will be used in 10 > 9 > 8 > 7 evict 1 |\n| 12 | 4 | hit | - | 4 already in frame 4 |\n**Total page faults = 8**\n*Hits = 12 - 8 = 4*\n*Hit ratio = 4 / 12 = 0.3333*\n*Fault ratio = 8 / 12 = 0.6667*\n**Answer: page faults = 8**"
+   },
+   {
+    "id": "translate_hex",
+    "kind": "translate",
+    "expected": 2604,
+    "got": 7724.0,
+    "finish": "stop",
+    "tail": "**Step-by-step translation**\n- convert 0x0A2C to decimal: 0 x 4096 = 0; 10 x 256 = 2560; 2 x 16 = 32; 12 x 1 = 12\n- sum: 0 + 2560 = 2560, 2560 + 32 = 2592, 2592 + 12 = 2604 -> 0x0A2C = 2604\n- page number = floor(2604 / 1024) = 2 (check: 2 x 1024 = 2048 <= 2604 < 3072)\n- page offset = 2604 - 2048 = 556\n- page table[2] = frame 7\n- frame base = 7 x 1024 = 7168\n- physical address = 7168 + 556 = 7724\n**Physical address = 7724**\n- in hexadecimal: 7724 = 0x1e2c\n**Answer: physical address = 0x1e2c**"
+   }
+  ]
+ }
+}

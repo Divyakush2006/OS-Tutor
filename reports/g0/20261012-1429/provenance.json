@@ -1,0 +1,41 @@
+{
+ "started_utc": "2026-10-12T08:59:28+00:00",
+ "commit": "f86cd5c380f0e4c80de644ad25f32912bea19202",
+ "dirty": false,
+ "models_sha256": {
+  "qwen3-4b-instruct-2507-Q8_0.gguf": "eed67be2a8eed4320ff71f3d5b350db10653549281e09b8967b97aeb1f1554ee",
+  "ostutor-v2.2-lora-f16.gguf": "d3423694a1327a49c5fda025d5e5f1751619c73d0f064bc8a105b77bb788bb3d",
+  "ostutor-v3-lora-f16.gguf": "587f21968759281531902ef1efab2970f84957259555e832711148da6ee69c04"
+ },
+ "dataset_train_sha256": "f56a7113e4aa5c0e4ccde8dfeb91128f7bc50a78aba39e980ed74283af19477d",
+ "llama_cpp": [
+  "version: 0.4.1-dev (build 11050, commit 60b06ab9a)",
+  "built with Clang 20.1.8 for Windows x86_64"
+ ],
+ "server_args": [
+  "-ngl",
+  "99",
+  "-c",
+  "20480",
+  "-np",
+  "1",
+  "-fa",
+  "on",
+  "-ctk",
+  "q8_0",
+  "-ctv",
+  "q8_0",
+  "--jinja"
+ ],
+ "decoding": {
+  "temperature": 0,
+  "answer_tokens": 4096,
+  "extract_tokens": 900
+ },
+ "prompts_sha256_16": {
+  "extract": "e1af4d12de992970",
+  "solve": "64f860ae3dbe5a4b",
+  "explain": "a5aac86bd05c72b8"
+ },
+ "out": "reports\\g0\\20261012-1429"
+}
