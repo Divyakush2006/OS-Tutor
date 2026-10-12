@@ -1,0 +1,6 @@
+{
+ "corpus": "ostutor-course-notes",
+ "status": "awaiting owner-supplied notes",
+ "note": "Each document needs id, title, path, source, licence and permission; the loader refuses any document without them.",
+ "documents": []
+}

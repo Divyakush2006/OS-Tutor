@@ -179,6 +179,35 @@ async def main():
     check("loop guard also applies to non-streaming answers",
           "loop guard" in msg and msg.count("must WAIT") <= gateway.LOOP_REPEATS)
 
+    # Retrieval (G2). Off by default: every test above ran with RAG = None and saw the
+    # trained prompt unchanged. Turned on here over the test fixture, never the real notes.
+    check("retrieval is off unless OSTUTOR_RAG is set", gateway.RAG is None)
+    from ostutor.rag.retrieve import Retriever
+    gateway.RAG = Retriever(gateway.ROOT / "data" / "rag" / "fixture")
+    try:
+        explain = gateway.SYSTEM_PROMPTS[("explain", "os")]
+        r = await c.post("/v1/chat/completions", json=dict(model="ostutor-explain", messages=[
+            dict(role="user", content="Can LRU suffer from Belady's anomaly?")]))
+        sent = SEEN[-1]["messages"][0]["content"]
+        check("an explain question gets the trained prompt plus the notes",
+              sent.startswith(explain + "\n\n") and "[S1] Page replacement" in sent, sent[:120])
+        check("the answer ends with its sources",
+              "Sources from your course notes" in r.json()["choices"][0]["message"]["content"])
+        await c.post("/v1/chat/completions", json=dict(model="ostutor-tutor", messages=[
+            dict(role="user", content="Can LRU suffer from Belady's anomaly? I think yes.")]))
+        check("tutor mode never retrieves",
+              SEEN[-1]["messages"][0]["content"] == gateway.SYSTEM_PROMPTS[("tutor", "os")])
+        await c.post("/v1/chat/completions", json=dict(model="ostutor-explain", messages=[
+            dict(role="user", content="What is the capital of Australia?")]))
+        check("a question the notes do not cover gets no notes",
+              SEEN[-1]["messages"][0]["content"] == explain)
+        out, _ = await text_of_stream(c, "ostutor-explain", "How does the working set model "
+                                                            "prevent thrashing?")
+        check("a streamed answer also ends with its sources",
+              out.startswith("Step 1") and "Sources from your course notes" in out, out[-160:])
+    finally:
+        gateway.RAG = None
+
     print("\nALL GATEWAY TESTS PASSED" if not FAILED else f"\n{len(FAILED)} FAILED: {FAILED}")
     return 1 if FAILED else 0
 

@@ -1,0 +1,115 @@
+{
+ "corpus": "ostutor-rag-fixture",
+ "status": "fixture - NOT course notes",
+ "purpose": "Tests the RAG pipeline before the owners supply course notes. Written by the engineer from general OS knowledge; contains no textbook text.",
+ "documents": [
+  {
+   "id": "n01",
+   "title": "Processes",
+   "path": "notes/n01_processes.md",
+   "source": "engineer-authored test fixture",
+   "licence": "CC0-1.0",
+   "permission": "authored for this repository; no third-party text",
+   "added": "2026-10-12"
+  },
+  {
+   "id": "n02",
+   "title": "Threads",
+   "path": "notes/n02_threads.md",
+   "source": "engineer-authored test fixture",
+   "licence": "CC0-1.0",
+   "permission": "authored for this repository; no third-party text",
+   "added": "2026-10-12"
+  },
+  {
+   "id": "n03",
+   "title": "CPU scheduling concepts",
+   "path": "notes/n03_scheduling.md",
+   "source": "engineer-authored test fixture",
+   "licence": "CC0-1.0",
+   "permission": "authored for this repository; no third-party text",
+   "added": "2026-10-12"
+  },
+  {
+   "id": "n04",
+   "title": "Process synchronisation",
+   "path": "notes/n04_sync.md",
+   "source": "engineer-authored test fixture",
+   "licence": "CC0-1.0",
+   "permission": "authored for this repository; no third-party text",
+   "added": "2026-10-12"
+  },
+  {
+   "id": "n05",
+   "title": "Deadlocks",
+   "path": "notes/n05_deadlock.md",
+   "source": "engineer-authored test fixture",
+   "licence": "CC0-1.0",
+   "permission": "authored for this repository; no third-party text",
+   "added": "2026-10-12"
+  },
+  {
+   "id": "n06",
+   "title": "Paging and address translation",
+   "path": "notes/n06_paging.md",
+   "source": "engineer-authored test fixture",
+   "licence": "CC0-1.0",
+   "permission": "authored for this repository; no third-party text",
+   "added": "2026-10-12"
+  },
+  {
+   "id": "n07",
+   "title": "Page replacement",
+   "path": "notes/n07_replacement.md",
+   "source": "engineer-authored test fixture",
+   "licence": "CC0-1.0",
+   "permission": "authored for this repository; no third-party text",
+   "added": "2026-10-12"
+  },
+  {
+   "id": "n08",
+   "title": "Thrashing and the working set",
+   "path": "notes/n08_thrashing.md",
+   "source": "engineer-authored test fixture",
+   "licence": "CC0-1.0",
+   "permission": "authored for this repository; no third-party text",
+   "added": "2026-10-12"
+  },
+  {
+   "id": "n09",
+   "title": "Contiguous allocation and segmentation",
+   "path": "notes/n09_segmentation.md",
+   "source": "engineer-authored test fixture",
+   "licence": "CC0-1.0",
+   "permission": "authored for this repository; no third-party text",
+   "added": "2026-10-12"
+  },
+  {
+   "id": "n10",
+   "title": "File-system implementation",
+   "path": "notes/n10_filesystems.md",
+   "source": "engineer-authored test fixture",
+   "licence": "CC0-1.0",
+   "permission": "authored for this repository; no third-party text",
+   "added": "2026-10-12"
+  },
+  {
+   "id": "n11",
+   "title": "Disk scheduling",
+   "path": "notes/n11_disk.md",
+   "source": "engineer-authored test fixture",
+   "licence": "CC0-1.0",
+   "permission": "authored for this repository; no third-party text",
+   "added": "2026-10-12"
+  },
+  {
+   "id": "n12",
+   "title": "System calls and protection",
+   "path": "notes/n12_syscalls.md",
+   "source": "engineer-authored test fixture",
+   "licence": "CC0-1.0",
+   "permission": "authored for this repository; no third-party text",
+   "added": "2026-10-12"
+  }
+ ]
+}

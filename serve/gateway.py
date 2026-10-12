@@ -28,6 +28,12 @@ Why it exists - the UI must not decide how the model is prompted:
     for itself rather than guessing from invented values.
   * FACT-CHECKED PROSE. Explanations are screened against the misconception rules in
     ostutor/theory_filter.py and redrafted with the correct fact when one fires.
+  * GROUNDED IN THE COURSE NOTES (G2, opt-in). With OSTUTOR_RAG set to a corpus
+    directory, explain and analyze answers get the most relevant passages of the
+    owners' notes appended to the trained prompt, cite them as [S1], [S2], and end
+    with the list of sources. Retrieval runs on the CPU in a few milliseconds and
+    abstains when the notes do not cover the question. Tutor mode never retrieves:
+    a passage could state the answer the student is working towards.
   * AUTO ROUTING. "ostutor" reads the question and picks the mode, so a student does
     not have to know that a shown attempt wants tutoring and a stated procedure wants
     a worked solution.
@@ -51,6 +57,7 @@ from ostutor.config import SYSTEM_PROMPTS  # noqa: E402  (single source of truth
 from ostutor.solver import (EXTRACT_PROMPT, SOLVER_KINDS, normalise,  # noqa: E402
                             parse_json, solve)
 from ostutor.theory_filter import CORRECTIONS, fact_flags  # noqa: E402
+from ostutor.rag.retrieve import Retriever, augment, sources_footer  # noqa: E402
 
 UPSTREAM = os.environ.get("TUTOR_UPSTREAM", "http://127.0.0.1:8081")
 log = logging.getLogger("tutor-gateway")
@@ -59,6 +66,9 @@ MAX_TOKENS = int(os.environ.get("TUTOR_MAX_TOKENS", "16384"))
 LOOP_REPEATS = 6          # identical consecutive lines that count as a loop
 CYCLE_MAX_LEN = 4         # also catch a block of up to 4 lines repeating
 CYCLE_REPEATS = 5
+# Retrieval over the owners' course notes: off unless this names a corpus directory, so
+# a gateway started without it behaves exactly as before.
+RAG_DIR = os.environ.get("OSTUTOR_RAG", "")
 
 # Every listed mode is the FINE-TUNED model. The untuned base is no longer offered as a
 # chat model - it was only ever there for side-by-side comparison during development -
@@ -75,10 +85,10 @@ MODELS = {
     "ostutor-solve": dict(prompt=SYSTEM_PROMPTS[("solve", "os")], lora=1.0, verify=True,
                           desc="Worked problems - numbered steps, simulator-verified numbers"),
     "ostutor-analyze": dict(prompt=SYSTEM_PROMPTS[("analyze", "os")], lora=1.0,
-                            verify=True, factcheck=True,
+                            verify=True, factcheck=True, rag=True,
                             desc="Analysis - assumptions, trade-offs, a quantified recommendation"),
     "ostutor-explain": dict(prompt=SYSTEM_PROMPTS[("explain", "os")], lora=1.0,
-                            factcheck=True,
+                            factcheck=True, rag=True,
                             desc="Concept explanations - fact-checked against known misconceptions"),
     "ostutor-tutor": dict(prompt=SYSTEM_PROMPTS[("tutor", "os")], lora=1.0,
                           desc="Socratic tutoring - diagnoses your attempt, never hands over the answer"),
@@ -90,6 +100,7 @@ MODELS = {
 DEFAULT_MODEL = "ostutor"
 
 app = FastAPI(title="OS Tutor gateway")
+RAG = Retriever(Path(RAG_DIR)) if RAG_DIR else None   # loaded once: ~7 s, then ~5 ms a query
 client = httpx.AsyncClient(base_url=UPSTREAM, timeout=httpx.Timeout(None, connect=10))
 
 
@@ -295,6 +306,20 @@ def verified_answer(question):
                    "language model, so these numbers are exact._")
 
 
+def grounded(spec, question):
+    """(system prompt, sources footer): the mode's trained prompt with the relevant
+    course notes appended, or the trained prompt unchanged when retrieval is off, the
+    mode does not retrieve, or the notes do not cover the question."""
+    if RAG is None or not spec.get("rag") or not question:
+        return spec["prompt"], ""
+    try:
+        hits = RAG.retrieve(question)
+    except Exception as e:                       # never let retrieval break the chat path
+        log.warning("retrieval failed, answering without notes: %s", e)
+        return spec["prompt"], ""
+    return augment(spec["prompt"], hits), sources_footer(hits)
+
+
 def fact_checked(answer, system, question):
     """Re-ask once if the drafted answer asserts a known misconception.
 
@@ -363,7 +388,13 @@ async def chat(req: Request):
         if verified is not None:
             return _reply(verified, asked, chose, "verified", scope)
 
-    # LAYER 2 - prose answers are checked against known misconceptions.
+    # LAYER 2 - prose is grounded in the course notes (when retrieval is on).
+    system, footer = (spec["prompt"], "") if client_system else grounded(spec, question)
+    if system != spec["prompt"]:
+        body = prepare(raw, prompt_override=system)
+        body["lora"] = [dict(id=0, scale=spec["lora"])]
+
+    # LAYER 3 - prose answers are checked against known misconceptions.
     if (spec.get("factcheck") and question and not client_system
             and not body.get("stream")):
         draft = await client.post("/v1/chat/completions", json=body)
@@ -372,9 +403,9 @@ async def chat(req: Request):
                 text = draft.json()["choices"][0]["message"]["content"] or ""
             except (KeyError, IndexError, TypeError):
                 text = ""
-            checked, flagged = fact_checked(text, spec["prompt"], question)
+            checked, flagged = fact_checked(text, system, question)
             if checked:
-                return _reply(checked, asked, chose,
+                return _reply(checked + footer, asked, chose,
                               "fact-corrected" if flagged else "checked", scope)
 
     if not body.get("stream"):
@@ -388,6 +419,7 @@ async def chat(req: Request):
                     data["choices"][0]["message"]["content"] = "\n".join(lines[: i + 1]) + GUARD_NOTE
                     data["choices"][0]["finish_reason"] = "stop"
                     break
+            data["choices"][0]["message"]["content"] += footer
         except (KeyError, IndexError, TypeError):
             pass
         # Tag the mode here too, so every answer records which mode produced it -
@@ -415,6 +447,12 @@ async def chat(req: Request):
                     continue
                 payload = line[5:].strip()
                 if payload == "[DONE]":
+                    if footer:
+                        note = dict(id=last_id, object="chat.completion.chunk", created=created,
+                                    model=body["model"],
+                                    choices=[dict(index=0, delta=dict(content=footer),
+                                                  finish_reason=None)])
+                        yield f"data: {json.dumps(note)}\n\n"
                     yield "data: [DONE]\n\n"
                     return
                 yield f"data: {payload}\n\n"

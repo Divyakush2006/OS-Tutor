@@ -38,6 +38,40 @@ CRLF to LF on disk in `b7521be`; it stays LF (Python is indifferent to line endi
 
 ---
 
+## D-006 — RAG: CPU hybrid retrieval, prose modes only, off by default
+
+**Date:** 2026-10-12 · **Decided by:** engineer (no student-facing change until the
+owners set `OSTUTOR_RAG`)
+
+**Decision.** `ostutor/rag/`: notes are chunked by heading (≤ 180 words, 30-word
+overlap); BM25 (pure Python) and all-MiniLM-L6-v2 embeddings (Apache-2.0, local cache
+only) are fused by reciprocal rank (k = 60); an abstain gate returns nothing when the
+notes do not cover the question. The gateway appends the passages to the *trained*
+system prompt (kept word for word first) for `explain` and `analyze` only, asks for
+`[S1]`-style citations and adds a sources footer. Tutor mode never retrieves; solve mode
+keeps the simulator. Off unless `OSTUTOR_RAG` names a corpus directory.
+
+**Alternatives.** (a) A vector database (FAISS / Chroma) as the brief suggests.
+(b) A larger embedding model (bge-large, Qwen3-Embedding-0.6B — both cached locally).
+(c) Retrieval in tutor mode too. (d) Dense-only retrieval.
+
+**Reason.** At course-notes scale (hundreds to low thousands of chunks) a NumPy dot
+product is exact and takes milliseconds, so (a) adds a service and no accuracy. (b)
+costs CPU time and RAM next to an 8 GB-VRAM stack that already leaves little free; it is
+the first thing to try if real-notes recall is low. (c) would let a passage state the
+answer a student is working towards — the tutor's one hard rule. (d) loses exact terms;
+on the fixture, BM25 alone was the best single retriever.
+
+**Evidence.** `reports/rag/fixture_eval.md`: hybrid section recall@4 95.6%, p95 latency
+5.7 ms on the CPU (brief: ≤ 500 ms). The v1 gate (cosine < 0.35), chosen before any
+measurement, abstained on only 6/10 out-of-scope questions, because the classes overlap
+(in-scope minimum 0.34, out-of-scope maximum 0.40). The v2 gate (cosine < 0.45 **and**
+BM25 < 6.0) abstains 10/10 but was fitted on the same queries and must be refitted on
+held-out queries over the owners' notes. 29 checks in `tools/test_rag.py`; 6 new gateway
+checks (35/35), every earlier one unchanged with retrieval off.
+
+---
+
 ## D-005 — Evaluation requests disable llama-server's prompt cache
 
 **Date:** 2026-10-12 · **Decided by:** engineer (evaluation only; serving unchanged)

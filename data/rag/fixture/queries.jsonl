@@ -1,0 +1,55 @@
+{"id": "q01", "query": "What happens to a process's state when it asks for disk I/O?", "doc": "n01", "section": "Process states"}
+{"id": "q02", "query": "What information does the kernel store about each process?", "doc": "n01", "section": "The process control block"}
+{"id": "q03", "query": "Why is a context switch considered overhead?", "doc": "n01", "section": "The process control block"}
+{"id": "q04", "query": "How is a program different from a process?", "doc": "n01", "section": "What a process is"}
+{"id": "q05", "query": "What do threads in the same process share and what is private to each?", "doc": "n02", "section": "Threads versus processes"}
+{"id": "q06", "query": "Why does one blocking call stall every thread in the many-to-one model?", "doc": "n02", "section": "Threading models"}
+{"id": "q07", "query": "Difference between concurrency and parallelism", "doc": "n02", "section": "Why threads help"}
+{"id": "q08", "query": "Why do short jobs wait so long behind a long job in first come first served?", "doc": "n03", "section": "Convoy effect and starvation"}
+{"id": "q09", "query": "How can a low priority process be prevented from waiting forever?", "doc": "n03", "section": "Convoy effect and starvation"}
+{"id": "q10", "query": "What goes wrong if the time slice in round robin is tiny?", "doc": "n03", "section": "Choosing the round-robin quantum"}
+{"id": "q11", "query": "define response time versus turnaround time", "doc": "n03", "section": "Criteria"}
+{"id": "q12", "query": "Is SRTF preemptive?", "doc": "n03", "section": "Preemptive and non-preemptive scheduling"}
+{"id": "q13", "query": "What three requirements must a critical-section solution satisfy?", "doc": "n04", "section": "The critical-section problem"}
+{"id": "q14", "query": "When is busy waiting acceptable?", "doc": "n04", "section": "Mutex locks and semaphores"}
+{"id": "q15", "query": "counting semaphore initial value for a pool of printers", "doc": "n04", "section": "Mutex locks and semaphores"}
+{"id": "q16", "query": "What happens if signal is called on a condition variable with no waiters?", "doc": "n04", "section": "Monitors and condition variables"}
+{"id": "q17", "query": "Coffman conditions for deadlock", "doc": "n05", "section": "Necessary conditions"}
+{"id": "q18", "query": "Does a cycle in the resource allocation graph always mean deadlock?", "doc": "n05", "section": "Resource-allocation graphs"}
+{"id": "q19", "query": "Is an unsafe state the same thing as a deadlock?", "doc": "n05", "section": "Safe and unsafe states"}
+{"id": "q20", "query": "Why is the banker's algorithm called deadlock avoidance?", "doc": "n05", "section": "Safe and unsafe states"}
+{"id": "q21", "query": "How does an OS recover once a deadlock has been detected?", "doc": "n05", "section": "Detection and recovery"}
+{"id": "q22", "query": "Does paging cause external fragmentation?", "doc": "n06", "section": "Pages and frames"}
+{"id": "q23", "query": "How do you compute effective memory access time with a TLB?", "doc": "n06", "section": "The translation look-aside buffer"}
+{"id": "q24", "query": "How is a logical address turned into a physical address?", "doc": "n06", "section": "Translating an address"}
+{"id": "q25", "query": "Why use multi-level page tables for 64-bit machines?", "doc": "n06", "section": "Large address spaces"}
+{"id": "q26", "query": "Can LRU suffer from Belady's anomaly?", "doc": "n07", "section": "Belady's anomaly"}
+{"id": "q27", "query": "more frames but more page faults, why?", "doc": "n07", "section": "Belady's anomaly"}
+{"id": "q28", "query": "How does the second chance clock algorithm work?", "doc": "n07", "section": "Replacement algorithms"}
+{"id": "q29", "query": "What steps does the OS take to service a page fault?", "doc": "n07", "section": "Demand paging and page faults"}
+{"id": "q30", "query": "The system spends nearly all its time swapping pages and the CPU is idle - what is happening?", "doc": "n08", "section": "What thrashing is"}
+{"id": "q31", "query": "How does the working set model prevent thrashing?", "doc": "n08", "section": "The working-set model"}
+{"id": "q32", "query": "page fault frequency scheme upper and lower bound", "doc": "n08", "section": "Page-fault frequency"}
+{"id": "q33", "query": "first fit vs best fit vs worst fit", "doc": "n09", "section": "Contiguous allocation"}
+{"id": "q34", "query": "Does segmentation have internal fragmentation?", "doc": "n09", "section": "Segmentation"}
+{"id": "q35", "query": "When is compaction possible and why is it costly?", "doc": "n09", "section": "Compaction"}
+{"id": "q36", "query": "Where is a file's name stored if not in the inode?", "doc": "n10", "section": "Inodes"}
+{"id": "q37", "query": "How do indirect block pointers let inodes support big files?", "doc": "n10", "section": "Inodes"}
+{"id": "q38", "query": "Compare linked and indexed file allocation", "doc": "n10", "section": "Allocation methods"}
+{"id": "q39", "query": "How can free disk blocks be tracked with a bitmap?", "doc": "n10", "section": "Free-space management"}
+{"id": "q40", "query": "Which disk scheduling algorithm is called the elevator algorithm?", "doc": "n11", "section": "The algorithms"}
+{"id": "q41", "query": "Why can SSTF starve requests?", "doc": "n11", "section": "The algorithms"}
+{"id": "q42", "query": "Do SSDs need disk scheduling?", "doc": "n11", "section": "Why the order of requests matters"}
+{"id": "q43", "query": "What happens when a user program executes a privileged instruction?", "doc": "n12", "section": "Dual-mode operation"}
+{"id": "q44", "query": "How does a user program invoke a system call?", "doc": "n12", "section": "System calls"}
+{"id": "q45", "query": "Why does the OS need a timer interrupt?", "doc": "n12", "section": "Interrupts and the timer"}
+{"id": "x01", "query": "How does TCP congestion control work?", "doc": null, "section": null}
+{"id": "x02", "query": "What is a B-tree index in a relational database?", "doc": null, "section": null}
+{"id": "x03", "query": "Explain backpropagation in neural networks.", "doc": null, "section": null}
+{"id": "x04", "query": "What is the time complexity of quicksort?", "doc": null, "section": null}
+{"id": "x05", "query": "How do I configure a VLAN on a Cisco switch?", "doc": null, "section": null}
+{"id": "x06", "query": "What is the capital of Australia?", "doc": null, "section": null}
+{"id": "x07", "query": "Explain public-key cryptography with RSA.", "doc": null, "section": null}
+{"id": "x08", "query": "What is a closure in JavaScript?", "doc": null, "section": null}
+{"id": "x09", "query": "How does garbage collection work in the JVM?", "doc": null, "section": null}
+{"id": "x10", "query": "Explain the CAP theorem in distributed databases.", "doc": null, "section": null}
