@@ -1,0 +1,7 @@
+{
+ "strong_cosine": 0.59,
+ "min_bm25": 18.5,
+ "fitted_on": "data/rag/eval/corpus_questions.jsonl (split=dev)",
+ "keep_target": 0.95,
+ "corpus_sha256": "4a2a5c9dbac67c5faf1fb690af9bc815e93ddc460d878724e84199501e855b60"
+}

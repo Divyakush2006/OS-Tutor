@@ -38,6 +38,62 @@ CRLF to LF on disk in `b7521be`; it stays LF (Python is indifferent to line endi
 
 ---
 
+## D-008 — Course corpus: ingestion, embedding model and a calibrated "not covered" gate
+
+**Date:** 2026-10-12 · **Decided by:** engineer (G2 success criteria)
+
+**Decision.** `python -m ostutor.rag.ingest data/rag/corpus` is the single ingest command.
+It refuses the whole corpus if any document lacks source, owner, date, checksum or a
+licence/permission, if a file changed after it was recorded, or if any supported file has
+no manifest entry. Extraction (`ostutor/rag/extract.py`) keeps slide titles ("Slide 4:
+…"), Word headings and PDF pages plus large-font headings as citation anchors; it drops
+PDF running headers (a line on ≥ ⅓ of pages) and folds ligatures (NFKC). Retrieval stays
+BM25 + all-MiniLM-L6-v2 with rank fusion. The abstain gate's two thresholds are fitted
+per corpus on the dev half of the labelled questions and stored in `gate.json`; when it
+abstains, the answer carries "Not found in the course materials".
+
+**Alternatives.** (a) multilingual-e5-base (278M) as the embedder. (b) Keep the fixture's
+thresholds. (c) Answer silently from general knowledge when nothing is found.
+
+**Reason / evidence** (`reports/rag/corpus_eval.md`, `corpus_multilingual-e5-base_eval.md`,
+124 in-scope + 40 out-of-scope questions over 2,783 chunks). MiniLM hybrid recall@5
+**79.0%**, e5-base 81.5%: 11 vs 8 unique misses, exact McNemar **p = 0.65**, not a real
+difference, at 3× the query latency (p95 25 ms vs 8 ms), a 5.5-minute index build and
+~1 GB more RAM next to a stack that leaves little free. (b) BM25 scores scale with the
+corpus: the fixture threshold (6.0) would have kept notes for nearly every off-topic
+question here; the calibrated gate is cosine ≥ 0.59 or BM25 ≥ 18.5. On the held-out test
+half it gave notes for **59/62** in-scope questions and withheld them for **18/20**
+out-of-scope ones. (c) violates the brief ("says so explicitly").
+
+---
+
+## D-007 — RAG corpus sources: the owners' course material plus openly licensed texts
+
+**Date:** 2026-10-12 · **Approved by:** owner (instruction of 2026-10-12: "you can get more
+online … add these with those found online")
+
+**Decision.** The corpus holds (1) the professor's material from `dataset_rag.zip`
+(42 documents kept, permission recorded as "supplied by the project owners for use in this
+tutor; not for redistribution"; not committed to git), and (2) only openly licensed online
+text: Max Hailperin, *Operating Systems and Middleware*, rev. 1.3.1 — 8 OS chapters,
+**CC BY-SA 3.0** (licence stated in the book source and README), pinned to commit
+`3567f8f8`; and 55 English Wikipedia OS articles, **CC BY-SA 4.0**, pinned to revision ids.
+12 files are excluded with reasons in the manifest (duplicates, images without text, the
+assignment brief, one legacy .doc Office would not convert, two PDF copies of Word handouts).
+
+**Alternatives.** (a) The owners' material only. (b) Free-to-read textbooks (OSTEP, Galvin
+slides found online). (c) Non-commercial texts (Little Book of Semaphores, Think OS:
+CC BY-NC-SA).
+
+**Reason.** The brief's rule was "never add copyrighted textbook text the owners did not
+supply"; the owner has now asked for online material to supplement theirs. (a) leaves
+gaps: no file systems, disk scheduling or deadlock theory beyond one problem sheet.
+(b) OSTEP is free to read but not openly licensed, so only the chapters the professor
+supplied are included. (c) would contradict the project's commercial-licence rule.
+Attribution for every online document is in its manifest entry and is shown in citations.
+
+---
+
 ## D-006 — RAG: CPU hybrid retrieval, prose modes only, off by default
 
 **Date:** 2026-10-12 · **Decided by:** engineer (no student-facing change until the

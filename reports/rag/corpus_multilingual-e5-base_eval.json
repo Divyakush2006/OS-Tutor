@@ -1,0 +1,912 @@
+{
+ "corpus": "data/rag/corpus",
+ "questions": "data/rag/eval/corpus_questions.jsonl",
+ "corpus_sha256": "4a2a5c9dbac67c5faf1fb690af9bc815e93ddc460d878724e84199501e855b60",
+ "documents": 105,
+ "chunks": 2783,
+ "in_scope": 124,
+ "out_of_scope": 40,
+ "load_seconds": 9.4,
+ "modes": {
+  "bm25": {
+   "recall_at_1": 0.4677,
+   "recall_at_5": 0.7581,
+   "doc_recall_at_5": 0.8871,
+   "mrr_at_10": 0.5859,
+   "latency_ms_p50": 0.46,
+   "latency_ms_p95": 0.63,
+   "latency_ms_max": 1.03,
+   "misses": [
+    {
+     "id": "c002",
+     "query": "Is a program the same thing as a process?",
+     "want": "course-2-os-functionalities",
+     "got": [
+      "course-process-abstraction",
+      "course-process-abstraction",
+      "course-process-api-2"
+     ]
+    },
+    {
+     "id": "c004",
+     "query": "Do programs usually call system calls directly, or through some API?",
+     "want": "course-3-unix-filestructure-related-system-calls",
+     "got": [
+      "wiki-system-call",
+      "course-process-api",
+      "wiki-kernel-operating-system"
+     ]
+    },
+    {
+     "id": "c006",
+     "query": "What basic operations should any OS offer for managing processes?",
+     "want": "course-4-the-abstraction-the-process",
+     "got": [
+      "course-1-introduction-to-os",
+      "hail-processes",
+      "course-process-execution-mechanism-2"
+     ]
+    },
+    {
+     "id": "c007",
+     "query": "When does a process move into the blocked state?",
+     "want": "course-4-the-abstraction-the-process",
+     "got": [
+      "wiki-process-state",
+      "wiki-process-state",
+      "course-process-abstraction"
+     ]
+    },
+    {
+     "id": "c008",
+     "query": "In the cooperative approach, how does the OS ever get the CPU back from a program?",
+     "want": "course-6-direct-execution",
+     "got": [
+      "course-6-direct-execution",
+      "course-process-execution-mechanism-2",
+      "course-process-execution-mechanism-2"
+     ]
+    },
+    {
+     "id": "c014",
+     "query": "How do I send the output of a command into a file instead of the screen?",
+     "want": "course-linux-commands",
+     "got": [
+      "course-process-api-2",
+      "hail-persistence",
+      "course-process-api-2"
+     ]
+    },
+    {
+     "id": "c020",
+     "query": "How can segments be shared safely between address spaces?",
+     "want": "course-13-segmentation",
+     "got": [
+      "wiki-memory-segmentation",
+      "wiki-thread-computing",
+      "wiki-memory-segmentation"
+     ]
+    },
+    {
+     "id": "c023",
+     "query": "Why can't we simply use bigger pages to shrink the page table?",
+     "want": "course-17-advanced-page-tables",
+     "got": [
+      "hail-vm",
+      "hail-vm",
+      "course-17-advanced-page-tables"
+     ]
+    },
+    {
+     "id": "c035",
+     "query": "What happens to child processes whose parent exits first?",
+     "want": "course-process-api",
+     "got": [
+      "wiki-fork-system-call",
+      "course-process-api-2",
+      "hail-processes"
+     ]
+    },
+    {
+     "id": "c036",
+     "query": "Why does POSIX make programs portable across operating systems?",
+     "want": "course-process-api",
+     "got": [
+      "hail-threads",
+      "hail-vm",
+      "hail-persistence"
+     ]
+    },
+    {
+     "id": "c037",
+     "query": "Why does the kernel use its own stack instead of the user's stack?",
+     "want": "course-process-execution-mechanism",
+     "got": [
+      "wiki-context-switch",
+      "course-process-execution-mechanism",
+      "hail-threads"
+     ]
+    },
+    {
+     "id": "c039",
+     "query": "In the readers-writers solution, which reader locks out the writers?",
+     "want": "course-reader-writer-problem",
+     "got": [
+      "wiki-readers-writers-problem",
+      "wiki-readers-writers-problem",
+      "wiki-readers-writers-problem"
+     ]
+    },
+    {
+     "id": "c042",
+     "query": "Who translates virtual addresses to physical addresses using the page table?",
+     "want": "course-virtual-memory",
+     "got": [
+      "hail-vm",
+      "hail-vm",
+      "wiki-page-table"
+     ]
+    },
+    {
+     "id": "c044",
+     "query": "Walk me through what happens on a memory access when the TLB misses.",
+     "want": "course-demand-paging",
+     "got": [
+      "course-paging-1",
+      "wiki-translation-lookaside-buffer",
+      "wiki-page-table"
+     ]
+    },
+    {
+     "id": "c048",
+     "query": "What information does a page table entry hold apart from the frame number?",
+     "want": "course-paging-1",
+     "got": [
+      "wiki-page-table",
+      "hail-vm",
+      "wiki-page-table"
+     ]
+    },
+    {
+     "id": "c052",
+     "query": "What does a process control block contain?",
+     "want": "course-process-abstraction",
+     "got": [
+      "wiki-process-control-block",
+      "wiki-process-control-block",
+      "wiki-process-control-block"
+     ]
+    },
+    {
+     "id": "c055",
+     "query": "Why does pthread_cond_wait take the mutex as an argument but signal does not?",
+     "want": "course-threads-api",
+     "got": [
+      "hail-synchronization",
+      "course-threads-api",
+      "course-threads-cv"
+     ]
+    },
+    {
+     "id": "c059",
+     "query": "In the producer/consumer example, why is waking the wrong consumer a problem?",
+     "want": "course-threads-cv",
+     "got": [
+      "wiki-monitor-synchronization",
+      "course-threads-cv",
+      "wiki-producer-consumer-problem"
+     ]
+    },
+    {
+     "id": "c061",
+     "query": "Why do interrupts make kernel data structures like inodes and bitmaps critical sections?",
+     "want": "course-threads-intro",
+     "got": [
+      "wiki-critical-section",
+      "wiki-critical-section",
+      "wiki-critical-section"
+     ]
+    },
+    {
+     "id": "c066",
+     "query": "Why should a semaphore used for ordering start at zero?",
+     "want": "course-threads-sema",
+     "got": [
+      "course-threads-sema",
+      "wiki-producer-consumer-problem",
+      "course-threads-sema"
+     ]
+    },
+    {
+     "id": "c069",
+     "query": "How do you fix an order-violation concurrency bug?",
+     "want": "course-threads-bugs",
+     "got": [
+      "course-concurrency-bugs",
+      "course-concurrency-bugs",
+      "course-threads-bugs"
+     ]
+    },
+    {
+     "id": "c085",
+     "query": "Why can running a CPU-heavy job and a disk-heavy job concurrently finish sooner than running them one after the other?",
+     "want": "hail-threads",
+     "got": [
+      "wiki-shortest-remaining-time",
+      "course-8-multi-level-feedback-scheduling",
+      "course-8-multi-level-feedback-scheduling"
+     ]
+    },
+    {
+     "id": "c086",
+     "query": "Before Belady showed otherwise, what did people believe about adding page frames?",
+     "want": "wiki-belady-s-anomaly",
+     "got": [
+      "hail-vm",
+      "course-threads-sema",
+      "hail-vm"
+     ]
+    },
+    {
+     "id": "c101",
+     "query": "How can race conditions happen in file systems, and how are they usually prevented?",
+     "want": "wiki-race-condition",
+     "got": [
+      "wiki-race-condition",
+      "wiki-race-condition",
+      "wiki-race-condition"
+     ]
+    },
+    {
+     "id": "c104",
+     "query": "What is the difference between a major and a minor page fault?",
+     "want": "wiki-page-fault",
+     "got": [
+      "wiki-page-fault",
+      "wiki-page-fault",
+      "course-threads-intro"
+     ]
+    },
+    {
+     "id": "c113",
+     "query": "What kinds of information does a PCB keep?",
+     "want": "wiki-process-control-block",
+     "got": [
+      "wiki-process-control-block",
+      "wiki-context-switch",
+      "wiki-context-switch"
+     ]
+    },
+    {
+     "id": "c116",
+     "query": "What are the downsides of demand paging?",
+     "want": "wiki-demand-paging",
+     "got": [
+      "wiki-demand-paging",
+      "wiki-memory-paging",
+      "hail-vm"
+     ]
+    },
+    {
+     "id": "c117",
+     "query": "Why does a linear page table stored in virtual memory need a second translation?",
+     "want": "hail-vm",
+     "got": [
+      "hail-vm",
+      "hail-vm",
+      "hail-vm"
+     ]
+    },
+    {
+     "id": "c118",
+     "query": "Who sets up the page table?",
+     "want": "wiki-page-table",
+     "got": [
+      "wiki-page-replacement-algorithm",
+      "hail-vm",
+      "hail-vm"
+     ]
+    },
+    {
+     "id": "c123",
+     "query": "Why do larger pages make the page table smaller but waste memory?",
+     "want": "wiki-memory-management-unit",
+     "got": [
+      "hail-vm",
+      "hail-vm",
+      "course-paging-1"
+     ]
+    }
+   ]
+  },
+  "dense": {
+   "recall_at_1": 0.4839,
+   "recall_at_5": 0.7661,
+   "doc_recall_at_5": 0.8548,
+   "mrr_at_10": 0.6048,
+   "latency_ms_p50": 21.49,
+   "latency_ms_p95": 25.0,
+   "latency_ms_max": 33.49,
+   "misses": [
+    {
+     "id": "c002",
+     "query": "Is a program the same thing as a process?",
+     "want": "course-2-os-functionalities",
+     "got": [
+      "wiki-process-computing",
+      "wiki-process-computing",
+      "hail-processes"
+     ]
+    },
+    {
+     "id": "c006",
+     "query": "What basic operations should any OS offer for managing processes?",
+     "want": "course-4-the-abstraction-the-process",
+     "got": [
+      "course-2-os-functionalities",
+      "course-2-os-functionalities",
+      "hail-processes"
+     ]
+    },
+    {
+     "id": "c010",
+     "query": "Why does round robin do badly on turnaround time even though it is fair?",
+     "want": "course-7-scheduling",
+     "got": [
+      "wiki-round-robin-scheduling",
+      "hail-scheduling",
+      "hail-scheduling"
+     ]
+    },
+    {
+     "id": "c013",
+     "query": "In lottery scheduling, what do tickets stand for?",
+     "want": "course-9-scheduling-proportional-share",
+     "got": [
+      "wiki-lottery-scheduling",
+      "wiki-lottery-scheduling",
+      "course-9-scheduling-proportional-share"
+     ]
+    },
+    {
+     "id": "c026",
+     "query": "Why is the Banker's algorithm rarely used in real systems?",
+     "want": "course-concurrency-bugs",
+     "got": [
+      "wiki-banker-s-algorithm",
+      "wiki-banker-s-algorithm",
+      "wiki-banker-s-algorithm"
+     ]
+    },
+    {
+     "id": "c028",
+     "query": "What is the difference between signal and broadcast on a condition variable?",
+     "want": "course-condition-variable",
+     "got": [
+      "wiki-monitor-synchronization",
+      "wiki-monitor-synchronization",
+      "wiki-monitor-synchronization"
+     ]
+    },
+    {
+     "id": "c033",
+     "query": "With 4-byte pages, how is logical address 6 split into page number and offset?",
+     "want": "course-paging-problem",
+     "got": [
+      "course-paging-problem",
+      "course-paging-problem",
+      "course-paging-problem"
+     ]
+    },
+    {
+     "id": "c037",
+     "query": "Why does the kernel use its own stack instead of the user's stack?",
+     "want": "course-process-execution-mechanism",
+     "got": [
+      "hail-threads",
+      "hail-processes",
+      "wiki-kernel-operating-system"
+     ]
+    },
+    {
+     "id": "c039",
+     "query": "In the readers-writers solution, which reader locks out the writers?",
+     "want": "course-reader-writer-problem",
+     "got": [
+      "wiki-readers-writers-problem",
+      "wiki-readers-writers-problem",
+      "wiki-readers-writers-problem"
+     ]
+    },
+    {
+     "id": "c041",
+     "query": "What do we need to prevent a race condition in a critical section?",
+     "want": "course-threads-and-concurrency",
+     "got": [
+      "wiki-race-condition",
+      "wiki-race-condition",
+      "wiki-race-condition"
+     ]
+    },
+    {
+     "id": "c042",
+     "query": "Who translates virtual addresses to physical addresses using the page table?",
+     "want": "course-virtual-memory",
+     "got": [
+      "wiki-page-table",
+      "wiki-virtual-memory",
+      "hail-vm"
+     ]
+    },
+    {
+     "id": "c047",
+     "query": "What happens to TLB entries on a context switch?",
+     "want": "course-paging-1",
+     "got": [
+      "wiki-context-switch",
+      "wiki-translation-lookaside-buffer",
+      "wiki-translation-lookaside-buffer"
+     ]
+    },
+    {
+     "id": "c048",
+     "query": "What information does a page table entry hold apart from the frame number?",
+     "want": "course-paging-1",
+     "got": [
+      "wiki-page-table",
+      "course-paging-problem",
+      "course-17-advanced-page-tables"
+     ]
+    },
+    {
+     "id": "c052",
+     "query": "What does a process control block contain?",
+     "want": "course-process-abstraction",
+     "got": [
+      "wiki-process-control-block",
+      "wiki-process-control-block",
+      "wiki-process-control-block"
+     ]
+    },
+    {
+     "id": "c060",
+     "query": "What is the expected final value when two threads each add to a shared counter ten million times?",
+     "want": "course-threads-intro",
+     "got": [
+      "course-threads-and-concurrency",
+      "hail-scheduling",
+      "course-threads-intro"
+     ]
+    },
+    {
+     "id": "c062",
+     "query": "How can a lock avoid wasting CPU by spinning?",
+     "want": "course-threads-locks",
+     "got": [
+      "course-threads-locks",
+      "wiki-spinlock",
+      "course-threads-locks"
+     ]
+    },
+    {
+     "id": "c064",
+     "query": "Why does a simple flag variable fail to give mutual exclusion?",
+     "want": "course-threads-locks",
+     "got": [
+      "wiki-mutual-exclusion",
+      "wiki-mutual-exclusion",
+      "wiki-peterson-s-algorithm"
+     ]
+    },
+    {
+     "id": "c066",
+     "query": "Why should a semaphore used for ordering start at zero?",
+     "want": "course-threads-sema",
+     "got": [
+      "course-threads-sema",
+      "wiki-semaphore-programming",
+      "course-threads-sema"
+     ]
+    },
+    {
+     "id": "c068",
+     "query": "Who invented the semaphore?",
+     "want": "course-threads-sema",
+     "got": [
+      "wiki-semaphore-programming",
+      "wiki-semaphore-programming",
+      "wiki-semaphore-programming"
+     ]
+    },
+    {
+     "id": "c069",
+     "query": "How do you fix an order-violation concurrency bug?",
+     "want": "course-threads-bugs",
+     "got": [
+      "course-concurrency-bugs",
+      "course-threads-bugs",
+      "course-concurrency-bugs"
+     ]
+    },
+    {
+     "id": "c072",
+     "query": "Which three file descriptors does every new process start with?",
+     "want": "course-4-the-abstraction-the-process",
+     "got": [
+      "course-3-unix-filestructure-related-system-calls",
+      "hail-persistence",
+      "hail-persistence"
+     ]
+    },
+    {
+     "id": "c082",
+     "query": "What is an adaptive mutex?",
+     "want": "wiki-spinlock",
+     "got": [
+      "hail-synchronization",
+      "hail-synchronization",
+      "wiki-lock-computer-science"
+     ]
+    },
+    {
+     "id": "c085",
+     "query": "Why can running a CPU-heavy job and a disk-heavy job concurrently finish sooner than running them one after the other?",
+     "want": "hail-threads",
+     "got": [
+      "hail-synchronization",
+      "hail-synchronization",
+      "hail-synchronization"
+     ]
+    },
+    {
+     "id": "c096",
+     "query": "Why are these mutex implementations called spinlocks?",
+     "want": "hail-synchronization",
+     "got": [
+      "hail-synchronization",
+      "wiki-spinlock",
+      "wiki-spinlock"
+     ]
+    },
+    {
+     "id": "c098",
+     "query": "What is the working set of a program?",
+     "want": "wiki-thrashing-computer-science",
+     "got": [
+      "wiki-page-replacement-algorithm",
+      "wiki-memory-paging",
+      "course-introduction-to-os"
+     ]
+    },
+    {
+     "id": "c100",
+     "query": "What does the long-term scheduler decide for a newly created process?",
+     "want": "wiki-process-state",
+     "got": [
+      "wiki-scheduling-computing",
+      "wiki-scheduling-computing",
+      "wiki-scheduling-computing"
+     ]
+    },
+    {
+     "id": "c117",
+     "query": "Why does a linear page table stored in virtual memory need a second translation?",
+     "want": "hail-vm",
+     "got": [
+      "hail-vm",
+      "hail-vm",
+      "wiki-translation-lookaside-buffer"
+     ]
+    },
+    {
+     "id": "c120",
+     "query": "What does the hardware do when the page number is not in the TLB?",
+     "want": "wiki-translation-lookaside-buffer",
+     "got": [
+      "wiki-translation-lookaside-buffer",
+      "wiki-translation-lookaside-buffer",
+      "wiki-translation-lookaside-buffer"
+     ]
+    },
+    {
+     "id": "c123",
+     "query": "Why do larger pages make the page table smaller but waste memory?",
+     "want": "wiki-memory-management-unit",
+     "got": [
+      "course-17-advanced-page-tables",
+      "hail-vm",
+      "hail-vm"
+     ]
+    }
+   ]
+  },
+  "hybrid": {
+   "recall_at_1": 0.4839,
+   "recall_at_5": 0.8145,
+   "doc_recall_at_5": 0.9113,
+   "mrr_at_10": 0.6246,
+   "latency_ms_p50": 21.76,
+   "latency_ms_p95": 25.24,
+   "latency_ms_max": 28.56,
+   "misses": [
+    {
+     "id": "c002",
+     "query": "Is a program the same thing as a process?",
+     "want": "course-2-os-functionalities",
+     "got": [
+      "wiki-process-computing",
+      "course-process-abstraction",
+      "wiki-process-computing"
+     ]
+    },
+    {
+     "id": "c006",
+     "query": "What basic operations should any OS offer for managing processes?",
+     "want": "course-4-the-abstraction-the-process",
+     "got": [
+      "course-2-os-functionalities",
+      "course-2-os-functionalities",
+      "hail-processes"
+     ]
+    },
+    {
+     "id": "c020",
+     "query": "How can segments be shared safely between address spaces?",
+     "want": "course-13-segmentation",
+     "got": [
+      "hail-processes",
+      "wiki-virtual-memory",
+      "hail-processes"
+     ]
+    },
+    {
+     "id": "c026",
+     "query": "Why is the Banker's algorithm rarely used in real systems?",
+     "want": "course-concurrency-bugs",
+     "got": [
+      "wiki-banker-s-algorithm",
+      "wiki-banker-s-algorithm",
+      "wiki-banker-s-algorithm"
+     ]
+    },
+    {
+     "id": "c035",
+     "query": "What happens to child processes whose parent exits first?",
+     "want": "course-process-api",
+     "got": [
+      "wiki-fork-system-call",
+      "hail-processes",
+      "hail-processes"
+     ]
+    },
+    {
+     "id": "c037",
+     "query": "Why does the kernel use its own stack instead of the user's stack?",
+     "want": "course-process-execution-mechanism",
+     "got": [
+      "hail-threads",
+      "course-process-execution-mechanism",
+      "wiki-thread-computing"
+     ]
+    },
+    {
+     "id": "c039",
+     "query": "In the readers-writers solution, which reader locks out the writers?",
+     "want": "course-reader-writer-problem",
+     "got": [
+      "wiki-readers-writers-problem",
+      "wiki-readers-writers-problem",
+      "wiki-readers-writers-problem"
+     ]
+    },
+    {
+     "id": "c042",
+     "query": "Who translates virtual addresses to physical addresses using the page table?",
+     "want": "course-virtual-memory",
+     "got": [
+      "wiki-page-table",
+      "hail-vm",
+      "hail-vm"
+     ]
+    },
+    {
+     "id": "c047",
+     "query": "What happens to TLB entries on a context switch?",
+     "want": "course-paging-1",
+     "got": [
+      "wiki-translation-lookaside-buffer",
+      "wiki-context-switch",
+      "wiki-translation-lookaside-buffer"
+     ]
+    },
+    {
+     "id": "c048",
+     "query": "What information does a page table entry hold apart from the frame number?",
+     "want": "course-paging-1",
+     "got": [
+      "wiki-page-table",
+      "hail-vm",
+      "course-17-advanced-page-tables"
+     ]
+    },
+    {
+     "id": "c052",
+     "query": "What does a process control block contain?",
+     "want": "course-process-abstraction",
+     "got": [
+      "wiki-process-control-block",
+      "wiki-process-control-block",
+      "wiki-process-control-block"
+     ]
+    },
+    {
+     "id": "c059",
+     "query": "In the producer/consumer example, why is waking the wrong consumer a problem?",
+     "want": "course-threads-cv",
+     "got": [
+      "course-threads-cv",
+      "wiki-monitor-synchronization",
+      "wiki-monitor-synchronization"
+     ]
+    },
+    {
+     "id": "c060",
+     "query": "What is the expected final value when two threads each add to a shared counter ten million times?",
+     "want": "course-threads-intro",
+     "got": [
+      "course-threads-and-concurrency",
+      "course-threads-intro",
+      "course-threads-intro"
+     ]
+    },
+    {
+     "id": "c066",
+     "query": "Why should a semaphore used for ordering start at zero?",
+     "want": "course-threads-sema",
+     "got": [
+      "course-threads-sema",
+      "wiki-semaphore-programming",
+      "course-threads-sema"
+     ]
+    },
+    {
+     "id": "c069",
+     "query": "How do you fix an order-violation concurrency bug?",
+     "want": "course-threads-bugs",
+     "got": [
+      "course-concurrency-bugs",
+      "course-concurrency-bugs",
+      "course-threads-bugs"
+     ]
+    },
+    {
+     "id": "c072",
+     "query": "Which three file descriptors does every new process start with?",
+     "want": "course-4-the-abstraction-the-process",
+     "got": [
+      "course-3-unix-filestructure-related-system-calls",
+      "hail-persistence",
+      "hail-persistence"
+     ]
+    },
+    {
+     "id": "c086",
+     "query": "Before Belady showed otherwise, what did people believe about adding page frames?",
+     "want": "wiki-belady-s-anomaly",
+     "got": [
+      "hail-vm",
+      "hail-vm",
+      "hail-vm"
+     ]
+    },
+    {
+     "id": "c100",
+     "query": "What does the long-term scheduler decide for a newly created process?",
+     "want": "wiki-process-state",
+     "got": [
+      "wiki-scheduling-computing",
+      "wiki-scheduling-computing",
+      "wiki-scheduling-computing"
+     ]
+    },
+    {
+     "id": "c101",
+     "query": "How can race conditions happen in file systems, and how are they usually prevented?",
+     "want": "wiki-race-condition",
+     "got": [
+      "wiki-race-condition",
+      "wiki-race-condition",
+      "wiki-race-condition"
+     ]
+    },
+    {
+     "id": "c113",
+     "query": "What kinds of information does a PCB keep?",
+     "want": "wiki-process-control-block",
+     "got": [
+      "wiki-process-control-block",
+      "wiki-context-switch",
+      "wiki-process-control-block"
+     ]
+    },
+    {
+     "id": "c116",
+     "query": "What are the downsides of demand paging?",
+     "want": "wiki-demand-paging",
+     "got": [
+      "wiki-demand-paging",
+      "wiki-memory-paging",
+      "hail-vm"
+     ]
+    },
+    {
+     "id": "c117",
+     "query": "Why does a linear page table stored in virtual memory need a second translation?",
+     "want": "hail-vm",
+     "got": [
+      "hail-vm",
+      "hail-vm",
+      "hail-vm"
+     ]
+    },
+    {
+     "id": "c123",
+     "query": "Why do larger pages make the page table smaller but waste memory?",
+     "want": "wiki-memory-management-unit",
+     "got": [
+      "course-17-advanced-page-tables",
+      "wiki-page-table",
+      "wiki-memory-management-unit"
+     ]
+    }
+   ]
+  }
+ },
+ "hybrid_recall_at_5_course": {
+  "n": 75,
+  "recall": 0.7867
+ },
+ "hybrid_recall_at_5_online": {
+  "n": 49,
+  "recall": 0.8571
+ },
+ "gate": {
+  "thresholds": {
+   "strong_cosine": 0.84,
+   "min_bm25": 18.5
+  },
+  "calibrated_in_this_run": false,
+  "dev": {
+   "in_scope": 62,
+   "in_scope_given_notes": 60,
+   "out_of_scope": 20,
+   "out_of_scope_abstained": 16,
+   "in_scope_refused": [
+    "c015",
+    "c095"
+   ],
+   "out_of_scope_given_notes": [
+    "x007",
+    "x009",
+    "x031",
+    "x035"
+   ]
+  },
+  "test": {
+   "in_scope": 62,
+   "in_scope_given_notes": 59,
+   "out_of_scope": 20,
+   "out_of_scope_abstained": 18,
+   "in_scope_refused": [
+    "c034",
+    "c082",
+    "c110"
+   ],
+   "out_of_scope_given_notes": [
+    "x002",
+    "x040"
+   ]
+  }
+ },
+ "embed_model": "intfloat/multilingual-e5-base"
+}

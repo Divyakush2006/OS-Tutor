@@ -1,122 +1,58 @@
 {
  "corpus": "data/rag/fixture",
- "corpus_sha256": "f535544961eb53ac99f4361d6540bd75a44351ba6a6c891f5378e548784b18d6",
+ "questions": "data/rag/fixture/queries.jsonl",
+ "corpus_sha256": "ca8566bbe4d022e3a83d9ca69acc855c3d47e8f5fe27ef94eb940682c201621d",
  "documents": 12,
  "chunks": 38,
  "in_scope": 45,
  "out_of_scope": 10,
- "gates": {
-  "v1": "cosine < 0.35",
-  "v2": "cosine < 0.45 and bm25 < 6.0"
- },
- "index_build_seconds": 7.29,
+ "load_seconds": 7.04,
  "modes": {
   "bm25": {
-   "section_recall_at_1": 0.9556,
-   "section_recall_at_4": 1.0,
-   "doc_recall_at_4": 1.0,
-   "mrr_at_10": 0.9778,
-   "false_abstain": 0,
-   "abstain_out_of_scope": 5,
-   "latency_ms_p50": 0.03,
-   "latency_ms_p95": 0.05,
-   "latency_ms_max": 0.06
+   "recall_at_1": 0.9778,
+   "recall_at_5": 1.0,
+   "doc_recall_at_5": 1.0,
+   "mrr_at_10": 0.9889,
+   "latency_ms_p50": 0.01,
+   "latency_ms_p95": 0.02,
+   "latency_ms_max": 0.04,
+   "misses": []
   },
   "dense": {
-   "section_recall_at_1": 0.9333,
-   "section_recall_at_4": 0.9333,
-   "doc_recall_at_4": 0.9333,
-   "mrr_at_10": 0.9333,
-   "false_abstain": 2,
-   "abstain_out_of_scope": 6,
-   "latency_ms_p50": 4.52,
-   "latency_ms_p95": 5.69,
-   "latency_ms_max": 6.66
+   "recall_at_1": 0.9556,
+   "recall_at_5": 0.9778,
+   "doc_recall_at_5": 1.0,
+   "mrr_at_10": 0.9689,
+   "latency_ms_p50": 4.48,
+   "latency_ms_p95": 5.63,
+   "latency_ms_max": 7.89,
+   "misses": [
+    {
+     "id": "q14",
+     "query": "When is busy waiting acceptable?",
+     "want": "n04",
+     "got": [
+      "n01",
+      "n03",
+      "n04"
+     ]
+    }
+   ]
   },
-  "hybrid, v1 gate": {
-   "section_recall_at_1": 0.9111,
-   "section_recall_at_4": 0.9333,
-   "doc_recall_at_4": 0.9556,
-   "mrr_at_10": 0.9267,
-   "false_abstain": 2,
-   "abstain_out_of_scope": 6,
-   "latency_ms_p50": 4.57,
-   "latency_ms_p95": 5.71,
-   "latency_ms_max": 13.62
-  },
-  "hybrid, v2 gate": {
-   "section_recall_at_1": 0.9333,
-   "section_recall_at_4": 0.9556,
-   "doc_recall_at_4": 0.9556,
-   "mrr_at_10": 0.9444,
-   "false_abstain": 2,
-   "abstain_out_of_scope": 10,
-   "latency_ms_p50": 4.58,
-   "latency_ms_p95": 5.7,
-   "latency_ms_max": 9.18
+  "hybrid": {
+   "recall_at_1": 0.9778,
+   "recall_at_5": 1.0,
+   "doc_recall_at_5": 1.0,
+   "mrr_at_10": 0.9822,
+   "latency_ms_p50": 4.56,
+   "latency_ms_p95": 5.83,
+   "latency_ms_max": 7.43,
+   "misses": []
   }
  },
- "misses": {
-  "bm25": [],
-  "dense": [
-   {
-    "id": "q12",
-    "query": "Is SRTF preemptive?",
-    "want": "n03 / Preemptive and non-preemptive scheduling",
-    "got": []
-   },
-   {
-    "id": "q14",
-    "query": "When is busy waiting acceptable?",
-    "want": "n04 / Mutex locks and semaphores",
-    "got": [
-     "n01 / Process states",
-     "n03 / Criteria"
-    ]
-   },
-   {
-    "id": "q15",
-    "query": "counting semaphore initial value for a pool of printers",
-    "want": "n04 / Mutex locks and semaphores",
-    "got": []
-   }
-  ],
-  "hybrid, v1 gate": [
-   {
-    "id": "q12",
-    "query": "Is SRTF preemptive?",
-    "want": "n03 / Preemptive and non-preemptive scheduling",
-    "got": []
-   },
-   {
-    "id": "q14",
-    "query": "When is busy waiting acceptable?",
-    "want": "n04 / Mutex locks and semaphores",
-    "got": [
-     "n01 / Process states",
-     "n03 / Criteria"
-    ]
-   },
-   {
-    "id": "q15",
-    "query": "counting semaphore initial value for a pool of printers",
-    "want": "n04 / Mutex locks and semaphores",
-    "got": []
-   }
-  ],
-  "hybrid, v2 gate": [
-   {
-    "id": "q12",
-    "query": "Is SRTF preemptive?",
-    "want": "n03 / Preemptive and non-preemptive scheduling",
-    "got": []
-   },
-   {
-    "id": "q14",
-    "query": "When is busy waiting acceptable?",
-    "want": "n04 / Mutex locks and semaphores",
-    "got": []
-   }
-  ]
- }
+ "hybrid_recall_at_5_course": {
+  "n": 45,
+  "recall": 1.0
+ },
+ "embed_model": "sentence-transformers/all-MiniLM-L6-v2"
 }

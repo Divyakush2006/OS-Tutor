@@ -37,3 +37,11 @@ docs/_case_study_*
 
 # --- G0 smoke runs (tools/g0_ablation.py --limit) are throwaway --------------------
 reports/g0/smoke-*/
+# RAG corpus: owners' course files are not for redistribution (the manifest records their
+# checksums); extraction caches and embeddings are rebuilt by `python -m ostutor.rag.ingest`
+data/rag/corpus/src/
+data/rag/corpus/docs/course/
+data/rag/corpus/extracted/
+data/rag/corpus/index/
+data/rag/fixture/extracted/
+data/rag/fixture/index/

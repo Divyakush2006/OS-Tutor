@@ -31,8 +31,9 @@ Why it exists - the UI must not decide how the model is prompted:
   * GROUNDED IN THE COURSE NOTES (G2, opt-in). With OSTUTOR_RAG set to a corpus
     directory, explain and analyze answers get the most relevant passages of the
     owners' notes appended to the trained prompt, cite them as [S1], [S2], and end
-    with the list of sources. Retrieval runs on the CPU in a few milliseconds and
-    abstains when the notes do not cover the question. Tutor mode never retrieves:
+    with the list of sources. Retrieval runs on the CPU in a few milliseconds; when
+    the notes do not cover the question it abstains and the answer says so, rather
+    than passing general knowledge off as course material. Tutor mode never retrieves:
     a passage could state the answer the student is working towards.
   * AUTO ROUTING. "ostutor" reads the question and picks the mode, so a student does
     not have to know that a shown attempt wants tutoring and a stated procedure wants
@@ -306,17 +307,25 @@ def verified_answer(question):
                    "language model, so these numbers are exact._")
 
 
+NOT_IN_NOTES = ("\n\n---\n> **Not found in the course materials.** This answer comes from the "
+                "tutor's general knowledge, not from your notes; check it against your textbook "
+                "or ask your instructor.")
+
+
 def grounded(spec, question):
-    """(system prompt, sources footer): the mode's trained prompt with the relevant
-    course notes appended, or the trained prompt unchanged when retrieval is off, the
-    mode does not retrieve, or the notes do not cover the question."""
+    """(system prompt, footer): the mode's trained prompt with the relevant course notes
+    appended and a sources footer; or, when the notes do not cover the question, the
+    trained prompt unchanged and a footer saying so. Retrieval off, or a mode that does
+    not retrieve, leaves both untouched."""
     if RAG is None or not spec.get("rag") or not question:
         return spec["prompt"], ""
     try:
         hits = RAG.retrieve(question)
     except Exception as e:                       # never let retrieval break the chat path
         log.warning("retrieval failed, answering without notes: %s", e)
-        return spec["prompt"], ""
+        return spec["prompt"], NOT_IN_NOTES
+    if not hits:
+        return spec["prompt"], NOT_IN_NOTES
     return augment(spec["prompt"], hits), sources_footer(hits)
 
 

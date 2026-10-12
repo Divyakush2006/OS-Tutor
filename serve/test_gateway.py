@@ -197,10 +197,12 @@ async def main():
             dict(role="user", content="Can LRU suffer from Belady's anomaly? I think yes.")]))
         check("tutor mode never retrieves",
               SEEN[-1]["messages"][0]["content"] == gateway.SYSTEM_PROMPTS[("tutor", "os")])
-        await c.post("/v1/chat/completions", json=dict(model="ostutor-explain", messages=[
+        r = await c.post("/v1/chat/completions", json=dict(model="ostutor-explain", messages=[
             dict(role="user", content="What is the capital of Australia?")]))
         check("a question the notes do not cover gets no notes",
               SEEN[-1]["messages"][0]["content"] == explain)
+        check("and the answer says it is not from the course materials",
+              "Not found in the course materials" in r.json()["choices"][0]["message"]["content"])
         out, _ = await text_of_stream(c, "ostutor-explain", "How does the working set model "
                                                             "prevent thrashing?")
         check("a streamed answer also ends with its sources",

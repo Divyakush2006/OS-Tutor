@@ -1,0 +1,16 @@
+# Shortest job next
+
+Shortest job next (SJN) – also known as shortest job first (SJF) or shortest process next (SPN) – is a method used by a computer operating system to decide which task to run first. When a computer has multiple programs or commands waiting to be processed, this scheduling policy chooses the waiting process with the smallest execution time. 
+
+## Advantages and Disadvantages
+
+SJN is advantageous because of its simplicity and because it minimizes the average amount of time each process has to wait until its execution is complete. However, it has the potential for process starvation for processes which will require a long time to complete if short processes are continually added. Highest response ratio next is similar but provides a solution to this problem using a technique called aging.
+Another disadvantage of using SJN is that the total execution time of a job must be known before execution. While it is impossible to predict execution time perfectly, several methods can be used to estimate it, such as a weighted average of previous execution times. Multilevel feedback queue can also be used to approximate SJN without the need for the total execution time oracle.
+SJN can be effectively used with interactive processes which generally follow a pattern of alternating between waiting for a command and executing it. If the execution burst of a process is regarded as a separate "job", the past behaviour can indicate which process to run next, based on an estimate of its running time. 
+SJN is used in specialized environments where accurate estimates of running time are available.
+SJN is a non-preemptive algorithm. Shortest remaining time is a preemptive variant of SJN.
+
+## Weighted shortest job first
+
+Weighted shortest job first (WSJF) is a modification of the concept used in agile development where jobs get weighted with the cost of delay so that the highest valued jobs get done sooner.
+Value-flow rate (VFR) is an alternate, more intuitive name given to WSJF which expresses cost of delay and duration using unitless relative "points" rather than actual units of time or money.
