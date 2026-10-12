@@ -203,6 +203,21 @@ async def main():
               SEEN[-1]["messages"][0]["content"] == explain)
         check("and the answer says it is not from the course materials",
               "Not found in the course materials" in r.json()["choices"][0]["message"]["content"])
+        # RAG never overrides a computed answer: a solvable problem in a retrieving mode is
+        # answered by the simulator layer, which runs first, and retrieval is not consulted.
+        real_verified, real_retrieve = gateway.verified_answer, gateway.RAG.retrieve
+        asked_rag = []
+        gateway.verified_answer = lambda q: "SIMULATOR ANSWER"
+        gateway.RAG.retrieve = lambda q, **k: asked_rag.append(q) or real_retrieve(q, **k)
+        try:
+            r = await c.post("/v1/chat/completions", json=dict(model="ostutor-analyze", messages=[
+                dict(role="user", content="FCFS, P1 arrives 0 burst 5, P2 arrives 1 burst 3. Average waiting time?")]))
+            reply = r.json()["choices"][0]["message"]["content"]
+            check("a solvable problem still gets the simulator's answer with retrieval on",
+                  reply.startswith("SIMULATOR ANSWER") and "Sources from your course notes" not in reply, reply[:80])
+            check("and retrieval is not consulted for it", asked_rag == [])
+        finally:
+            gateway.verified_answer, gateway.RAG.retrieve = real_verified, real_retrieve
         out, _ = await text_of_stream(c, "ostutor-explain", "How does the working set model "
                                                             "prevent thrashing?")
         check("a streamed answer also ends with its sources",

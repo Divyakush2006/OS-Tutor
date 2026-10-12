@@ -1,0 +1,27 @@
+{
+ "corpus": "data/rag/corpus",
+ "corpus_sha256": "4a2a5c9dbac67c5faf1fb690af9bc815e93ddc460d878724e84199501e855b60",
+ "commit": "e92fa8b05580bde3fbb3a5e31721ac9f77adc489",
+ "dirty": false,
+ "gate": {
+  "strong_cosine": 0.59,
+  "min_bm25": 18.5
+ },
+ "server_args": [
+  "-ngl",
+  "99",
+  "-c",
+  "20480",
+  "-np",
+  "1",
+  "-fa",
+  "on",
+  "-ctk",
+  "q8_0",
+  "-ctv",
+  "q8_0",
+  "--jinja"
+ ],
+ "cache_prompt": false,
+ "temperature": 0
+}

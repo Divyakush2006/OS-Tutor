@@ -1,0 +1,292 @@
+{
+ "checked_by": "AI-assisted check, not the human check the brief asks for; to be confirmed by hand in judge_sample.md",
+ "rule": "supported only if everything the sentence states is in the cited passage",
+ "n": 40,
+ "engineer_supported": 24,
+ "judge_supported": 29,
+ "agreement": 29,
+ "judge_yes_engineer_no": 8,
+ "judge_no_engineer_yes": 3,
+ "rows": [
+  {
+   "n": 1,
+   "key": "c120|9|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 2,
+   "key": "c066|9|3",
+   "engineer": false,
+   "judge": true,
+   "note": "passage shows the ordering example but not the value 0"
+  },
+  {
+   "n": 3,
+   "key": "c006|15|2",
+   "engineer": false,
+   "judge": false,
+   "note": ""
+  },
+  {
+   "n": 4,
+   "key": "c048|10|2",
+   "engineer": false,
+   "judge": false,
+   "note": ""
+  },
+  {
+   "n": 5,
+   "key": "c054|6|2",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 6,
+   "key": "c012|8|1",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 7,
+   "key": "c090|0|3",
+   "engineer": false,
+   "judge": true,
+   "note": "COW pages supported; shared file descriptors are not in this passage"
+  },
+  {
+   "n": 8,
+   "key": "c080|4|1",
+   "engineer": false,
+   "judge": false,
+   "note": ""
+  },
+  {
+   "n": 9,
+   "key": "c038|2|4",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 10,
+   "key": "c024|6|1",
+   "engineer": true,
+   "judge": false,
+   "note": "Base[SN] lookup is exactly what the slide shows"
+  },
+  {
+   "n": 11,
+   "key": "c104|2|2",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 12,
+   "key": "c006|3|1",
+   "engineer": false,
+   "judge": false,
+   "note": ""
+  },
+  {
+   "n": 13,
+   "key": "c052|11|4",
+   "engineer": false,
+   "judge": false,
+   "note": ""
+  },
+  {
+   "n": 14,
+   "key": "c006|13|1",
+   "engineer": false,
+   "judge": false,
+   "note": ""
+  },
+  {
+   "n": 15,
+   "key": "c022|2|2",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 16,
+   "key": "c042|0|1",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 17,
+   "key": "c100|3|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 18,
+   "key": "c094|3|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 19,
+   "key": "c090|10|3",
+   "engineer": false,
+   "judge": false,
+   "note": "COW is supported; the list of IPC mechanisms is not"
+  },
+  {
+   "n": 20,
+   "key": "c068|0|2",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 21,
+   "key": "c056|5|3",
+   "engineer": false,
+   "judge": true,
+   "note": "the web-server quote is from OSTEP ch. 27, not the cited ch. 26 passage"
+  },
+  {
+   "n": 22,
+   "key": "c102|0|2",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 23,
+   "key": "c048|6|2",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 24,
+   "key": "c094|1|2",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 25,
+   "key": "c074|3|2",
+   "engineer": false,
+   "judge": false,
+   "note": "the passage names the stack pointer but not its role"
+  },
+  {
+   "n": 26,
+   "key": "c044|6|4",
+   "engineer": false,
+   "judge": true,
+   "note": "quote supported; the worked address example is invented (and its arithmetic is wrong)"
+  },
+  {
+   "n": 27,
+   "key": "c058|12|1",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 28,
+   "key": "c096|4|1",
+   "engineer": false,
+   "judge": true,
+   "note": "Linux and context-switch cost are not in the slide"
+  },
+  {
+   "n": 29,
+   "key": "c008|0|2",
+   "engineer": false,
+   "judge": true,
+   "note": "'illegal operation' is not in this passage"
+  },
+  {
+   "n": 30,
+   "key": "c104|6|3",
+   "engineer": true,
+   "judge": false,
+   "note": "supported once [S1] (minor fault) is read with [S3]"
+  },
+  {
+   "n": 31,
+   "key": "c006|7|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 32,
+   "key": "c030|1|1",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 33,
+   "key": "c090|7|1",
+   "engineer": false,
+   "judge": true,
+   "note": "the race-condition note is not in the passage"
+  },
+  {
+   "n": 34,
+   "key": "c064|6|2",
+   "engineer": true,
+   "judge": false,
+   "note": "the quoted test-and-set sentence is verbatim in the passage"
+  },
+  {
+   "n": 35,
+   "key": "c074|6|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 36,
+   "key": "c038|3|1",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 37,
+   "key": "c080|5|2",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 38,
+   "key": "c048|11|2",
+   "engineer": false,
+   "judge": true,
+   "note": "'certain processes or users' is not supported"
+  },
+  {
+   "n": 39,
+   "key": "c094|5|2",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 40,
+   "key": "c120|8|1",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  }
+ ]
+}
