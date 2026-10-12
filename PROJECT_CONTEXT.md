@@ -86,7 +86,7 @@ deliberately departs from its recommended architecture in one place.
 | Domain-specific fine-tuning (contribution 1) | **Done** | QLoRA on 11,760 curated rows; adapter v3.0 |
 | Chat interface | **Done** | Open WebUI, six modes, auto-routing |
 | Fine-tuned model for teaching style | **Done** | SDFT-distilled explanations, Socratic tutoring data |
-| RAG knowledge base (contribution 5, "Option 1") | **Not built — deliberate** | Replaced for *procedures* by verified simulators. See below. |
+| RAG knowledge base (contribution 5, "Option 1") | **Built (G2), off by default; awaiting course notes** | `ostutor/rag/`, CPU hybrid retrieval for explain/analyze only; procedures still go to the simulators (D-006) |
 | Personalized feedback (contribution 2) | **Partial** | `tutor` mode responds to the student's own attempt; no per-student history or profile |
 | Generate labs, MCQs, viva questions (contribution 3) | **Not started** | Only the internal 70-item MCQ eval set exists |
 | Adaptive difficulty (contribution 4) | **Not started** | |
@@ -331,7 +331,7 @@ the evaluation itself is deterministic.
    on this evidence; it also cannot be ruled out. The 70-item set is too small to decide,
    which is why the 200-item set (G3) matters. Conceptual answers remain *ungrounded*
    regardless — that, not this number, is the real gap (G2).
-2. **Base and v2.2 on the procedural suite are unmeasured** (the only attempt was void).
+2. ~~Base and v2.2 on the procedural suite are unmeasured~~ — measured in G0 (`reports/g0/20261012-1429/regraded.md`): base 30/57, v2.2 19/57; the adapter's gain without the solver is not significant (p = 0.557).
 3. **Conceptual tutoring has no verifier and no measurement** — no rubric eval exists.
 4. **Formula kinds (11) are not delegated**; the model answers them with its unaided accuracy.
 5. **Fact checker is a finite rule list** (10 corrections); it cannot catch unknown errors.
@@ -402,7 +402,7 @@ reusable copy could go in `docs/`.
 | Decision | Reason |
 |---|---|
 | **Verified-solver delegation** instead of more training | Execution failure is architectural; delegation gave 64.9% → 100% with no retraining |
-| **No RAG** (so far) | Retrieval can't certify a computed answer; but see Section 2 — RAG is the right tool for concepts |
+| **RAG for concepts only, opt-in** (D-006) | Retrieval can't certify a computed answer, so procedures stay with the simulators; prose modes retrieve over owner notes; tutor never retrieves |
 | **Qwen3-4B-Instruct-2507**, non-thinking | Visible steps for students; fits 16k QLoRA on T4; strong for size |
 | **16,384-token sequences** | Longest row 11,648; long worked traces + rectifier order must stay whole |
 | **Extraction on the untuned base** | 84% vs 79% for the adapter |
@@ -456,7 +456,9 @@ ostutor/                 data pipeline + solver (python -m ostutor.build)
   evaluation/harness.py  simulator-exact grader
 train/kaggle_train.py    QLoRA training (Kaggle, 2×T4)
 serve/                   gateway.py, start_tutor.ps1, stop_tutor.ps1, tests, llama.cpp/
+  rag/                   G2 retrieval: corpus.py (manifest + chunking), retrieve.py (BM25 + MiniLM, gate, citations)
 tools/                   evaluation, benchmarking, generation, packaging scripts
+                         (g0_*.py ablation/audit/regrade; rag_eval.py, rag_e2e.py; test_g0.py, test_rag.py)
 data/                    raw/, build/, eval/ (57-item suite), eval_theory/ (70 MCQ), eval_general/
 models/                  Qwen3-4B-Instruct-2507 (HF), gguf/ (base Q8_0 + v2.2/v3 LoRAs)
 outputs/                 trained adapters (v2.0, v2.2 = ostutor-lora, v3) and logs
@@ -475,6 +477,12 @@ python -m ostutor.build
 python tools/test_pipeline.py
 serve/.venv-webui/Scripts/python serve/test_gateway.py
 python tools/test_router.py
+python tools/test_g0.py
+python tools/test_rag.py
+
+# Retrieval: measure on the fixture; serve with the owners' notes
+python tools/rag_eval.py data/rag/fixture
+$env:OSTUTOR_RAG = "data/rag/corpus"   # before start_tutor.ps1; unset = no retrieval
 
 # Start / stop the local tutor  (UI at http://localhost:3000)
 powershell -ExecutionPolicy Bypass -File serve\start_tutor.ps1
@@ -520,6 +528,7 @@ python docs/build_case_study.py
 | **Case study — current project status** (18 pp, professor's 7-section structure, 16 verified references) | `docs/OS-Tutor-Case-Study.pdf` (source `docs/os-tutor-case-study.html`) | Professor's case-study submission |
 | **Design document** (8 pp: problem, aim, architecture, software/hardware requirements, uniqueness, expected outcome) | `docs/OS-Tutor-Design-Document.pdf` (source `docs/os-tutor-design-document.html`) | Review panel |
 | Design document, online collaborative copy | online doc "OS Tutor — Design Document" — **out of sync**: lacks the expected-outcome rewrite and author names | — |
+| **Project report with RAG** (dataset · preprocessing · code + screenshots · results · what went wrong · improvements) | `docs/OS-Tutor-Project-Report.pdf` (source `docs/os-tutor-rag-report.html`; `python docs/build_code_shots.py` then `python docs/build_rag_report.py`) | Assignment submission; RAG figures are fixture-measured or labelled targets |
 | Dataset card | `DATASET_CARD.md` | Dataset documentation |
 | Planning research | `OSTutorLLM-Dataset-Pipeline.md`, `OSSolverLLM-Model-Selection.md` | Background (September 2026; parts superseded by Section 10) |
 | Anti-forgetting notes | `docs/ANTI_FORGETTING.md` | Background |

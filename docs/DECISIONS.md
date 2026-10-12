@@ -68,7 +68,7 @@ measurement, abstained on only 6/10 out-of-scope questions, because the classes 
 (in-scope minimum 0.34, out-of-scope maximum 0.40). The v2 gate (cosine < 0.45 **and**
 BM25 < 6.0) abstains 10/10 but was fitted on the same queries and must be refitted on
 held-out queries over the owners' notes. 29 checks in `tools/test_rag.py`; 6 new gateway
-checks (35/35), every earlier one unchanged with retrieval off.
+checks (34/34), every earlier one unchanged with retrieval off.
 
 ---
 

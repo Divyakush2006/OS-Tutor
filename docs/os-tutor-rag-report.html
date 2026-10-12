@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OS Tutor — Project Report with RAG Integration</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm 20mm 18mm; }
+
+  :root { --ink:#16181d; --mute:#5d636e; --rule:#d7dae0; --soft:#f5f6f8; --accent:#2b4c7e; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font-family: "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+         font-size: 10.1pt; line-height: 1.55; color: var(--ink); background: #fff; }
+
+  .cover { height: 252mm; display: flex; flex-direction: column; }
+  .cover .kicker { font-size: 8.6pt; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin-top: 30mm; }
+  .cover h1 { font-size: 25pt; line-height: 1.18; font-weight: 650; letter-spacing: -.02em; margin: 10px 0 12px; }
+  .cover .sub { font-size: 12pt; color: var(--mute); margin: 0 0 26px; max-width: 152mm; }
+  .cover .rule { height: 2px; background: var(--ink); width: 100%; margin: 4px 0 22px; }
+  .cover table.people { width: auto; margin: 0; font-size: 10.4pt; }
+  .cover table.people td { border: none; padding: 3px 34px 3px 0; }
+  .cover table.people th { border: none; font-size: 8.2pt; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); font-weight: 600; padding: 0 34px 6px 0; }
+  .cover .reg { font-family: Consolas, monospace; font-size: 9.6pt; color: var(--mute); }
+  .cover .abstract { margin-top: auto; border-top: 1px solid var(--rule); padding-top: 14px; }
+  .cover .abstract h4 { font-size: 8.2pt; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin: 0 0 6px; font-weight: 600; }
+  .cover .abstract p { font-size: 9.5pt; line-height: 1.6; margin: 0 0 7px; }
+  .cover .date { font-size: 9.6pt; color: var(--mute); margin-top: 14px; }
+
+  .pb { break-before: page; page-break-before: always; }
+
+  .toc h2 { border: none; margin-top: 0; }
+  .toc ol { list-style: none; padding: 0; margin: 0; }
+  .toc li { display: flex; align-items: baseline; padding: 1.4px 0; line-height: 1.35; font-size: 9.8pt; }
+  .toc li.main { font-weight: 640; margin-top: 7px; }
+  .toc li.subi { padding-left: 18px; color: #2b2f37; font-size: 9.2pt; }
+  .toc .t { white-space: nowrap; }
+  .toc .dots { flex: 1; border-bottom: 1px dotted #b5bac3; margin: 0 6px; transform: translateY(-3px); }
+  .toc .pg { font-variant-numeric: tabular-nums; min-width: 16px; text-align: right; }
+
+  h2 { font-size: 14pt; font-weight: 650; margin: 26px 0 10px; padding-bottom: 6px;
+       border-bottom: 1.5px solid var(--ink); break-after: avoid; page-break-after: avoid; }
+  h2 .n { color: var(--accent); margin-right: 6px; }
+  h3 { font-size: 10.8pt; font-weight: 650; margin: 17px 0 6px; break-after: avoid; page-break-after: avoid; }
+  p { margin: 0 0 9px; }
+  ul, ol { margin: 0 0 10px; padding-left: 19px; }
+  li { margin-bottom: 4px; }
+  strong { font-weight: 640; }
+  code { font-family: Consolas, monospace; font-size: 8.6pt; background: var(--soft); padding: 1px 4px; border-radius: 2px; }
+  .cite { color: var(--accent); font-size: 8.8pt; }
+  .src { color: var(--mute); font-size: 8.2pt; }
+
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 14px; font-size: 9pt;
+          break-inside: avoid; page-break-inside: avoid; }
+  p:has(+ table), p:has(+ ol), p:has(+ ul), p:has(+ figure) { break-after: avoid; page-break-after: avoid; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; page-break-inside: avoid; }
+  th { text-align: left; font-weight: 640; padding: 5px 9px 5px 0; border-bottom: 1.4px solid var(--ink); vertical-align: bottom; }
+  td { padding: 4px 9px 4px 0; border-bottom: 1px solid var(--rule); vertical-align: top; line-height: 1.45; }
+  tr:last-child td { border-bottom: none; }
+  tr.total td { border-top: 1.4px solid var(--ink); border-bottom: none; font-weight: 640; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .caption { font-size: 8.3pt; color: var(--mute); margin: -8px 0 14px; }
+
+  .ok { color: #1d6b3a; font-weight: 640; }
+  .warn { color: #9a5b00; font-weight: 640; }
+  .bad { color: #a12a2a; font-weight: 640; }
+  .tag { display: inline-block; font-size: 7.6pt; font-weight: 640; letter-spacing: .04em; text-transform: uppercase;
+         padding: 1px 6px; border-radius: 3px; vertical-align: 1px; }
+  .tag.m { background: #e4efe7; color: #1d6b3a; }
+  .tag.f { background: #e7ecf5; color: #2b4c7e; }
+  .tag.t { background: #f6ecdc; color: #9a5b00; }
+
+  .callout { border-left: 3px solid var(--accent); background: var(--soft); padding: 9px 13px; margin: 12px 0 14px; font-size: 9.5pt; break-inside: avoid; }
+  .callout.warn { border-left-color: #9a5b00; }
+  .callout p:last-child { margin-bottom: 0; }
+
+  figure { margin: 12px 0 16px; break-inside: avoid; page-break-inside: avoid; text-align: center; }
+  figure img { width: 100%; height: auto; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,.18); }
+  figure img.chart { box-shadow: none; border-radius: 0; }
+  figure svg { width: 100%; height: auto; }
+  figcaption { font-size: 8.3pt; color: var(--mute); margin-top: 7px; text-align: left; }
+
+  .listing { break-inside: auto; margin: 6px 0 14px; }
+  .listing h4 { font-size: 9pt; margin: 12px 0 4px; font-weight: 640; break-after: avoid; }
+  .listing h4 span { color: var(--mute); font-weight: 400; font-family: Consolas, monospace; font-size: 8.2pt; }
+  .listing pre { margin: 0; background: #f7f8fa; border: 1px solid var(--rule); border-radius: 4px; padding: 7px 10px;
+                 font-family: Consolas, monospace; font-size: 7.6pt; line-height: 1.42; white-space: pre-wrap; }
+  .listing .ln { color: #a0a6b1; display: inline-block; width: 26px; user-select: none; }
+</style>
+</head>
+<body>
+
+<!-- ======================= COVER ======================= -->
+<section class="cover">
+  <div class="kicker">Project Report · Dataset to Results, with RAG Integration</div>
+  <h1>OS Tutor: A Fine-Tuned, Retrieval-Grounded and Simulator-Verified Operating Systems Tutor</h1>
+  <p class="sub">Dataset, preprocessing, implementation, measured results, what went wrong, and what we would do differently, for a 4-billion-parameter tutor whose prose is grounded in course notes and whose numbers come from verified simulators.</p>
+  <div class="rule"></div>
+
+  <table class="people">
+    <thead><tr><th>Team member</th><th>Register number</th></tr></thead>
+    <tbody>
+      <tr><td>Divyakush Punjabi</td><td class="reg">24BCB0126</td></tr>
+    </tbody>
+  </table>
+
+  <div class="abstract">
+    <h4>Summary</h4>
+    <p>OS Tutor is Qwen3-4B-Instruct-2507 fine-tuned with QLoRA on 11,760 curated rows. It has three guards around the model. <strong>Verified simulators</strong> compute every numerical answer. A <strong>retrieval (RAG) layer</strong> grounds concept explanations in course notes and cites them. A <strong>fact checker</strong> corrects known misconceptions. On a 57-item hand-written problem suite the full system scores <strong>57/57</strong>, against 30/57 for the untuned model. On a 600-item out-of-distribution holdout it scores <strong>98.8%</strong>.</p>
+    <p>The RAG layer is built, tested and wired into the tutor. Retrieval takes under 7 ms on the CPU. Every RAG figure in this report was measured on a <em>test corpus written by the team</em>; the course notes have not been supplied yet. Figures for real notes are given as <span class="tag t">target</span>s, never as results.</p>
+  </div>
+  <div class="date">12 October 2026</div>
+</section>
+
+<!-- ======================= CONTENTS ======================= -->
+<section class="toc pb">
+  <h2>Contents</h2>
+  <ol>
+    <li class="main"><span class="t">Reading this report</span><span class="dots"></span><span class="pg" data-for="s0">0</span></li>
+    <li class="main"><span class="t">1&nbsp;&nbsp;Dataset</span><span class="dots"></span><span class="pg" data-for="s1">0</span></li>
+    <li class="subi"><span class="t">1.1 Training dataset</span><span class="dots"></span><span class="pg" data-for="s1-1">0</span></li>
+    <li class="subi"><span class="t">1.2 Evaluation datasets</span><span class="dots"></span><span class="pg" data-for="s1-2">0</span></li>
+    <li class="subi"><span class="t">1.3 Retrieval knowledge base</span><span class="dots"></span><span class="pg" data-for="s1-3">0</span></li>
+    <li class="main"><span class="t">2&nbsp;&nbsp;Dataset Preprocessing</span><span class="dots"></span><span class="pg" data-for="s2">0</span></li>
+    <li class="subi"><span class="t">2.1 The eleven-stage build</span><span class="dots"></span><span class="pg" data-for="s2-1">0</span></li>
+    <li class="subi"><span class="t">2.2 Cleaning, deduplication and decontamination</span><span class="dots"></span><span class="pg" data-for="s2-2">0</span></li>
+    <li class="subi"><span class="t">2.3 Selection, rendering, ordering and release gates</span><span class="dots"></span><span class="pg" data-for="s2-3">0</span></li>
+    <li class="subi"><span class="t">2.4 Preprocessing for retrieval</span><span class="dots"></span><span class="pg" data-for="s2-4">0</span></li>
+    <li class="main"><span class="t">3&nbsp;&nbsp;Code Implementation</span><span class="dots"></span><span class="pg" data-for="s3">0</span></li>
+    <li class="subi"><span class="t">3.1 System architecture</span><span class="dots"></span><span class="pg" data-for="s3-1">0</span></li>
+    <li class="subi"><span class="t">3.2 Data pipeline</span><span class="dots"></span><span class="pg" data-for="s3-2">0</span></li>
+    <li class="subi"><span class="t">3.3 Fine-tuning</span><span class="dots"></span><span class="pg" data-for="s3-3">0</span></li>
+    <li class="subi"><span class="t">3.4 Verified solver</span><span class="dots"></span><span class="pg" data-for="s3-4">0</span></li>
+    <li class="subi"><span class="t">3.5 RAG pipeline</span><span class="dots"></span><span class="pg" data-for="s3-5">0</span></li>
+    <li class="subi"><span class="t">3.6 Gateway integration</span><span class="dots"></span><span class="pg" data-for="s3-6">0</span></li>
+    <li class="subi"><span class="t">3.7 Evaluation and tests</span><span class="dots"></span><span class="pg" data-for="s3-7">0</span></li>
+    <li class="main"><span class="t">4&nbsp;&nbsp;Metrics (Assessment): Results and Discussion</span><span class="dots"></span><span class="pg" data-for="s4">0</span></li>
+    <li class="subi"><span class="t">4.1 Metrics and why each was chosen</span><span class="dots"></span><span class="pg" data-for="s4-1">0</span></li>
+    <li class="subi"><span class="t">4.2 Training loss</span><span class="dots"></span><span class="pg" data-for="s4-2">0</span></li>
+    <li class="subi"><span class="t">4.3 Procedural accuracy and ablation</span><span class="dots"></span><span class="pg" data-for="s4-3">0</span></li>
+    <li class="subi"><span class="t">4.4 Out-of-distribution holdout</span><span class="dots"></span><span class="pg" data-for="s4-4">0</span></li>
+    <li class="subi"><span class="t">4.5 Catastrophic forgetting</span><span class="dots"></span><span class="pg" data-for="s4-5">0</span></li>
+    <li class="subi"><span class="t">4.6 Fact checker</span><span class="dots"></span><span class="pg" data-for="s4-6">0</span></li>
+    <li class="subi"><span class="t">4.7 RAG: retrieval quality and latency</span><span class="dots"></span><span class="pg" data-for="s4-7">0</span></li>
+    <li class="subi"><span class="t">4.8 RAG: end to end on the served model</span><span class="dots"></span><span class="pg" data-for="s4-8">0</span></li>
+    <li class="subi"><span class="t">4.9 Discussion</span><span class="dots"></span><span class="pg" data-for="s4-9">0</span></li>
+    <li class="subi"><span class="t">4.10 Expected outcome on the course notes</span><span class="dots"></span><span class="pg" data-for="s4-10">0</span></li>
+    <li class="main"><span class="t">5&nbsp;&nbsp;What Went Wrong</span><span class="dots"></span><span class="pg" data-for="s5">0</span></li>
+    <li class="main"><span class="t">6&nbsp;&nbsp;Alternative Flow (Improvements)</span><span class="dots"></span><span class="pg" data-for="s6">0</span></li>
+    <li class="main"><span class="t">Appendix A&nbsp;&nbsp;Code listings</span><span class="dots"></span><span class="pg" data-for="a">0</span></li>
+    <li class="main"><span class="t">Appendix B&nbsp;&nbsp;Where every number comes from</span><span class="dots"></span><span class="pg" data-for="b">0</span></li>
+  </ol>
+</section>
+
+<!-- ======================= READING ======================= -->
+<section class="pb">
+<h2>Reading this report</h2>
+<p>This report describes the system <strong>with the RAG pipeline integrated</strong>. The pipeline is real code in the repository. It is covered by 29 unit checks and 6 gateway checks, and it was measured end to end on the served model. One input is still missing: the institution's course notes. Until the owners supply them, retrieval runs over a <em>fixture</em>: 12 short OS notes the team wrote for testing, with 55 labelled questions. Every number in this report carries one of three labels:</p>
+<table>
+  <thead><tr><th style="width:22%">Label</th><th>Meaning</th></tr></thead>
+  <tbody>
+    <tr><td><span class="tag m">measured</span></td><td>Produced by a script in the repository on the real system. Appendix B names the file.</td></tr>
+    <tr><td><span class="tag f">fixture</span></td><td>Measured on the real RAG code over the team-written test corpus. The same people wrote the notes and the questions, so treat these as an upper bound.</td></tr>
+    <tr><td><span class="tag t">target</span></td><td>What we expect, or require, on the course notes. Not measured yet, and never presented as a result.</td></tr>
+  </tbody>
+</table>
+<p>Three earlier claims are corrected here; Section 5 explains each. There is no "final training loss of 0.2710": no training artifact contains that number. The adjacent-CS gain is not "genuine transfer", because p = 0.20. And the adapter's gain on the problem suite without the solver is not significant once the grader is fixed (p = 0.56).</p>
+</section>
+
+<!-- ======================= 1 DATASET ======================= -->
+<section class="pb">
+<h2><span class="n">1</span>Dataset</h2>
+
+<h3>1.1 Training dataset</h3>
+<p>The training set is <strong><code>ostutor-sft</code> v3.0.0</strong>. It is built by one command (<code>python -m ostutor.build</code>, seed 42, about 6 minutes), and two consecutive builds are byte-identical. It has five categories, each serving one behaviour the tutor needs:</p>
+<table>
+  <thead><tr><th>Category</th><th class="num">Share</th><th class="num">Rows</th><th>What it is</th><th>Where it comes from</th></tr></thead>
+  <tbody>
+    <tr><td>Procedural</td><td class="num">64%</td><td class="num">7,526</td><td>Worked OS numericals, every decision written as a rule plus the comparison behind it. 39 question types, 8 families.</td><td>Our own simulators (verified), plus clarification items where an input is missing</td></tr>
+    <tr><td>Replay</td><td class="num">16%</td><td class="num">1,884</td><td>General instructions: the anti-forgetting anchor</td><td>Tülu 3 SFT mixture, SmolTalk2 (no-think)</td></tr>
+    <tr><td>Tutoring</td><td class="num">8%</td><td class="num">938</td><td>Socratic replies to a student's <em>wrong</em> attempt</td><td>MathDial teacher moves (375); own OS dialogues (563)</td></tr>
+    <tr><td>Shell</td><td class="num">6%</td><td class="num">707</td><td>Natural language → bash, each command passes <code>bash -n</code></td><td>tldr, NL2Bash (MIT), InterCode, NL2SH-ALFA</td></tr>
+    <tr><td>Conceptual</td><td class="num">6%</td><td class="num">705</td><td>Concept explanations</td><td>Self-distilled answers to a 295-question bank in 4 wordings, plus hand-written gold</td></tr>
+    <tr class="total"><td>Total (train)</td><td class="num">100%</td><td class="num">11,760</td><td colspan="2">plus 240 validation and 600 out-of-distribution rows</td></tr>
+  </tbody>
+</table>
+<p class="caption">Source: <code>DATASET_CARD.md</code>, <code>reports/manifest.json</code>. Train SHA-256 <code>f56a7113…477d</code>.</p>
+
+<p><strong>Procedural families:</strong> CPU scheduling 1,733 (FCFS, SJF, SRTF, RR, priority, preemptive priority, HRRN); formula 1,530 (11 kinds: EAT, multilevel paging, deadlock minimum, fork count, …); deadlock / Banker's 1,070; page replacement 990 (FIFO, LRU, OPT, CLOCK); disk scheduling 990 (FCFS, SSTF, SCAN, LOOK, C-SCAN, C-LOOK); contiguous allocation 536; address translation 382; clarification 295.</p>
+
+<p><strong>Why generated data for procedures.</strong> A simulator-generated problem has a correct answer by construction, and the team can produce as many as needed at any size. Scraped worked solutions carry their authors' arithmetic slips, and nothing checks them.</p>
+
+<p><strong>Licensing.</strong> Every training row is commercially licensed: MIT 8,991 · ODC-BY-1.0 959 · mixed-permissive 925 · CC-BY-4.0 885. Three sources were excluded on licence grounds. <code>ostep-homework</code> has no licence and is used only as an offline test oracle. <code>ceval/ceval-exam</code> is CC BY-NC-SA and is used for evaluation only. <code>AnishJoshi/nl2bash-custom</code> has no licence.</p>
+
+<h3>1.2 Evaluation datasets</h3>
+<table>
+  <thead><tr><th>Set</th><th class="num">Items</th><th>Measures</th><th>Graded by</th></tr></thead>
+  <tbody>
+    <tr><td>Hand-written OS problem suite</td><td class="num">57</td><td>Procedural correctness on free-worded textbook-style problems, 19 kinds</td><td>Simulator-exact grader (<code>harness.py</code>)</td></tr>
+    <tr><td>OOD holdout</td><td class="num">600</td><td>Problems in framings never used in training; extraction, delegation, correctness</td><td>Simulator-exact; parameters compared field by field</td></tr>
+    <tr><td>General MMLU</td><td class="num">400</td><td>Catastrophic forgetting: general knowledge</td><td>Log-likelihood of the four options</td></tr>
+    <tr><td>Adjacent CS (MMLU CS subjects)</td><td class="num">300</td><td>Forgetting or transfer in nearby subjects</td><td>Log-likelihood</td></tr>
+    <tr><td>OS theory MCQ</td><td class="num">70</td><td>Declarative OS knowledge</td><td>Log-likelihood; generated letter for the RAG experiment (§4.8)</td></tr>
+    <tr><td>Fact-checker probes</td><td class="num">10</td><td>One question per misconception rule</td><td>Manual read of each answer (status <code>unreviewed</code>)</td></tr>
+    <tr><td>RAG fixture queries</td><td class="num">55</td><td>45 in-scope questions labelled with note + section; 10 out-of-scope</td><td>Recall@k, MRR, abstention</td></tr>
+  </tbody>
+</table>
+<p>Every training row was decontaminated against all 4,836 evaluation items before selection (§2.2).</p>
+
+<h3>1.3 Retrieval knowledge base</h3>
+<p>The RAG layer reads a <strong>corpus directory</strong> with a <code>manifest.json</code>. Every document must declare <code>id</code>, <code>title</code>, <code>path</code>, <code>source</code>, <code>licence</code> and <code>permission</code>. The loader <em>refuses</em> a document that lacks any of these instead of skipping it quietly, so no text can enter the index unless its right to be there is recorded.</p>
+<table>
+  <thead><tr><th>Corpus</th><th>Location</th><th class="num">Documents</th><th class="num">Chunks</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr><td>Course notes</td><td><code>data/rag/corpus/</code></td><td class="num">0</td><td class="num">0</td><td><span class="warn">Awaiting owner-supplied notes</span> (lecture notes, lab manuals, PPTs, question banks), with permission recorded per document</td></tr>
+    <tr><td>Test fixture</td><td><code>data/rag/fixture/</code></td><td class="num">12</td><td class="num">38</td><td>Team-written, CC0, no textbook text. Processes, threads, scheduling, synchronisation, deadlock, paging, page replacement, thrashing, segmentation, file systems, disk scheduling, system calls</td></tr>
+  </tbody>
+</table>
+<p>The brief suggests building the knowledge base from Silberschatz, lab manuals, PPTs and past papers. We add no textbook text the owners have not supplied and given permission for.</p>
+</section>
+
+<!-- ======================= 2 PREPROCESSING ======================= -->
+<section class="pb">
+<h2><span class="n">2</span>Dataset Preprocessing</h2>
+
+<h3>2.1 The eleven-stage build</h3>
+<p><code>ostutor/build.py</code> runs every stage in order. It writes each stage's statistics to <code>reports/manifest.json</code> and fails the build if any release gate fails.</p>
+<table>
+  <thead><tr><th class="num">#</th><th>Stage</th><th>What it does</th><th class="num">Rows after</th></tr></thead>
+  <tbody>
+    <tr><td class="num">1</td><td>Ingest</td><td>31 source files, line-level provenance (file + row index) on every row</td><td class="num">80,732</td></tr>
+    <tr><td class="num">2</td><td>Analyse</td><td>Each candidate cleaning rule is tested against the data <em>before</em> adoption; some were rejected on evidence</td><td class="num">80,732</td></tr>
+    <tr><td class="num">3</td><td>Clean / scrub / repair</td><td>Refusals, degenerate repetition, non-Latin replay, bash syntax errors and answer-revealing tutor turns dropped; PII redacted (card numbers Luhn-checked); rows with credentials destroyed</td><td class="num">70,170</td></tr>
+    <tr><td class="num">4</td><td>Deduplicate</td><td>−656 exact (blake2b) · −1,133 near (MinHash LSH, Jaccard 0.80)</td><td class="num">68,381</td></tr>
+    <tr><td class="num">5</td><td>Decontaminate</td><td>−643 against 4,836 eval items (distinctive 13-grams; exact parameter fingerprints, which caught 15 reworded leaks)</td><td class="num">67,738</td></tr>
+    <tr><td class="num">6</td><td>Score</td><td>Category-specific quality scorer</td><td class="num">—</td></tr>
+    <tr><td class="num">7</td><td>Select gold</td><td>Quality floor → identity dedup (fingerprint or embedding) → k-centre diversity → weighted family waterfill</td><td class="num">12,000</td></tr>
+    <tr><td class="num">8</td><td>Render</td><td>The model's own chat template, one system prompt per (mode, domain)</td><td class="num">12,000</td></tr>
+    <tr><td class="num">9</td><td>Split, then order</td><td>11,760 / 240 / 600; rectifier interleaving and spaced replay on the train split</td><td class="num">11,760</td></tr>
+    <tr><td class="num">10</td><td>Verify</td><td>Every ordering invariant re-checked on the rows actually shipped</td><td class="num">—</td></tr>
+    <tr><td class="num">11</td><td>Release gates</td><td>19 gates; all must pass</td><td class="num">19/19</td></tr>
+  </tbody>
+</table>
+<p class="caption">Rows after stages 4 and 5 are computed from the removal counts in the dataset card.</p>
+
+<h3>2.2 Cleaning, deduplication and decontamination</h3>
+<ul>
+  <li><strong>Analyse before cleaning.</strong> A rule is adopted only if the data supports it, and every verdict is written to <code>reports/analysis/</code>. Two bugs found this way are described in Section 5: a tutoring threshold that silently dropped all 1,508 OS tutoring rows, and a decontamination key that removed 58% of the tutoring rows.</li>
+  <li><strong>Boilerplate is not contamination.</strong> A naive "any shared 13-gram" rule removed 58% of the procedural rows. Training and evaluation problems share template text: a Banker's table header alone appears in 428 rows. An evaluation n-gram therefore counts as contamination only when it is <em>rare</em> in training, appearing in at most 5 rows. The 93 boilerplate n-grams are ignored.</li>
+  <li><strong>Generated rows are checked by their parameters, not their words.</strong> A leaked problem is the same problem however it is worded, so simulator rows are matched on an exact parameter fingerprint. That caught 15 reworded leaks that n-grams missed.</li>
+</ul>
+
+<h3>2.3 Selection, rendering, ordering and release gates</h3>
+<ul>
+  <li><strong>Ratios are proportions, not ceilings.</strong> In v1, the categories that came up short let the others' shares balloon: replay reached 31% against a 12% design. The build now scales the total to the scarcest category, which is tutoring. Measured mixture drift is ≤ 0.02 percentage points.</li>
+  <li><strong>Rectifier ordering.</strong> No more than 4 consecutive rows come from one category, and no more than 3 from one source across 81 sources (measured: 1). Replay is spaced every 4 rows early in training and every 14 late (FOREVER, arXiv 2601.03938). The order matters, so training uses a sequential sampler.</li>
+  <li><strong>Surprise-ranked replay.</strong> Replay rows are chosen by their per-token NLL under the base model (SuRe, arXiv 2511.22367), not by a hand-written quality heuristic.</li>
+  <li><strong>Release gates (19/19 pass).</strong> The gates cover: no secrets, no <code>&lt;think&gt;</code> blocks, no non-commercial rows, schema validity, token p99 ≤ 16,384 (measured 2,753; longest row 11,648, so nothing is truncated), rectifier invariants, mixture drift, distinct-answer ratio, template share, diversity, OOD holdout present, procedural inputs complete, and OS tutoring present.</li>
+</ul>
+
+<h3>2.4 Preprocessing for retrieval</h3>
+<table>
+  <thead><tr><th style="width:24%">Step</th><th>Choice</th><th style="width:34%">Why</th></tr></thead>
+  <tbody>
+    <tr><td>Validate the manifest</td><td>Six required fields per document; duplicates and missing licence or permission are errors</td><td>The brief requires provenance and permission for every document</td></tr>
+    <tr><td>Split by heading</td><td>Each Markdown heading starts a section; the chunk carries its note title and section name</td><td>A citation must name a place a student can find</td></tr>
+    <tr><td>Window long sections</td><td>≤ 180 words per chunk with a 30-word overlap</td><td>One idea per chunk; a sentence cut at a boundary is still whole in one of the two chunks</td></tr>
+    <tr><td>Lexical index</td><td>Lower-case alphanumeric tokens, a short stop-word list, BM25 (k₁ = 1.5, b = 0.75)</td><td>Exact OS terms (TLB, inode, Belady) matter</td></tr>
+    <tr><td>Dense index</td><td>all-MiniLM-L6-v2 (Apache-2.0, 22M parameters), normalised embeddings of section + text, loaded from the local cache only</td><td>Catches paraphrase; runs on the CPU; no query leaves the machine</td></tr>
+    <tr><td>Integrity</td><td>SHA-256 over every chunk id and text</td><td>Every evaluation names the exact corpus it ran on</td></tr>
+  </tbody>
+</table>
+<p>The fixture gives 38 chunks from 12 notes; the index builds in 7.3 s on the CPU <span class="tag f">fixture</span>.</p>
+</section>
+
+<!-- ======================= 3 CODE ======================= -->
+<section class="pb">
+<h2><span class="n">3</span>Code Implementation</h2>
+<p>Every screenshot below is rendered from the repository file at the stated line range, and the line numbers are the real ones. The same code appears as text in Appendix A, and the terminal images show captured output.</p>
+
+<h3>3.1 System architecture</h3>
+<figure>
+<svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial" font-size="10.5">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5d636e"/></marker></defs>
+  <g stroke="#16181d" stroke-width="1.2" fill="#fff">
+    <rect x="8" y="104" width="86" height="40" rx="5"/>
+    <rect x="124" y="104" width="92" height="40" rx="5" fill="#f5f6f8"/>
+    <rect x="262" y="14" width="140" height="40" rx="5"/>
+    <rect x="448" y="14" width="140" height="40" rx="5" fill="#e4efe7"/>
+    <rect x="262" y="104" width="140" height="40" rx="5" fill="#e7ecf5"/>
+    <rect x="448" y="104" width="140" height="40" rx="5"/>
+    <rect x="448" y="194" width="140" height="40" rx="5"/>
+    <rect x="262" y="194" width="140" height="40" rx="5" fill="#f6ecdc"/>
+  </g>
+  <g text-anchor="middle" fill="#16181d">
+    <text x="51" y="121">Student</text><text x="51" y="134" fill="#5d636e" font-size="9">Open WebUI</text>
+    <text x="170" y="121">Auto router</text><text x="170" y="134" fill="#5d636e" font-size="9">gateway.py</text>
+    <text x="332" y="31">Parameter extraction</text><text x="332" y="44" fill="#5d636e" font-size="9">base model, grounded</text>
+    <text x="518" y="31">Verified simulator</text><text x="518" y="44" fill="#5d636e" font-size="9">exact numbers</text>
+    <text x="332" y="121">RAG retrieval (CPU)</text><text x="332" y="134" fill="#5d636e" font-size="9">BM25 + MiniLM, cites [S1]</text>
+    <text x="518" y="121">Fine-tuned model</text><text x="518" y="134" fill="#5d636e" font-size="9">Qwen3-4B + LoRA v3</text>
+    <text x="518" y="211">Fact checker</text><text x="518" y="224" fill="#5d636e" font-size="9">10 correction rules</text>
+    <text x="332" y="211">Tutor mode</text><text x="332" y="224" fill="#5d636e" font-size="9">no solver, no RAG</text>
+  </g>
+  <g stroke="#5d636e" stroke-width="1.1" fill="none" marker-end="url(#a)">
+    <path d="M94,124 H122"/>
+    <path d="M216,116 L260,40"/><path d="M402,34 H446"/>
+    <path d="M216,124 H260"/><path d="M402,124 H446"/>
+    <path d="M518,144 V192"/>
+    <path d="M216,132 L260,210"/>
+    <path d="M300,54 V102" stroke-dasharray="3 3"/>
+  </g>
+  <g fill="#5d636e" font-size="8.6">
+    <text x="232" y="74" text-anchor="end">solvable problem</text>
+    <text x="239" y="100" text-anchor="middle">concept /</text>
+    <text x="239" y="111" text-anchor="middle">analysis</text>
+    <text x="232" y="184" text-anchor="end">shown attempt</text>
+    <text x="305" y="80">ungrounded → model</text>
+    <text x="424" y="28" text-anchor="middle">grounded</text>
+  </g>
+</svg>
+<figcaption><strong>Figure 1.</strong> Request flow. The router picks a path. Solvable problems are computed by a simulator. Concept and analysis questions are grounded in retrieved course notes, answered by the fine-tuned model and fact-checked. A shown attempt goes to the Socratic tutor, which never receives a computed answer or a retrieved passage.</figcaption>
+</figure>
+<table>
+  <thead><tr><th>Layer</th><th>Component</th><th>Runs on</th></tr></thead>
+  <tbody>
+    <tr><td>Weights</td><td>llama.cpp b11050 · Q8_0 base GGUF + v3 LoRA (f16) applied at runtime · port 8081</td><td>RTX 4060 Laptop (8 GB)</td></tr>
+    <tr><td>Logic</td><td><code>serve/gateway.py</code> (FastAPI): routing, solver, <strong>retrieval</strong>, fact checking, loop guard, trained prompts · port 8090</td><td>CPU</td></tr>
+    <tr><td>Retrieval</td><td><code>ostutor/rag/</code>: corpus loader, BM25, MiniLM, rank fusion, abstain gate, citations</td><td>CPU</td></tr>
+    <tr><td>UI</td><td>Open WebUI 0.11.3, local only · port 3000</td><td>CPU</td></tr>
+  </tbody>
+</table>
+
+<h3>3.2 Data pipeline</h3>
+<p>Stages 3–5 of the build. Each stage writes its statistics into the manifest and prints what it removed, so a regression shows up as a changed count.</p>
+<figure><img src="shots/code_build_stages.png" alt="build.py stages 3 to 5">
+<figcaption><strong>Figure 2.</strong> <code>ostutor/build.py</code>: cleaning, deduplication and decontamination stages.</figcaption></figure>
+<figure><img src="shots/code_decontaminate.png" alt="decontamination core">
+<figcaption><strong>Figure 3.</strong> The core of decontamination. Generated rows are judged by exact parameter fingerprint, prose rows by <em>distinctive</em> shared 13-grams only.</figcaption></figure>
+
+<h3>3.3 Fine-tuning</h3>
+<p>QLoRA via Unsloth on Kaggle's free tier: 2 × Tesla T4 with DDP (<code>torchrun --nproc_per_node=2</code>), 735 optimiser steps, 3.5 hours. The settings and the reason for each:</p>
+<table>
+  <thead><tr><th style="width:30%">Setting</th><th style="width:28%">Value</th><th>Why</th></tr></thead>
+  <tbody>
+    <tr><td>Base model</td><td>Qwen3-4B-Instruct-2507 (Apache-2.0), non-thinking</td><td>Visible numbered steps for students; fits 16k-token QLoRA on a T4; 14B+ cannot train at 16k on free hardware or serve fast on 8 GB</td></tr>
+    <tr><td>LoRA</td><td>r = 32, α = 64, all linear layers, dropout 0.05</td><td>LoRA bounds weight drift (forgets less than full fine-tuning)</td></tr>
+    <tr><td>Learning rate / schedule</td><td>1e-4, cosine, 3% warm-up, <strong>1 epoch</strong></td><td>v2.2's second epoch memorised more</td></tr>
+    <tr><td>Sequence length</td><td>16,384, no packing</td><td>Longest row 11,648; packing would break the ordering</td></tr>
+    <tr><td>Precision / optimiser</td><td>fp16, adamw_8bit, NEFTune α = 5</td><td>T4 (Turing) has no bf16</td></tr>
+    <tr><td>Loss</td><td>Assistant tokens only</td><td>Learn to answer, not to echo the question</td></tr>
+    <tr><td>Checkpoint</td><td>Best validation loss, evaluated ~every 8% of steps</td><td>The OOD loss is logged but never used to select a checkpoint</td></tr>
+  </tbody>
+</table>
+<figure><img src="shots/code_lora.png" alt="LoRA configuration">
+<figcaption><strong>Figure 4.</strong> <code>train/kaggle_train.py</code>: the 4-bit base and the LoRA adapter on all seven projection matrices.</figcaption></figure>
+<figure><img src="shots/code_sftconfig.png" alt="trainer configuration">
+<figcaption><strong>Figure 5.</strong> The trainer configuration: no packing, fp16, 8-bit AdamW, NEFTune, step-wise validation with best-checkpoint restore.</figcaption></figure>
+
+<h3>3.4 Verified solver</h3>
+<p>The model never carries out a procedure. It <em>reads</em> the question into typed JSON. This step runs on the untuned base at LoRA scale 0, which reads more reliably: 84% extraction accuracy against 79% for the adapter. Every extracted number must then appear in the question. Grounded parameters go to a simulator, which computes the answer; anything ungrounded falls back to the model.</p>
+<figure><img src="shots/code_grounding.png" alt="grounding check">
+<figcaption><strong>Figure 6.</strong> <code>ostutor/solver.py</code>: the grounding check, which makes delegation trustworthy. It caught an invented Banker's <em>Available</em> vector [10, 5, 7] for a problem stating [3, 3, 2].</figcaption></figure>
+
+<h3>3.5 RAG pipeline</h3>
+<p>The pipeline has three files. <code>corpus.py</code> validates the manifest and cuts the notes into citable chunks. <code>retrieve.py</code> ranks the chunks, decides whether any of them are relevant, and builds the prompt. <code>__init__.py</code> documents the design.</p>
+<figure><img src="shots/code_corpus.png" alt="corpus loader">
+<figcaption><strong>Figure 7.</strong> <code>ostutor/rag/corpus.py</code>: a document without source, licence or permission is refused, not skipped.</figcaption></figure>
+<figure><img src="shots/code_retrieve.png" alt="hybrid retrieval">
+<figcaption><strong>Figure 8.</strong> <code>ostutor/rag/retrieve.py</code>: BM25 and dense rankings, the abstain gate, and reciprocal-rank fusion (k = 60; Cormack et al., SIGIR 2009).</figcaption></figure>
+<p><strong>The abstain gate.</strong> A passage that is only the least-bad match is worse than no passage, because the model would cite it as support. When the gate decides the notes do not cover the question, retrieval returns nothing, and the answer is generated exactly as without RAG. The first gate (v1) used only the dense similarity, and it failed on the fixture (§4.7). The served gate (v2) keeps the passages if <em>either</em> signal is strong: cosine ≥ 0.45 or BM25 ≥ 6.0.</p>
+<figure><img src="shots/code_augment.png" alt="prompt construction">
+<figcaption><strong>Figure 9.</strong> The prompt keeps the <em>trained</em> system prompt word for word at the start, so the adapter still sees the prompt it learned the mode under. The notes follow, labelled [S1]…[S4], with an instruction never to invent a citation.</figcaption></figure>
+
+<h3>3.6 Gateway integration</h3>
+<p>Retrieval is layer 2 of the gateway. It runs after the simulator layer, so a solvable problem is still computed, and before the fact checker, which checks the grounded draft. Only <code>explain</code> and <code>analyze</code> retrieve. Tutor mode never does, because a passage could state the answer the student is working towards. Retrieval is switched on by <code>OSTUTOR_RAG=&lt;corpus dir&gt;</code>; a gateway started without it behaves exactly as before. Answers end with a "Sources from your course notes" list, in both the streamed and the non-streamed path.</p>
+<figure><img src="shots/code_gateway_layers.png" alt="gateway layers">
+<figcaption><strong>Figure 10.</strong> <code>serve/gateway.py</code>: layer 1 is the simulator, layer 2 retrieval, layer 3 the fact checker.</figcaption></figure>
+
+<h3>3.7 Evaluation and tests</h3>
+<p>Every comparison in the project is <em>paired</em>: the same items are scored under two configurations. The right test for a paired yes/no outcome is McNemar's, and with 5–30 discordant items the exact binomial form is needed.</p>
+<figure><img src="shots/code_mcnemar.png" alt="exact McNemar">
+<figcaption><strong>Figure 11.</strong> <code>ostutor/evaluation/stats.py</code>: the exact two-sided McNemar test used for every p-value in Section 4.</figcaption></figure>
+<p>Four test suites need no GPU: <code>tools/test_pipeline.py</code> (data pipeline), <code>tools/test_router.py</code> (28 labelled routing cases, 0 misroutes allowed on shown attempts), <code>tools/test_g0.py</code> (55 checks on statistics, extraction scoring, grader regressions and the one-adapter guard), and the new <code>tools/test_rag.py</code> (29 checks). The gateway suite grew from 28 to 34 checks.</p>
+<figure><img src="shots/term_test_rag.png" alt="RAG tests">
+<figcaption><strong>Figure 12.</strong> <code>tools/test_rag.py</code>: 29/29 checks, covering manifest refusal, chunking, BM25, hybrid retrieval, abstention, prompt construction and citation parsing.</figcaption></figure>
+<figure><img src="shots/term_test_gateway.png" alt="gateway tests">
+<figcaption><strong>Figure 13.</strong> <code>serve/test_gateway.py</code> (last lines): the six retrieval checks. Every earlier check is unchanged with retrieval off.</figcaption></figure>
+</section>
+
+<!-- ======================= 4 METRICS ======================= -->
+<section class="pb">
+<h2><span class="n">4</span>Metrics (Assessment): Results and Discussion</h2>
+
+<h3>4.1 Metrics and why each was chosen</h3>
+<table>
+  <thead><tr><th style="width:24%">Metric</th><th>What it answers</th><th style="width:30%">Why this one</th></tr></thead>
+  <tbody>
+    <tr><td>Simulator-exact accuracy</td><td>Is the final number right?</td><td>The simulator is ground truth; no judge model, no partial credit</td></tr>
+    <tr><td>Exact McNemar p</td><td>Is a before/after difference real?</td><td>Paired items; small discordant counts</td></tr>
+    <tr><td>Right→wrong / wrong→right</td><td>Did an unchanged mean hide cancelling losses?</td><td>Forgetting can hide inside a flat average</td></tr>
+    <tr><td>Extraction accuracy, delegation rate</td><td>Did the model read the problem correctly, and how often did the simulator answer?</td><td>Only answer-changing fields are scored (e.g. the quantum only for RR)</td></tr>
+    <tr><td>Validation / OOD loss</td><td>Did training fit without diverging?</td><td>A training-health signal, <em>not</em> a correctness measure (§4.2)</td></tr>
+    <tr><td>Precision / recall (fact checker)</td><td>Does a correction fire when, and only when, it should?</td><td>False alarms damage trust; misses ship misconceptions</td></tr>
+    <tr><td>Section recall@k, MRR@10</td><td>Did retrieval find the passage that answers the question?</td><td>Section-level is stricter than document-level, and a citation needs the right section</td></tr>
+    <tr><td>Abstention rate</td><td>Does retrieval return nothing when the notes do not cover the question?</td><td>A wrong passage is cited as support</td></tr>
+    <tr><td>Citation rate, invented citations</td><td>Does the answer use and honestly cite the notes?</td><td>A citation to a note that does not exist is the RAG equivalent of a hallucination</td></tr>
+    <tr><td>Latency p95, tokens/s</td><td>Does it stay fast?</td><td>Brief: retrieval ≤ 500 ms p95; generation ≥ 20 tok/s</td></tr>
+  </tbody>
+</table>
+<p><strong>Why no AUC-ROC or F1 over the whole system.</strong> The tutor is not a scored binary classifier, so there is no threshold to sweep. Precision and recall are used where a binary decision exists: the fact checker and the abstain gate.</p>
+
+<h3>4.2 Training loss <span class="tag m">measured</span></h3>
+<figure><img class="chart" src="shots/loss_curve.svg" alt="loss curves">
+<figcaption><strong>Figure 14.</strong> v3 training run, from the trainer's own log (<code>outputs/ostutor-lora-v3/ostutor-lora/train_metrics.json</code>).</figcaption></figure>
+<table>
+  <thead><tr><th>Quantity</th><th class="num">Start (step 59)</th><th class="num">End (step 735)</th></tr></thead>
+  <tbody>
+    <tr><td>Validation loss (240 rows)</td><td class="num">0.4413</td><td class="num"><strong>0.2713</strong></td></tr>
+    <tr><td>OOD loss (logged, never used for selection)</td><td class="num">0.0385</td><td class="num">0.0139</td></tr>
+    <tr><td>Training loss, epoch average</td><td class="num" colspan="2">0.1773 (last logged batches 0.31–0.33)</td></tr>
+  </tbody>
+</table>
+<p>The validation loss fell at every one of 12 evaluations, so training was healthy. The training loss climbs from near zero to 0.31–0.33 after step ~550. The training order is engineered (rectifier interleaving, spaced replay), so the late batches have a different mix from the early ones; this was not investigated further, and validation kept falling through it. It does <strong>not</strong> show the model can solve problems. The OOD loss is low because that split is fully templated procedural text, yet the same model solves only 34 of 57 suite problems on its own. Teacher-forced loss measures how well the model predicts a correct answer it is shown, not whether it can produce one.</p>
+
+<h3>4.3 Procedural accuracy and ablation <span class="tag m">measured</span></h3>
+<p>All six configurations were measured on the served path: llama.cpp with one adapter per server, greedy decoding, 57 items. They were graded with the corrected grader (D-003 and D-004, Section 5).</p>
+<table>
+  <thead><tr><th>Configuration</th><th class="num">Correct</th><th class="num">Accuracy</th><th class="num">Delegated to simulator</th></tr></thead>
+  <tbody>
+    <tr><td>Base (untuned)</td><td class="num">30/57</td><td class="num">52.6%</td><td class="num">0</td></tr>
+    <tr><td>Base + solver</td><td class="num">49/57</td><td class="num">86.0%</td><td class="num">38</td></tr>
+    <tr><td>v2.2 adapter</td><td class="num">19/57</td><td class="num">33.3%</td><td class="num">0</td></tr>
+    <tr><td>v2.2 + solver</td><td class="num">43/57</td><td class="num">75.4%</td><td class="num">38</td></tr>
+    <tr><td>v3 adapter</td><td class="num">34/57</td><td class="num">59.6%</td><td class="num">0</td></tr>
+    <tr class="total"><td>v3 + solver (deployed)</td><td class="num">57/57</td><td class="num">100.0%</td><td class="num">38</td></tr>
+  </tbody>
+</table>
+<p class="caption">Source: <code>reports/g0/20261012-1429/regraded.md</code>. As originally graded, base was 25/57; the 5 changed items are listed there.</p>
+<table>
+  <thead><tr><th>What is being tested</th><th>A → B</th><th class="num">Right→wrong</th><th class="num">Wrong→right</th><th class="num">p</th><th>Verdict</th></tr></thead>
+  <tbody>
+    <tr><td>Solver, on v3</td><td>34 → 57</td><td class="num">0</td><td class="num">23</td><td class="num">&lt; 10⁻⁶</td><td class="ok">significant</td></tr>
+    <tr><td>Solver, on the base</td><td>30 → 49</td><td class="num">0</td><td class="num">19</td><td class="num">4 × 10⁻⁶</td><td class="ok">significant</td></tr>
+    <tr><td>Adapter, with the solver</td><td>49 → 57</td><td class="num">0</td><td class="num">8</td><td class="num">0.0078</td><td class="ok">significant</td></tr>
+    <tr><td>Adapter, without the solver</td><td>30 → 34</td><td class="num">11</td><td class="num">15</td><td class="num">0.557</td><td class="warn">not significant</td></tr>
+    <tr><td>v2.2 vs base, no solver</td><td>30 → 19</td><td class="num">17</td><td class="num">6</td><td class="num">0.035</td><td class="bad">v2.2 significantly worse</td></tr>
+    <tr><td>v2.2 → v3, no solver</td><td>19 → 34</td><td class="num">2</td><td class="num">17</td><td class="num">0.0007</td><td class="ok">significant</td></tr>
+  </tbody>
+</table>
+<p><strong>Reading the ablation.</strong> The solver contributes most of the accuracy: +19 to +23 items, with zero losses. The adapter's measurable value is the 8 items the solver cannot take on its own (49 → 57, no losses). Every one of those 8 comes from the adapter answering the problems the solver declines. Without the solver, the adapter's +4 is indistinguishable from noise. v2.2 actively hurt the model, which is why v3 was rebuilt.</p>
+
+<h3>4.4 Out-of-distribution holdout <span class="tag m">measured</span></h3>
+<table>
+  <thead><tr><th>Kind</th><th class="num">n</th><th class="num">Extraction</th><th class="num">Delegated</th><th class="num">Correct</th><th class="num">Delegated but misread</th></tr></thead>
+  <tbody>
+    <tr><td>Banker's request</td><td class="num">91</td><td class="num">98.9%</td><td class="num">98.9%</td><td class="num">100.0%</td><td class="num">0</td></tr>
+    <tr><td>Banker's safety</td><td class="num">96</td><td class="num">96.9%</td><td class="num">96.9%</td><td class="num">100.0%</td><td class="num">0</td></tr>
+    <tr><td>Disk scheduling</td><td class="num">80</td><td class="num">88.8%</td><td class="num">100.0%</td><td class="num"><span class="warn">92.5%</span></td><td class="num">9</td></tr>
+    <tr><td>Free-space allocation</td><td class="num">74</td><td class="num">100.0%</td><td class="num">100.0%</td><td class="num">100.0%</td><td class="num">0</td></tr>
+    <tr><td>Page replacement</td><td class="num">86</td><td class="num">98.8%</td><td class="num">100.0%</td><td class="num">100.0%</td><td class="num">1</td></tr>
+    <tr><td>CPU scheduling</td><td class="num">91</td><td class="num">98.9%</td><td class="num">98.9%</td><td class="num">98.9%</td><td class="num">0</td></tr>
+    <tr><td>Address translation</td><td class="num">82</td><td class="num">100.0%</td><td class="num">100.0%</td><td class="num">100.0%</td><td class="num">0</td></tr>
+    <tr class="total"><td>All</td><td class="num">600</td><td class="num">97.5%</td><td class="num">99.2%</td><td class="num">98.8%</td><td class="num">10</td></tr>
+  </tbody>
+</table>
+<p class="caption">Source: <code>reports/g0/20261012-1429/ood.json</code>, <code>summary.md</code>. v3 + solver, end to end.</p>
+<p>7 of the 600 answers were wrong. Six were disk problems where the stated range "0–299" was read as size 299 instead of 300 cylinders. The re-extraction diagnostic reproduced this off-by-one in <strong>9 of 9</strong> misread items. Grounding cannot catch it, because 299 <em>does</em> appear in the question. The seventh wrong answer was a scheduling problem that was not delegated.</p>
+
+<h3>4.5 Catastrophic forgetting <span class="tag m">measured</span></h3>
+<table>
+  <thead><tr><th>Benchmark (paired)</th><th class="num">Base</th><th class="num">v3</th><th class="num">Δ</th><th class="num">R→W</th><th class="num">W→R</th><th class="num">p</th></tr></thead>
+  <tbody>
+    <tr><td>General MMLU (400)</td><td class="num">80.25%</td><td class="num">79.50%</td><td class="num">−0.75 pp</td><td class="num">13</td><td class="num">10</td><td class="num">0.678</td></tr>
+    <tr><td>Adjacent CS (300)</td><td class="num">64.67%</td><td class="num">67.33%</td><td class="num">+2.66 pp</td><td class="num">11</td><td class="num">19</td><td class="num">0.201</td></tr>
+    <tr><td>OS theory MCQ (70)</td><td class="num">90.00%</td><td class="num">85.71%</td><td class="num">−4.29 pp</td><td class="num">4</td><td class="num">1</td><td class="num">0.375</td></tr>
+  </tbody>
+</table>
+<p class="caption">Source: <code>reports/forgetting_v3_paired.json</code>; p-values from <code>reports/g0/historical_significance.md</code>.</p>
+<p><strong>No effect is statistically detectable in either direction.</strong> That covers both the OS-theory dip and the adjacent-CS gain. The 70-item theory set is too small to decide a 4-point change, because the result hinges on 5 discordant questions; a 200-item set is planned. The base model scores identically, item for item, in two separate runs, so this evaluation is deterministic.</p>
+
+<h3>4.6 Fact checker <span class="tag m">measured</span></h3>
+<p>Ten probes were run, one per correction rule, and every v3 answer was read by hand. The checker produced <strong>1 true positive, 2 false positives, 1 false negative and 6 true negatives</strong>, so precision is 1/3 and recall is 1/2. Both false alarms were <em>correct</em> negated sentences: the rules match "suffers from Belady's anomaly" without seeing the "does not" before it. The miss was <code>seg_internal_frag</code>. On a broader set of 70 theory answers it flagged 0. <span class="src">Source: <code>reports/g0/20261012-1429/factcheck_v3.json</code>.</span></p>
+
+<h3>4.7 RAG: retrieval quality and latency <span class="tag f">fixture</span></h3>
+<figure><img src="shots/term_rag_eval.png" alt="retrieval evaluation">
+<figcaption><strong>Figure 15.</strong> <code>tools/rag_eval.py</code> over the fixture: 45 in-scope and 10 out-of-scope questions, 5 timed passes each (the first discarded).</figcaption></figure>
+<table>
+  <thead><tr><th>Configuration</th><th class="num">Section R@1</th><th class="num">Section R@4</th><th class="num">MRR@10</th><th class="num">False abstain</th><th class="num">Out-of-scope abstained</th><th class="num">p95 ms</th></tr></thead>
+  <tbody>
+    <tr><td>BM25 only</td><td class="num">95.6%</td><td class="num">100.0%</td><td class="num">0.978</td><td class="num">0/45</td><td class="num"><span class="bad">5/10</span></td><td class="num">0.07</td></tr>
+    <tr><td>Dense only (MiniLM)</td><td class="num">93.3%</td><td class="num">93.3%</td><td class="num">0.933</td><td class="num">2/45</td><td class="num">6/10</td><td class="num">6.97</td></tr>
+    <tr><td>Hybrid, v1 gate</td><td class="num">91.1%</td><td class="num">93.3%</td><td class="num">0.927</td><td class="num">2/45</td><td class="num"><span class="bad">6/10</span></td><td class="num">6.25</td></tr>
+    <tr class="total"><td>Hybrid, v2 gate (served)</td><td class="num">93.3%</td><td class="num">95.6%</td><td class="num">0.944</td><td class="num">2/45</td><td class="num">10/10</td><td class="num">5.70</td></tr>
+  </tbody>
+</table>
+<p class="caption">Source: <code>reports/rag/fixture_eval.md</code> (the committed run). Latency is CPU-only, per query, after warm-up.</p>
+<ul>
+  <li><strong>Latency is not a concern.</strong> p95 is 5.7 ms against the brief's 500 ms.</li>
+  <li><strong>The v1 gate failed.</strong> It was chosen before any measurement, and it let 4 of the 10 off-topic questions retrieve OS passages. Dense similarity alone cannot separate the two classes: in-scope questions go as low as 0.34 and out-of-scope ones as high as 0.40.</li>
+  <li><strong>The v2 gate is optimistic.</strong> It was fitted on these same 55 questions, so its 10/10 is not an independent result. It must be refitted on held-out questions over the real notes.</li>
+  <li><strong>BM25 beat the hybrid on the fixture.</strong> The likely reason: the same person wrote the notes and the questions, so they share vocabulary. Real student questions will paraphrase more, which is the case the dense half exists for. The decision stays open until real-notes data exists.</li>
+  <li><strong>Both remaining misses are false abstentions</strong> on terse questions: "Is SRTF preemptive?" and "When is busy waiting acceptable?". The answer is then generated without notes, which is the safe failure.</li>
+</ul>
+
+<h3>4.8 RAG: end to end on the served model <span class="tag f">fixture</span></h3>
+@@E2E@@
+<p><strong>Reading the results.</strong></p>
+<ul>
+  <li><strong>Citations behave as designed.</strong> 41 of 43 answers that were given notes cited them, and no answer cited a note that does not exist. The two that did not cite (SSTF starvation, invoking a system call) still restated the note's content. All 10 off-topic questions received no notes, so their answers were generated exactly as without RAG.</li>
+  <li><strong>RAG fixed a misconception the fine-tuned model holds.</strong> Asked "Can LRU suffer from Belady's anomaly?", the model <em>without</em> notes answered "Yes, LRU (Least Recently Used) can suffer from Belady's anomaly", which is wrong and was flagged by the fact checker. <em>With</em> notes it answered "No, LRU … does not suffer from Belady's anomaly [S1]" and gave the stack-algorithm reason from the note. That was the only fact-checker flag in either arm (1 off, 0 on, of 55).</li>
+  <li><strong>No measurable effect on the theory MCQ.</strong> Both arms scored 65/70, with one flip each way (p = 1.0), including on the 53 items where notes were retrieved. At 93% the model is near the ceiling of this set in this protocol, so the MCQ cannot show a gain. A harder 200-item set is needed (G3).</li>
+  <li><strong>Speed is unaffected.</strong> Decoding stayed at ~43 tok/s with about 380 extra prompt tokens; the slowest answer with RAG was 41.7 tok/s, against a 20 tok/s floor. These are server-reported decode rates and exclude prompt processing, which is why they differ from the 26.9 tok/s wall-clock figure measured earlier through the full stack.</li>
+  <li><strong>A confound, stated plainly.</strong> The run capped answers at 700 tokens. 28 of 55 answers <em>without</em> notes hit the cap, against 7 of 55 with notes. So the shorter, faster answers with RAG (median 225 tokens, 5.5 s, against 700 tokens and 16.2 s) are partly an artefact of truncation. They show that grounded answers are more focused; they do not give a clean measure of speed-up.</li>
+</ul>
+
+<h3>4.9 Discussion</h3>
+<ul>
+  <li><strong>Each layer guards a different failure.</strong> The simulator guards procedures: a 4B model cannot execute a long schedule reliably, but it can read one. Retrieval guards declarative claims by tying each one to a passage the student can check. The fact checker guards a known list of misconceptions. Tutor mode is shielded from all three, because its job is to <em>withhold</em> the answer.</li>
+  <li><strong>Fine-tuning's measured value is narrower than first claimed.</strong> With the solver, the adapter adds 8 significant items. Without it, there is no significant gain over the untuned base. Its other contributions are the trained output formats, the Socratic behaviour and the shell mode, and none of these is yet measured by a number (G3).</li>
+  <li><strong>RAG addresses the one measured weakness.</strong> Declarative OS knowledge is the area where fine-tuning did not help and may have slightly hurt (85.71% vs 90.00%, not significant). Retrieval is the brief's recommended remedy for exactly this, and Section 4.8 tests it.</li>
+  <li><strong>Measurement found more errors than the model did.</strong> Two grader blind spots, a non-deterministic cache, a void benchmark and two unsupported claims all biased the numbers in the project's favour. Each was found by auditing the evaluation rather than the model (Section 5).</li>
+</ul>
+
+<h3>4.10 Expected outcome on the course notes <span class="tag t">target</span></h3>
+<p>These are the acceptance targets for the course-notes run. None of them is a result yet.</p>
+<table>
+  <thead><tr><th>Measure</th><th class="num">Fixture (measured)</th><th class="num">Target on course notes</th><th>How it will be measured</th></tr></thead>
+  <tbody>
+    <tr><td>Retrieval p95 latency</td><td class="num">5.7 ms</td><td class="num">≤ 500 ms</td><td><code>tools/rag_eval.py</code></td></tr>
+    <tr><td>Section recall@4</td><td class="num">95.6%</td><td class="num">≥ 85%</td><td>≥ 100 owner-written questions, labelled, held out from gate fitting</td></tr>
+    <tr><td>Out-of-scope abstention</td><td class="num">10/10 (fitted)</td><td class="num">≥ 90%</td><td>Same held-out set</td></tr>
+    <tr><td>Answers citing a note, when given notes</td><td class="num">see §4.8</td><td class="num">≥ 90%</td><td><code>tools/rag_e2e.py</code></td></tr>
+    <tr><td>Invented citations</td><td class="num">see §4.8</td><td class="num">0</td><td><code>tools/rag_e2e.py</code></td></tr>
+    <tr><td>OS theory MCQ (200 items) with RAG</td><td class="num">—</td><td class="num">≥ base (90%)</td><td>Paired McNemar, RAG off vs on</td></tr>
+    <tr><td>Procedural suite, full system</td><td class="num">57/57</td><td class="num">57/57 (no regression)</td><td><code>tools/g0_ablation.py</code></td></tr>
+    <tr><td>Generation speed with notes in the prompt</td><td class="num">see §4.8</td><td class="num">≥ 20 tok/s</td><td>Server timings</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ======================= 5 WRONG ======================= -->
+<section class="pb">
+<h2><span class="n">5</span>What Went Wrong</h2>
+<p>These are listed by impact. Each entry gives what happened, how it was found, and what was done about it. The first group distorted <em>reported numbers</em>, which is the most serious kind of error for a project whose claims rest on measurement.</p>
+
+<h3>5.1 Errors in measurement and reporting</h3>
+<table>
+  <thead><tr><th style="width:24%">What went wrong</th><th>Effect</th><th style="width:30%">Fix / status</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Void benchmark</strong>: v2.2 and v3 loaded into one llama-server and switched by per-request LoRA scale</td><td>Did not isolate the adapters: v3 scored 17/57 there and 36/57 alone, so every column of that benchmark was wrong</td><td>Declared void. One adapter per server, enforced by <code>check_adapters</code>, which refuses to measure otherwise</td></tr>
+    <tr><td><strong>Unsupported claims in submitted PDFs</strong>: "final training loss 0.2710", and "the flips confirm genuine transfer"</td><td>0.2710 appears in no training artifact. The transfer has p = 0.20</td><td>Withdrawn in <code>PROJECT_CONTEXT.md</code> and in this report. <span class="warn">The two earlier PDFs still need correcting (owner decision)</span></td></tr>
+    <tr><td><strong>Grader blind spots</strong> (D-003, D-004): LaTeX <code>\quad</code> separators, and a "Final Answer" line with a bare number</td><td>5 correct base-model answers were graded wrong. That inflated the adapter's apparent no-solver gain from p = 0.557 to p = 0.136</td><td>Fixed with regression tests. Re-grading 799 historical outputs changed 0 verdicts. Base-model failures are now hand-audited</td></tr>
+    <tr><td><strong>Prompt cache made greedy decoding non-deterministic</strong> (D-005)</td><td>Same weights scored 36/57 and 34/57; only 23/57 outputs were identical</td><td>Evaluation sends <code>cache_prompt: false</code> (6/6 byte-identical repeats); serving keeps the cache. The deterministic rerun of G0 was interrupted and is still pending</td></tr>
+    <tr><td><strong>Teacher-forced loss read as correctness</strong></td><td>A low OOD loss (0.0139) was taken as evidence of generalisation</td><td>Loss is reported only as a training-health signal (§4.2)</td></tr>
+  </tbody>
+</table>
+
+<h3>5.2 Errors in the system</h3>
+<table>
+  <thead><tr><th style="width:24%">What went wrong</th><th>Effect</th><th style="width:30%">Fix / status</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Disk-size off-by-one</strong> in extraction ("0–299" read as 299)</td><td>6 confidently wrong OOD answers. Grounding passes it because 299 is in the text</td><td><span class="warn">Not fixed</span>: a student-facing change awaiting owner approval. Proposed: read an "a–b" range as b − a + 1 cylinders</td></tr>
+    <tr><td><strong>Fact checker ignores negation</strong> and misses one of its own rules</td><td>Precision 1/3, recall 1/2 on the probes</td><td><span class="warn">Not fixed</span>; awaiting approval. Proposed: a negation window before each pattern, and probes for every rule in the test suite</td></tr>
+    <tr><td><strong>Fact checker silently returned the misconception</strong> when its redraft call failed (D-002)</td><td>A student would see "LRU suffers from Belady's anomaly" with no warning</td><td>Fixed: the correction is attached. The test was also non-hermetic (it passed only with the server up)</td></tr>
+    <tr><td><strong>Fact checker runs only on non-streaming requests</strong></td><td>Open WebUI streams by default, so in the UI the checker may never run. Not confirmed: the gateway logs for this deployment are empty</td><td><span class="warn">To verify</span>. Retrieval and its sources footer work on both paths</td></tr>
+    <tr><td><strong>v1 RAG abstain gate</strong></td><td>4 of 10 off-topic questions retrieved OS passages</td><td>Replaced by the v2 combined gate, which must be refitted on held-out real-notes questions</td></tr>
+  </tbody>
+</table>
+
+<h3>5.3 Errors in the data pipeline and training</h3>
+<table>
+  <thead><tr><th style="width:24%">What went wrong</th><th>Effect</th><th style="width:30%">Fix</th></tr></thead>
+  <tbody>
+    <tr><td>More data was used to fix scheduling</td><td>Scheduling had the most rows (1,733) and the worst accuracy (42%). All 7 of 7 failures had perfect arithmetic and a wrong schedule</td><td>Diagnosed as architectural; fixed by delegation, not more data (64.9% → 100%)</td></tr>
+    <tr><td><code>clean.py</code> required ≥ 4 messages for tutoring</td><td>Silently discarded all 1,508 OS tutoring rows</td><td>Threshold &lt; 2, plus a release gate requiring ≥ 300 OS tutoring rows</td></tr>
+    <tr><td>Naive 13-gram decontamination</td><td>Removed 58% of procedural rows (shared template text)</td><td>Distinctive n-grams only, plus parameter fingerprints</td></tr>
+    <tr><td>Decontamination keyed on <code>category == "procedural"</code></td><td>Removed 58% of OS tutoring rows</td><td>Keyed on whether a row has a fingerprint</td></tr>
+    <tr><td><code>numbers_in()</code> missed a number followed by "."</td><td>Grounding wrongly rejected valid extractions</td><td>Fixed with tests</td></tr>
+    <tr><td>v2.2's second epoch</td><td>Memorised more; v2.2 is significantly <em>worse</em> than base (p = 0.035)</td><td>v3 trains one epoch</td></tr>
+    <tr><td>A <code>memory_probe()</code> before training</td><td>Bypassed Unsloth's checkpointing and reported a false OOM</td><td>Replaced by running the longest rows first through the real trainer</td></tr>
+  </tbody>
+</table>
+
+<h3>5.4 Errors in engineering process</h3>
+<ul>
+  <li><strong>A benchmark chain waited an hour polling itself.</strong> <code>busy("benchmark.py")</code> matched <code>run_full_benchmark.py</code>. Polling for a free GPU between jobs also raced and crashed the next job. Fixed: match the full path, and require several consecutive clear polls.</li>
+  <li><strong>Git normalised 57 CRLF files to LF.</strong> The repository was staged before line-ending conversion was disabled, which would have silently changed bytes the dataset manifest hashes. Fixed and verified file by file (D-001).</li>
+  <li><strong>RAG fixture is not independent.</strong> The notes and questions share an author, and the v2 gate was fitted on them. This is acknowledged in every RAG number, but it is a real limitation.</li>
+</ul>
+</section>
+
+<!-- ======================= 6 IMPROVEMENTS ======================= -->
+<section class="pb">
+<h2><span class="n">6</span>Alternative Flow (Improvements)</h2>
+<p>For each stage: what we would do differently with hindsight, or next, and the evidence that motivates it.</p>
+
+<h3>6.1 Evaluate before training, not after</h3>
+<p>The biggest lesson is ordering. The project trained three adapters before it measured the untuned base on the same suite with the same grader. Done the other way round, the ablation would have shown on day one that the solver, not more fine-tuning, was the lever. A better flow:</p>
+<ol>
+  <li>Build the evaluation sets and the grader, then audit the grader on the <em>base</em> model's outputs.</li>
+  <li>Measure the base model, deterministically, with a significance test for every comparison.</li>
+  <li>Add tools (solver, retrieval) and measure again.</li>
+  <li>Fine-tune only for the gaps tools cannot close, and state the expected effect size first.</li>
+</ol>
+
+<h3>6.2 Data</h3>
+<ul>
+  <li><strong>Targeted declarative replay</strong> for the OS-theory topics that regressed, or a LoRA-scale sweep, so theory accuracy can recover to ≥ base without retraining everything.</li>
+  <li><strong>Grow tutoring supply with genuine material.</strong> Tutoring is the scarcest category and bounds the whole dataset. Rewordings would add memorisation pressure, not supply.</li>
+  <li><strong>A 200-item theory MCQ</strong>, so a 4-point change no longer hinges on 5 questions.</li>
+</ul>
+
+<h3>6.3 Model</h3>
+<ul>
+  <li><strong>Zero-shot probe newer bases</strong> (Qwen3.5-4B, Gemma 4 12B, non-thinking) on the theory MCQ before any retraining, with Qwen3-4B-2507 as control.</li>
+  <li><strong>Merge the LoRA before quantising.</strong> Runtime LoRA is the likely reason decode speed is below the card's bandwidth bound. Speculative decoding with a 0.6B draft model is a second option.</li>
+</ul>
+
+<h3>6.4 Retrieval</h3>
+<ul>
+  <li><strong>Collect held-out real questions first.</strong> At least 100 owner-written questions over the course notes, labelled with note and section, half for fitting the gate and half for reporting.</li>
+  <li><strong>Try a stronger embedder if recall is low.</strong> bge-code-v1, multilingual-e5-base and Qwen3-Embedding-0.6B are already in the local cache. Add a small cross-encoder re-ranker over the top 10 if section recall@1 is the bottleneck.</li>
+  <li><strong>Learned or calibrated abstention.</strong> Use a logistic model over (max cosine, max BM25, margin between the top two) instead of hand-set thresholds, with precision and recall reported on held-out data.</li>
+  <li><strong>Grounding checks on the answer, not just the prompt.</strong> Verify that each cited sentence is supported by the cited passage (entailment, or overlap as a first step). The fact checker becomes a check against the notes instead of a fixed rule list.</li>
+  <li><strong>Retrieval for tutor hints, but behind a leak filter.</strong> Passages could make Socratic hints more accurate, but only if a filter guarantees no passage states the final answer. That needs its own answer-leak measurement first (G3).</li>
+</ul>
+
+<h3>6.5 Verification and serving</h3>
+<ul>
+  <li><strong>Fix the disk off-by-one</strong> and add a range-semantics check to grounding, not just a presence check.</li>
+  <li><strong>Negation-aware fact checking</strong>, with every rule exercised by a probe in the test suite.</li>
+  <li><strong>Run the fact checker on streamed answers</strong>: buffer prose answers, or check and append a correction after the stream ends.</li>
+  <li><strong>Extend delegation to the 11 formula kinds</strong>, which are still answered by the model unaided.</li>
+</ul>
+
+<h3>6.6 Process</h3>
+<ul>
+  <li>Every reported number names its file, and documents are generated from those files rather than typed by hand. The two incorrect PDF claims would not have been possible.</li>
+  <li>Version control from the first day, with byte-exact storage and a commit hash in every report.</li>
+  <li>Every evaluation run records its provenance (commit, model hashes, server arguments, decoding settings, cache setting), as the G0 harness now does.</li>
+</ul>
+</section>
+
+<!-- ======================= APPENDIX A ======================= -->
+<section class="pb">
+<h2>Appendix A&nbsp;&nbsp;Code listings</h2>
+<p>The code shown in the screenshots of Section 3, as text. Each listing is cut from the repository at build time, so it matches the screenshot line for line.</p>
+@@LISTINGS@@
+</section>
+
+<!-- ======================= APPENDIX B ======================= -->
+<section class="pb">
+<h2>Appendix B&nbsp;&nbsp;Where every number comes from</h2>
+<table>
+  <thead><tr><th style="width:36%">Numbers</th><th>File</th><th style="width:28%">Produced by</th></tr></thead>
+  <tbody>
+    <tr><td>Dataset composition, pipeline counts, gates</td><td><code>DATASET_CARD.md</code>, <code>reports/manifest.json</code></td><td><code>python -m ostutor.build</code></td></tr>
+    <tr><td>Training and validation loss</td><td><code>outputs/ostutor-lora-v3/ostutor-lora/train_metrics.json</code></td><td><code>train/kaggle_train.py</code></td></tr>
+    <tr><td>Suite, all six configurations, re-graded</td><td><code>reports/g0/20261012-1429/regraded.md</code></td><td><code>tools/g0_ablation.py</code>, <code>tools/g0_regrade.py</code></td></tr>
+    <tr><td>OOD holdout, 600 items</td><td><code>reports/g0/20261012-1429/ood.json</code></td><td><code>tools/g0_ablation.py</code></td></tr>
+    <tr><td>Disk off-by-one, cache determinism</td><td><code>reports/g0/20261012-1429/diagnostics.json</code></td><td><code>tools/g0_diagnostics.py</code></td></tr>
+    <tr><td>Fact-checker probes</td><td><code>reports/g0/20261012-1429/factcheck_v3.json</code></td><td><code>tools/g0_ablation.py</code></td></tr>
+    <tr><td>Forgetting, paired</td><td><code>reports/forgetting_v3_paired.json</code>, <code>reports/g0/historical_significance.md</code></td><td><code>tools/run_forgetting_eval.py</code>, <code>tools/significance_history.py</code></td></tr>
+    <tr><td>RAG retrieval</td><td><code>reports/rag/fixture_eval.md</code></td><td><code>tools/rag_eval.py</code></td></tr>
+    <tr><td>RAG end to end</td><td><code>@@E2E_DIR@@</code></td><td><code>tools/rag_e2e.py</code></td></tr>
+    <tr><td>Generation speed 26.9 tok/s (wall clock, full stack)</td><td><code>PROJECT_CONTEXT.md</code> §7</td><td>Served stack, 300 tokens</td></tr>
+    <tr><td>Engineering decisions</td><td><code>docs/DECISIONS.md</code> (D-001 … D-006)</td><td>—</td></tr>
+  </tbody>
+</table>
+<h3>Reproducing</h3>
+<pre style="font-family:Consolas,monospace;font-size:8.2pt;background:#f7f8fa;border:1px solid #d7dae0;border-radius:4px;padding:9px 11px;white-space:pre-wrap">python -m ostutor.build                                  # dataset, 11 stages, 19 gates
+python tools/test_pipeline.py; python tools/test_router.py; python tools/test_g0.py; python tools/test_rag.py
+serve/.venv-webui/Scripts/python serve/test_gateway.py
+python tools/g0_ablation.py                              # suite + OOD + fact checker (GPU)
+python tools/rag_eval.py data/rag/fixture                # retrieval (CPU)
+python tools/rag_e2e.py data/rag/fixture                 # RAG off vs on, served model (GPU)
+$env:OSTUTOR_RAG="data/rag/corpus"; powershell -File serve\start_tutor.ps1   # serve with RAG
+python docs/build_code_shots.py; python docs/build_rag_report.py            # this document</pre>
+</section>
+
+</body>
+</html>

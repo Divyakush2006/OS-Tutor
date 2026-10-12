@@ -1,0 +1,146 @@
+{
+ "run": "20261012-1429",
+ "graded_at_commit": "18e5025ea51db21194b7207df4ff8d6b8f0ba9be",
+ "configs": {
+  "base": {
+   "n": 57,
+   "correct_as_run": 25,
+   "correct_regraded": 30,
+   "changed": [
+    "fcfs_disk",
+    "lru_4f",
+    "scan_down",
+    "sstf_2",
+    "translate_4k"
+   ]
+  },
+  "base+solver": {
+   "n": 57,
+   "correct_as_run": 49,
+   "correct_regraded": 49,
+   "changed": []
+  },
+  "v2.2": {
+   "n": 57,
+   "correct_as_run": 19,
+   "correct_regraded": 19,
+   "changed": []
+  },
+  "v2.2+solver": {
+   "n": 57,
+   "correct_as_run": 43,
+   "correct_regraded": 43,
+   "changed": []
+  },
+  "v3": {
+   "n": 57,
+   "correct_as_run": 34,
+   "correct_regraded": 34,
+   "changed": []
+  },
+  "v3+solver": {
+   "n": 57,
+   "correct_as_run": 57,
+   "correct_regraded": 57,
+   "changed": []
+  }
+ },
+ "paired": {
+  "adapter, no solver": {
+   "a": "base",
+   "b": "v3",
+   "n": 57,
+   "only_in_a": 0,
+   "only_in_b": 0,
+   "correct_a": 30,
+   "correct_b": 34,
+   "accuracy_a": 0.5263,
+   "accuracy_b": 0.5965,
+   "delta_pp": 7.02,
+   "right_to_wrong": 11,
+   "wrong_to_right": 15,
+   "discordant": 26,
+   "mcnemar_p": 0.557197
+  },
+  "adapter, with solver": {
+   "a": "base+solver",
+   "b": "v3+solver",
+   "n": 57,
+   "only_in_a": 0,
+   "only_in_b": 0,
+   "correct_a": 49,
+   "correct_b": 57,
+   "accuracy_a": 0.8596,
+   "accuracy_b": 1.0,
+   "delta_pp": 14.04,
+   "right_to_wrong": 0,
+   "wrong_to_right": 8,
+   "discordant": 8,
+   "mcnemar_p": 0.007812
+  },
+  "solver, on the base model": {
+   "a": "base",
+   "b": "base+solver",
+   "n": 57,
+   "only_in_a": 0,
+   "only_in_b": 0,
+   "correct_a": 30,
+   "correct_b": 49,
+   "accuracy_a": 0.5263,
+   "accuracy_b": 0.8596,
+   "delta_pp": 33.33,
+   "right_to_wrong": 0,
+   "wrong_to_right": 19,
+   "discordant": 19,
+   "mcnemar_p": 4e-06
+  },
+  "solver, on v3": {
+   "a": "v3",
+   "b": "v3+solver",
+   "n": 57,
+   "only_in_a": 0,
+   "only_in_b": 0,
+   "correct_a": 34,
+   "correct_b": 57,
+   "accuracy_a": 0.5965,
+   "accuracy_b": 1.0,
+   "delta_pp": 40.35,
+   "right_to_wrong": 0,
+   "wrong_to_right": 23,
+   "discordant": 23,
+   "mcnemar_p": 0.0
+  },
+  "v2.2 adapter, no solver": {
+   "a": "base",
+   "b": "v2.2",
+   "n": 57,
+   "only_in_a": 0,
+   "only_in_b": 0,
+   "correct_a": 30,
+   "correct_b": 19,
+   "accuracy_a": 0.5263,
+   "accuracy_b": 0.3333,
+   "delta_pp": -19.3,
+   "right_to_wrong": 17,
+   "wrong_to_right": 6,
+   "discordant": 23,
+   "mcnemar_p": 0.03469
+  },
+  "v2.2 -> v3, no solver": {
+   "a": "v2.2",
+   "b": "v3",
+   "n": 57,
+   "only_in_a": 0,
+   "only_in_b": 0,
+   "correct_a": 19,
+   "correct_b": 34,
+   "accuracy_a": 0.3333,
+   "accuracy_b": 0.5965,
+   "delta_pp": 26.32,
+   "right_to_wrong": 2,
+   "wrong_to_right": 17,
+   "discordant": 19,
+   "mcnemar_p": 0.000729
+  }
+ }
+}
