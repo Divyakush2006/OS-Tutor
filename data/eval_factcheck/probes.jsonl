@@ -1,0 +1,10 @@
+{"id": "fc-lru_belady", "rule": "lru_belady", "status": "unreviewed", "question": "Can LRU page replacement suffer from Belady's anomaly? Explain why or why not."}
+{"id": "fc-unsafe_is_deadlock", "rule": "unsafe_is_deadlock", "status": "unreviewed", "question": "If the Banker's algorithm finds that the system is in an unsafe state, does that mean the system is deadlocked?"}
+{"id": "fc-cycle_always_deadlock", "rule": "cycle_always_deadlock", "status": "unreviewed", "question": "Does a cycle in a resource-allocation graph always mean that the system is deadlocked?"}
+{"id": "fc-seg_internal_frag", "rule": "seg_internal_frag", "status": "unreviewed", "question": "Does segmentation suffer from internal fragmentation, external fragmentation, or both? Explain."}
+{"id": "fc-paging_external_frag", "rule": "paging_external_frag", "status": "unreviewed", "question": "Does paging suffer from external fragmentation? Explain."}
+{"id": "fc-sstf_optimal", "rule": "sstf_optimal", "status": "unreviewed", "question": "Is SSTF disk scheduling optimal, in the sense of always minimising total head movement?"}
+{"id": "fc-fork_child_pid", "rule": "fork_child_pid", "status": "unreviewed", "question": "What value does fork() return in the child process, and what does it return in the parent?"}
+{"id": "fc-rr_large_q_sjf", "rule": "rr_large_q_sjf", "status": "unreviewed", "question": "What does Round Robin scheduling turn into when the time quantum is made very large?"}
+{"id": "fc-rr_large_q_starves", "rule": "rr_large_q_starves", "status": "unreviewed", "question": "Can making the Round Robin time quantum very large cause starvation of processes?"}
+{"id": "fc-mutex_equals_semaphore", "rule": "mutex_equals_semaphore", "status": "unreviewed", "question": "Is a mutex exactly the same thing as a binary semaphore? Explain the difference, if any."}

@@ -374,43 +374,58 @@ def parse_json(text):
         return None
 
 
-def extract(question, ask, tries=3):
+def extract(question, ask, tries=3, trace=None):
     """Parameters for a question, or (None, reason).
 
     `ask(system, user)` returns the model's reply. Retried with the failure named,
     because the observed errors (a pair instead of a flat list, an invented vector)
-    are ones a model corrects when told."""
+    are ones a model corrects when told.
+
+    `trace`, if given, is a list that receives one dict per attempt describing what
+    happened to it (outcome: invalid_json | non_solver | banker_request_retry |
+    ungrounded | ok). Evaluation uses it to separate JSON failures from grounding
+    rejections; it never changes the result."""
     note = ""
     for attempt in range(tries):
         raw = ask(EXTRACT_PROMPT + note, question)
         v = normalise(parse_json(raw), question)
         if v is None:
+            _log(trace, attempt, "invalid_json")
             note = "\n\nYour last answer was not valid JSON in one of the shapes above. Output only the JSON object."
             continue
         if v["kind"] not in SOLVER_KINDS:
+            _log(trace, attempt, "non_solver", kind=v["kind"])
             return v, "not a solver kind"
         # "can P0's request for (0,2,0) be granted?" is a REQUEST question. When the
         # model returns banker_safety and simply omits the request vector there is
         # nothing to detect it by, and the answer that comes back is a safe sequence -
         # a confident answer to a question nobody asked. Ask again, pointedly.
         if v["kind"] == "banker_safety" and _asks_request(question):
+            _log(trace, attempt, "banker_request_retry", kind=v["kind"])
             note = ("\n\nThat problem asks whether a REQUEST can be granted. Use the "
                     "banker_request shape and include \"req\" (the requested vector) "
                     "and \"req_proc\" (the process making it).")
             continue
         ok, missing = grounded(v, question)
         if ok:
+            _log(trace, attempt, "ok", kind=v["kind"], params=v)
             return v, f"ok (attempt {attempt + 1})"
+        _log(trace, attempt, "ungrounded", kind=v["kind"], missing=missing[:6], params=v)
         note = (f"\n\nYour last answer used numbers that are not in the problem: "
                 f"{missing[:6]}. Copy the values exactly as written.")
     return None, "extraction could not be grounded in the question"
 
 
-def solve(question, ask):
+def _log(trace, attempt, outcome, **info):
+    if trace is not None:
+        trace.append(dict(attempt=attempt + 1, outcome=outcome, **info))
+
+
+def solve(question, ask, trace=None):
     """(worked_solution, meta). The numbers come from the simulator, so they are right
     whenever extraction is grounded; otherwise this declines and the caller falls back
-    to the model answering for itself."""
-    v, why = extract(question, ask)
+    to the model answering for itself. `trace` is passed through to extract()."""
+    v, why = extract(question, ask, trace=trace)
     if v is None:
         return None, dict(delegated=False, reason=why)
     if v["kind"] not in SOLVER_KINDS:

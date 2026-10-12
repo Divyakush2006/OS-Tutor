@@ -28,6 +28,41 @@ break the reproducibility check.
 **Evidence.** Staged-file audit at init: no secrets, no `oracle/`, no weights, largest file
 1.07 MB. Nothing is pushed to any remote.
 
+**Correction (same day).** The baseline `f6f554e` was staged *before* `core.autocrlf` was
+turned off, so git normalised 57 CRLF files to LF in the repository — the opposite of
+this decision. Found when edits to `solver.py` showed as whole-file diffs. Fixed in
+`3d9f654`, which stores those files as they are on disk (whitespace-only; `git diff -w`
+is empty). A check that every tracked file's HEAD blob equals its disk bytes now passes.
+One knock-on effect: while chasing the symptom, `serve/gateway.py` was converted from
+CRLF to LF on disk in `b7521be`; it stays LF (Python is indifferent to line endings).
+
+---
+
+## D-003 — Grader: a quantity's answer ends at a LaTeX separator or the next quantity
+
+**Date:** 2026-10-12 · **Decided by:** engineer (alters no existing measured number — verified)
+
+**Decision.** In `ostutor/evaluation/harness.py::_answer_number`, a quantity's segment
+now also ends at `\quad`, `\qquad`, `;`, or the next "average / avg / mean" quantity.
+
+**Alternatives.** (a) Leave it and hand-audit base outputs. (b) Strip all LaTeX before
+grading. (c) Ask an LLM judge to read the final answer.
+
+**Reason.** The base model writes LaTeX: `\boxed{Average waiting time = 17/3 \approx 5.67},
+\quad \boxed{Average turnaround time = 47/3 \approx 15.67}`. The old segment ended only at
+`, <letter>`, so it ran past `, \quad` and read the *turnaround* time (15.67) as the
+waiting time — marking a correct answer wrong. The fine-tuned adapter writes the trained
+`**Answer:**` format and is not affected, so the bug biases every base-vs-adapter
+comparison in the adapter's favour: exactly what G0 is meant to measure. (b) would also
+remove structure other grading depends on; (c) adds a non-deterministic grader.
+
+**Evidence.** Found in the G0 smoke run (`rr_classic`, base). Re-grading all **805**
+saved outputs in `reports/` with old and new code changes exactly **1** verdict (that
+item, wrong → right); no historical reported number moves. Seven regression cases in
+`tools/test_g0.py`, including that line and every format the old code already handled.
+Because one blind spot was found, base-alone wrong answers in the G0 run are additionally
+hand-audited and the audit is reported separately.
+
 ---
 
 ## D-002 — Fact checker attaches the correction when its redraft is unavailable

@@ -34,3 +34,6 @@ __pycache__/
 *.pyc
 .vscode/
 docs/_case_study_*
+
+# --- G0 smoke runs (tools/g0_ablation.py --limit) are throwaway --------------------
+reports/g0/smoke-*/

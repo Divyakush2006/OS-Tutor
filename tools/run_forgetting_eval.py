@@ -31,6 +31,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from ostutor import config as C
+from ostutor.evaluation.stats import mcnemar_exact
 
 GENERAL = C.ROOT / "data" / "eval_general"
 ADJACENT = ["mmlu_college_computer_science", "mmlu_computer_security", "mmlu_machine_learning"]
@@ -133,8 +134,11 @@ def main():
             lost = sum(1 for i in rows if prev[i["id"]]["correct"] and not i["correct"])
             gained = sum(1 for i in rows if not prev[i["id"]]["correct"] and i["correct"])
             delta = round(summary[g]["accuracy"] - base["summary"][g]["accuracy"], 4)
-            comp[g] = dict(delta=delta, right_to_wrong=lost, wrong_to_right=gained, n=len(rows))
-            print(f"{g:12s} delta {delta:+.4f}  right->wrong {lost}  wrong->right {gained}")
+            p = mcnemar_exact(lost, gained)
+            comp[g] = dict(delta=delta, right_to_wrong=lost, wrong_to_right=gained, n=len(rows),
+                           mcnemar_p=round(p, 6))
+            print(f"{g:12s} delta {delta:+.4f}  right->wrong {lost}  wrong->right {gained}"
+                  f"  McNemar p={p:.4f}")
         report["comparison"] = comp
 
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)

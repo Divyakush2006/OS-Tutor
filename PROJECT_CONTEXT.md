@@ -295,8 +295,13 @@ clarification 3/3 → **3/3**, remaining 12 kinds 15/16 → **16/16**.
 | OS theory MCQ (70) | 90.00% | 88.57% | **85.71%** | **−4.29 pp** | 4 | 1 |
 
 Files: `reports/forgetting_base_v3.json`, `forgetting_v2.2_paired.json`, `forgetting_v3_paired.json`.
-**No catastrophic forgetting** of general ability. Statistical significance has **not** been
-computed; with 23 / 30 / 5 discordant pairs, none of these deltas is likely significant.
+
+**Exact McNemar p-values** (`reports/g0/historical_significance.md`, computed 2026-10-12):
+general p = 0.678, adjacent CS p = 0.201, OS theory p = 0.375. **No forgetting effect is
+statistically detectable in either direction** — not the OS-theory drop, and not the
+adjacent-CS gain. Earlier wording that the flips "confirm genuine transfer" is withdrawn.
+The base model scores identically item-for-item in the 2026-09-19 and 2026-09-21 runs, so
+the evaluation itself is deterministic.
 
 ### Other
 
@@ -312,9 +317,11 @@ computed; with 23 / 30 / 5 discordant pairs, none of these deltas is likely sign
 
 ## 8. Open issues and limitations
 
-1. **Declarative OS theory regressed** — 85.71% vs 90.00% base (4 lost, 1 gained, n=70). Heavy
-   procedural training likely displaced some factual recall. Small sample; base near ceiling.
-   **This is the project's main open problem.**
+1. **Declarative OS theory: a dip that is not statistically real** — 85.71% vs 90.00% base
+   (4 lost, 1 gained, n=70), exact McNemar **p = 0.375**. It cannot be called a regression
+   on this evidence; it also cannot be ruled out. The 70-item set is too small to decide,
+   which is why the 200-item set (G3) matters. Conceptual answers remain *ungrounded*
+   regardless — that, not this number, is the real gap (G2).
 2. **Base and v2.2 on the procedural suite are unmeasured** (the only attempt was void).
 3. **Conceptual tutoring has no verifier and no measurement** — no rubric eval exists.
 4. **Formula kinds (11) are not delegated**; the model answers them with its unaided accuracy.

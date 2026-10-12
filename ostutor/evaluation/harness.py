@@ -57,10 +57,15 @@ def _answer_number(text, *keys):
     # The quantity's segment runs from the keyword to the next ", <word>" (the next
     # quantity) or the end of the line; its answer is the last number in it, so
     # "Average waiting time = 48 / 5 = **9.6**" reads 9.6, not 48.
+    # A segment also ends at a LaTeX separator or the next "average"/"avg"/"mean"
+    # quantity: "\boxed{Average waiting time = 17/3 \approx 5.67}, \quad
+    # \boxed{Average turnaround time = ... 15.67}" otherwise runs on to the end of the
+    # line and reads the TURNAROUND time as the waiting time (docs/DECISIONS.md D-003).
     for k in keys:
-        segs = re.findall(re.escape(k) + r"[^=:\n\d]{0,40}[=:]([^\n]*?)(?=,\s*[A-Za-z]|\n|$)",
-                          text, re.I)
+        segs = re.findall(re.escape(k) + r"[^=:\n\d]{0,40}[=:]([^\n]*?)"
+                          r"(?=,\s*(?:[A-Za-z]|\\q?quad)|;|\\q?quad|\n|$)", text, re.I)
         for seg in reversed(segs):
+            seg = re.split(r"\b(?:average|avg\.?|mean)\b", seg, maxsplit=1, flags=re.I)[0]
             seg = re.sub(r"0x[0-9a-fA-F]+", " ", seg)       # "13474 (0x34a2)" -> 13474
             nums = re.findall(r"-?\d[\d,]*(?:\.\d+)?", seg)
             if nums:
