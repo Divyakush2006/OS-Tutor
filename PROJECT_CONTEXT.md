@@ -312,6 +312,25 @@ adjacent-CS gain. Earlier wording that the flips "confirm genuine transfer" is w
 The base model scores identically item-for-item in the 2026-09-19 and 2026-09-21 runs, so
 the evaluation itself is deterministic.
 
+### RAG over the course corpus (G2, 2026-10-12)
+
+Corpus `data/rag/corpus`: 42 course documents from the owners' `dataset_rag.zip` + 8
+Hailperin chapters (CC BY-SA 3.0) + 55 Wikipedia articles (CC BY-SA 4.0) = 105 documents,
+2,783 chunks (D-007, `docs/RAG_CORPUS.md`). Off unless `OSTUTOR_RAG` is set.
+
+| Measure | Result | Source |
+|---|---|---|
+| Retrieval recall@5, 124 labelled questions (hybrid) | **79.0%** (course-material answers 74.7%, online 85.7%) | `reports/rag/corpus_eval.md` |
+| Retrieval latency, CPU | p95 **8.3 ms** (brief ≤ 500 ms) | same |
+| "Not covered" gate, held-out test half | notes for 59/62 in-scope; withheld for 18/20 off-topic | same |
+| Theory MCQ, 200 items, generated letter | base 185 · base+RAG 186 · v3 186 · **v3+RAG 184** (all p ≥ 0.75) | `reports/rag/e2e-20261012-2239/summary.md` |
+| Explain answers citing the notes | 50/59, **0 invented citations**, 42.9 tok/s | same |
+| Faithfulness of cited sentences | judge (base model) 117/143 = 81.8%; engineer check of 40: **24/40** — judge is lenient | same + `judge_sample_engineer_check.json` |
+
+The MCQ target (v3+RAG ≥ base) is **not met numerically** (92.0% vs 92.5%, 1 item, p = 1.0);
+on this 200-item set v3 alone is not below base either. Only 132 of 446 answer sentences
+carry a citation. The 130 new MCQ items and the 164 retrieval questions are `unreviewed`.
+
 ### Other
 
 | Check | Result |
@@ -340,6 +359,12 @@ the evaluation itself is deterministic.
 7. **Runtime LoRA may cost speed.** 26.9 tok/s is ~45% of the card's bandwidth for a 4.3 GB
    model; merging the adapter before quantizing is untested but likely 10–30% faster.
 8. **Institution / department / course code** are missing from both PDF cover pages.
+9. **RAG faithfulness is moderate and citation is sparse** — about 60% of cited sentences
+   fully supported on a strict check; most answer sentences cite nothing. Needs a stronger
+   citation instruction or answer-side verification (report §6.4). Human check pending
+   (`reports/rag/e2e-20261012-2239/judge_sample.md`).
+10. **Lab handout `Shell programming - sample excersice.doc`** is not in the corpus — Office
+   automation hung on it; open in Word, save as .docx, re-run the import.
 
 ---
 
