@@ -157,6 +157,29 @@ for text, want in cases:
     got = _answer_number(text, *W)
     check(f"reads {want} from: {text[:52]}...", got == want, f"got {got}")
 
+print("grader: explicit final-answer markers (D-004)")
+from ostutor.evaluation.harness import grade  # noqa: E402
+
+suite = {json.loads(l)["id"]: json.loads(l)
+         for l in open(ROOT / "data/eval/os_freeform.jsonl", encoding="utf-8")}
+marker_cases = [
+    # (item, output tail, should be correct) - the first four are real base-model endings
+    ("scan_down", "- Total: 53 + 183 = **236**\n---\n### ✅ Final Answer:\n**236**", True),
+    ("fcfs_disk", "- 5461 + 1620 = **7081**\n**Final Answer: 7081**", True),
+    ("translate_4k", "= 4096 + 808\n= **4904**\n---\n### ✅ Final Answer:\n**4904**", True),
+    ("lru_4f", "Step 18: fault (18)\n✅ Final answer: **10 page faults**", True),
+    # the trained v3 format must grade exactly as before
+    ("scan_down", "**Answer: total head movement = 236**", True),
+    ("scan_down", "**Answer: total head movement = 230**", False),
+    # a marker with the WRONG value is still wrong, whatever the working says
+    ("scan_down", "Total: 53 + 183 = **236**\n### Final Answer:\n**235**", False),
+    # hex in the marker is decoded (expected 4904 = 0x1328)
+    ("translate_4k", "**Answer: physical address = 0x1328**", True),
+]
+for iid, out, want in marker_cases:
+    got = grade(suite[iid], out)["final_correct"]
+    check(f"{iid}: {out.splitlines()[-1][:44]!r} -> {want}", got == want, f"got {got}")
+
 # ---------------------------------------------------------------- server guard
 print("adapter guard")
 import g0_ablation as g  # noqa: E402

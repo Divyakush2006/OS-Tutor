@@ -156,6 +156,32 @@ def _grade_formula(v, output):
 _ASKS_BACK = re.compile(r"\?|please (?:share|give|provide|tell)|could you", re.I)
 
 
+_FINAL_MARK = re.compile(r"final\s+answer|\*\*answer\b|^\s*answer\s*:", re.I | re.M)
+_MARK_KEY = {"paging": r"faults?",
+             "disk": r"(?:total\s+)?(?:head\s+movement|distance|seek)",
+             "translate": r"physical\s+address"}
+
+
+def _final_marker_value(kind, output):
+    """The number under the LAST explicit final-answer marker, for one-quantity kinds.
+
+    The base model ends with "### Final Answer:" and puts the bare result on the next
+    line ("**236**"), with no keyword. The keyword search then fell back to a line of
+    working ("Total: 53 + 183 = 236" read as 53). An explicit marker is the model's own
+    statement of its answer, so it is read first (docs/DECISIONS.md D-004).
+    """
+    marks = list(_FINAL_MARK.finditer(output))
+    if not marks:
+        return None
+    seg = "\n".join([l for l in output[marks[-1].start():].splitlines() if l.strip()][:2])
+    seg = re.sub(r"0x([0-9a-fA-F]+)", lambda m: str(int(m.group(1), 16)), seg)
+    k = re.search(_MARK_KEY[kind] + r"\s*(?:=|:|is|are)?\s*\**\s*(-?\d[\d,]*)", seg, re.I)
+    if k:
+        return float(k.group(1).replace(",", ""))
+    nums = re.findall(r"-?\d[\d,]*(?:\.\d+)?", seg)
+    return float(nums[-1].replace(",", "")) if nums else None
+
+
 def grade(record, output):
     """Grade one model output against the simulator. Returns a dict."""
     v = record["verify"]
@@ -261,6 +287,12 @@ def grade(record, output):
     elif kind == "clarify":
         # Correct behaviour: ask for the missing input, produce no numeric answer.
         res["final_correct"] = bool(_ASKS_BACK.search(output)) and "**Answer:" not in output
+
+    if kind in _MARK_KEY:
+        marked = _final_marker_value(kind, output)
+        if marked is not None:
+            res["got"] = marked
+            res["final_correct"] = int(marked) == int(res["expected"])
 
     res["step_accuracy"] = (res["steps_correct"] / res["steps_checked"]
                             if res["steps_checked"] else None)
