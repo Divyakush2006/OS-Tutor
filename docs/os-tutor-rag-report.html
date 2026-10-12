@@ -4,119 +4,85 @@
 <meta charset="utf-8">
 <title>OS Tutor — Project Report with RAG Integration</title>
 <style>
-  @page { size: A4; margin: 20mm 18mm 20mm 18mm; }
-
-  :root { --ink:#16181d; --mute:#5d636e; --rule:#d7dae0; --soft:#f5f6f8; --accent:#2b4c7e; }
-  * { box-sizing: border-box; }
+  @page { size: A4; margin: 25.4mm 25.4mm 25.4mm 25.4mm; }
   html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  body { margin: 0; font-family: "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
-         font-size: 10.1pt; line-height: 1.55; color: var(--ink); background: #fff; }
+  body { margin: 0; font-family: "Times New Roman", Times, serif; font-size: 12pt; line-height: 1.32;
+         color: #000; background: #fff; }
 
-  .cover { height: 252mm; display: flex; flex-direction: column; }
-  .cover .kicker { font-size: 8.6pt; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin-top: 30mm; }
-  .cover h1 { font-size: 25pt; line-height: 1.18; font-weight: 650; letter-spacing: -.02em; margin: 10px 0 12px; }
-  .cover .sub { font-size: 12pt; color: var(--mute); margin: 0 0 26px; max-width: 152mm; }
-  .cover .rule { height: 2px; background: var(--ink); width: 100%; margin: 4px 0 22px; }
-  .cover table.people { width: auto; margin: 0; font-size: 10.4pt; }
-  .cover table.people td { border: none; padding: 3px 34px 3px 0; }
-  .cover table.people th { border: none; font-size: 8.2pt; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); font-weight: 600; padding: 0 34px 6px 0; }
-  .cover .reg { font-family: Consolas, monospace; font-size: 9.6pt; color: var(--mute); }
-  .cover .abstract { margin-top: auto; border-top: 1px solid var(--rule); padding-top: 14px; }
-  .cover .abstract h4 { font-size: 8.2pt; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin: 0 0 6px; font-weight: 600; }
-  .cover .abstract p { font-size: 9.5pt; line-height: 1.6; margin: 0 0 7px; }
-  .cover .date { font-size: 9.6pt; color: var(--mute); margin-top: 14px; }
+  .cover { height: 245mm; text-align: center; display: flex; flex-direction: column; }
+  .cover .top { margin-top: 38mm; font-size: 14pt; }
+  .cover h1 { font-size: 20pt; font-weight: bold; line-height: 1.3; margin: 10mm 8mm 0; }
+  .cover .by { margin-top: 32mm; font-size: 12pt; }
+  .cover .names { margin: 4mm auto 0; font-size: 12.5pt; line-height: 1.7; }
+  .cover .bottom { margin-top: auto; font-size: 12pt; line-height: 1.6; }
 
   .pb { break-before: page; page-break-before: always; }
 
-  .toc h2 { border: none; margin-top: 0; }
+  .toc h2 { text-align: center; }
   .toc ol { list-style: none; padding: 0; margin: 0; }
-  .toc li { display: flex; align-items: baseline; padding: 1.4px 0; line-height: 1.35; font-size: 9.8pt; }
-  .toc li.main { font-weight: 640; margin-top: 7px; }
-  .toc li.subi { padding-left: 18px; color: #2b2f37; font-size: 9.2pt; }
+  .toc li { display: flex; align-items: baseline; padding: 1px 0; line-height: 1.35; font-size: 12pt; }
+  .toc li.main { margin-top: 6px; }
+  .toc li.subi { padding-left: 22px; font-size: 11.5pt; }
   .toc .t { white-space: nowrap; }
-  .toc .dots { flex: 1; border-bottom: 1px dotted #b5bac3; margin: 0 6px; transform: translateY(-3px); }
-  .toc .pg { font-variant-numeric: tabular-nums; min-width: 16px; text-align: right; }
+  .toc .dots { flex: 1; border-bottom: 1px dotted #000; margin: 0 4px; transform: translateY(-4px); }
+  .toc .pg { min-width: 16px; text-align: right; }
 
-  h2 { font-size: 14pt; font-weight: 650; margin: 26px 0 10px; padding-bottom: 6px;
-       border-bottom: 1.5px solid var(--ink); break-after: avoid; page-break-after: avoid; }
-  h2 .n { color: var(--accent); margin-right: 6px; }
-  h3 { font-size: 10.8pt; font-weight: 650; margin: 17px 0 6px; break-after: avoid; page-break-after: avoid; }
-  p { margin: 0 0 9px; }
-  ul, ol { margin: 0 0 10px; padding-left: 19px; }
-  li { margin-bottom: 4px; }
-  strong { font-weight: 640; }
-  code { font-family: Consolas, monospace; font-size: 8.6pt; background: var(--soft); padding: 1px 4px; border-radius: 2px; }
-  .cite { color: var(--accent); font-size: 8.8pt; }
-  .src { color: var(--mute); font-size: 8.2pt; }
+  h2 { font-size: 14pt; font-weight: bold; margin: 0 0 10pt; break-after: avoid; page-break-after: avoid; }
+  h3 { font-size: 12pt; font-weight: bold; margin: 14pt 0 6pt; break-after: avoid; page-break-after: avoid; }
+  p { margin: 0 0 8pt; text-align: justify; }
+  ul, ol { margin: 0 0 8pt; padding-left: 26px; }
+  li { margin-bottom: 3pt; text-align: justify; }
+  code { font-family: "Courier New", Courier, monospace; font-size: 10.5pt; }
 
-  table { width: 100%; border-collapse: collapse; margin: 10px 0 14px; font-size: 9pt;
+  table { width: 100%; border-collapse: collapse; margin: 6pt 0 10pt; font-size: 10.5pt; line-height: 1.25;
           break-inside: avoid; page-break-inside: avoid; }
   p:has(+ table), p:has(+ ol), p:has(+ ul), p:has(+ figure) { break-after: avoid; page-break-after: avoid; }
   thead { display: table-header-group; }
   tr { break-inside: avoid; page-break-inside: avoid; }
-  th { text-align: left; font-weight: 640; padding: 5px 9px 5px 0; border-bottom: 1.4px solid var(--ink); vertical-align: bottom; }
-  td { padding: 4px 9px 4px 0; border-bottom: 1px solid var(--rule); vertical-align: top; line-height: 1.45; }
-  tr:last-child td { border-bottom: none; }
-  tr.total td { border-top: 1.4px solid var(--ink); border-bottom: none; font-weight: 640; }
-  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .caption { font-size: 8.3pt; color: var(--mute); margin: -8px 0 14px; }
+  th, td { border: 0.75px solid #000; padding: 3px 5px; vertical-align: top; text-align: left; }
+  th { font-weight: bold; background: #d9d9d9; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  tr.total td { font-weight: bold; }
+  td code, th code { font-size: 9.5pt; }
+  .caption { font-size: 10.5pt; margin: -4pt 0 10pt; text-align: left; }
 
-  .ok { color: #1d6b3a; font-weight: 640; }
-  .warn { color: #9a5b00; font-weight: 640; }
-  .bad { color: #a12a2a; font-weight: 640; }
-  .tag { display: inline-block; font-size: 7.6pt; font-weight: 640; letter-spacing: .04em; text-transform: uppercase;
-         padding: 1px 6px; border-radius: 3px; vertical-align: 1px; }
-  .tag.m { background: #e4efe7; color: #1d6b3a; }
-  .tag.f { background: #e7ecf5; color: #2b4c7e; }
-  .tag.t { background: #f6ecdc; color: #9a5b00; }
-
-  .callout { border-left: 3px solid var(--accent); background: var(--soft); padding: 9px 13px; margin: 12px 0 14px; font-size: 9.5pt; break-inside: avoid; }
-  .callout.warn { border-left-color: #9a5b00; }
-  .callout p:last-child { margin-bottom: 0; }
-
-  figure { margin: 12px 0 16px; break-inside: avoid; page-break-inside: avoid; text-align: center; }
-  figure img { width: 100%; height: auto; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,.18); }
-  figure img.chart { box-shadow: none; border-radius: 0; }
+  figure { margin: 10pt 0 12pt; break-inside: avoid; page-break-inside: avoid; text-align: center; }
+  figure img { width: 100%; height: auto; }
+  figure img.chart { width: 82%; }
   figure svg { width: 100%; height: auto; }
-  figcaption { font-size: 8.3pt; color: var(--mute); margin-top: 7px; text-align: left; }
+  figcaption { font-size: 10.5pt; margin-top: 5pt; text-align: center; }
 
-  .listing { break-inside: auto; margin: 6px 0 14px; }
-  .listing h4 { font-size: 9pt; margin: 12px 0 4px; font-weight: 640; break-after: avoid; }
-  .listing h4 span { color: var(--mute); font-weight: 400; font-family: Consolas, monospace; font-size: 8.2pt; }
-  .listing pre { margin: 0; background: #f7f8fa; border: 1px solid var(--rule); border-radius: 4px; padding: 7px 10px;
-                 font-family: Consolas, monospace; font-size: 7.6pt; line-height: 1.42; white-space: pre-wrap; }
-  .listing .ln { color: #a0a6b1; display: inline-block; width: 26px; user-select: none; }
+  .listing h4 { font-size: 11pt; margin: 10pt 0 3pt; font-weight: bold; break-after: avoid; }
+  .listing h4 span { font-weight: normal; font-family: "Courier New", monospace; font-size: 10pt; }
+  .listing pre { margin: 0; border: 0.75px solid #000; padding: 5px 7px; font-family: "Courier New", monospace;
+                 font-size: 8.6pt; line-height: 1.3; white-space: pre-wrap; }
+  .listing .ln { display: inline-block; width: 28px; color: #555; }
+  pre.cmd { font-family: "Courier New", monospace; font-size: 9.5pt; border: 0.75px solid #000; padding: 6px 8px;
+            white-space: pre-wrap; line-height: 1.3; }
 </style>
 </head>
 <body>
 
-<!-- ======================= COVER ======================= -->
 <section class="cover">
-  <div class="kicker">Project Report · Dataset to Results, with RAG Integration</div>
+  <div class="top">A Project Report on</div>
   <h1>OS Tutor: A Fine-Tuned, Retrieval-Grounded and Simulator-Verified Operating Systems Tutor</h1>
-  <p class="sub">Dataset, preprocessing, implementation, measured results, what went wrong, and what we would do differently, for a 4-billion-parameter tutor whose prose is grounded in course notes and whose numbers come from verified simulators.</p>
-  <div class="rule"></div>
+  <div class="by">Submitted by</div>
+  <div class="names">Divyakush Punjabi (24BCB0126)</div>
+  <div class="bottom">Case Study: Building an LLM for Learning and Teaching Operating Systems<br>October 2026</div>
+</section>
 
-  <table class="people">
-    <thead><tr><th>Team member</th><th>Register number</th></tr></thead>
-    <tbody>
-      <tr><td>Divyakush Punjabi</td><td class="reg">24BCB0126</td></tr>
-    </tbody>
-  </table>
-
-  <div class="abstract">
-    <h4>Summary</h4>
-    <p>OS Tutor is Qwen3-4B-Instruct-2507 fine-tuned with QLoRA on 11,760 curated rows. It has three guards around the model. <strong>Verified simulators</strong> compute every numerical answer. A <strong>retrieval (RAG) layer</strong> grounds concept explanations in course notes and cites them. A <strong>fact checker</strong> corrects known misconceptions. On a 57-item hand-written problem suite the full system scores <strong>57/57</strong>, against 30/57 for the untuned model. On a 600-item out-of-distribution holdout it scores <strong>98.8%</strong>.</p>
-    <p>The RAG layer is built, tested and wired into the tutor. Retrieval takes under 7 ms on the CPU. Every RAG figure in this report was measured on a <em>test corpus written by the team</em>; the course notes have not been supplied yet. Figures for real notes are given as <span class="tag t">target</span>s, never as results.</p>
-  </div>
-  <div class="date">12 October 2026</div>
+<section class="pb">
+<h2>Abstract</h2>
+<p>This report describes OS Tutor, a tutor for Operating Systems built on Qwen3-4B-Instruct-2507 and fine-tuned with QLoRA on 11,760 curated training rows. The model is surrounded by three supporting components. Verified simulators compute the answer to every numerical problem, a retrieval (RAG) layer grounds concept explanations in course notes and cites them, and a fact checker corrects known misconceptions. On a 57-item hand-written problem suite the complete system scores 57/57, compared with 30/57 for the untuned model, and on a 600-item out-of-distribution holdout it scores 98.8%.</p>
+<p>The RAG layer has been implemented, tested and connected to the tutor. Retrieval runs on the CPU in under 7 ms per query. The course notes from the institution have not yet been supplied, so all retrieval results in this report were measured on a small set of test notes written by us. These results are therefore an upper bound, and the figures we expect on the real notes are given separately as targets.</p>
+<p>The report follows the order of the work: the datasets, how they were preprocessed, the implementation with code screenshots, the measured results, the problems we ran into, and what we would do differently.</p>
 </section>
 
 <!-- ======================= CONTENTS ======================= -->
 <section class="toc pb">
   <h2>Contents</h2>
   <ol>
-    <li class="main"><span class="t">Reading this report</span><span class="dots"></span><span class="pg" data-for="s0">0</span></li>
+    <li class="main"><span class="t">Note on the Results</span><span class="dots"></span><span class="pg" data-for="s0">0</span></li>
     <li class="main"><span class="t">1&nbsp;&nbsp;Dataset</span><span class="dots"></span><span class="pg" data-for="s1">0</span></li>
     <li class="subi"><span class="t">1.1 Training dataset</span><span class="dots"></span><span class="pg" data-for="s1-1">0</span></li>
     <li class="subi"><span class="t">1.2 Evaluation datasets</span><span class="dots"></span><span class="pg" data-for="s1-2">0</span></li>
@@ -152,24 +118,19 @@
   </ol>
 </section>
 
-<!-- ======================= READING ======================= -->
 <section class="pb">
-<h2>Reading this report</h2>
-<p>This report describes the system <strong>with the RAG pipeline integrated</strong>. The pipeline is real code in the repository. It is covered by 29 unit checks and 6 gateway checks, and it was measured end to end on the served model. One input is still missing: the institution's course notes. Until the owners supply them, retrieval runs over a <em>fixture</em>: 12 short OS notes the team wrote for testing, with 55 labelled questions. Every number in this report carries one of three labels:</p>
-<table>
-  <thead><tr><th style="width:22%">Label</th><th>Meaning</th></tr></thead>
-  <tbody>
-    <tr><td><span class="tag m">measured</span></td><td>Produced by a script in the repository on the real system. Appendix B names the file.</td></tr>
-    <tr><td><span class="tag f">fixture</span></td><td>Measured on the real RAG code over the team-written test corpus. The same people wrote the notes and the questions, so treat these as an upper bound.</td></tr>
-    <tr><td><span class="tag t">target</span></td><td>What we expect, or require, on the course notes. Not measured yet, and never presented as a result.</td></tr>
-  </tbody>
-</table>
-<p>Three earlier claims are corrected here; Section 5 explains each. There is no "final training loss of 0.2710": no training artifact contains that number. The adjacent-CS gain is not "genuine transfer", because p = 0.20. And the adapter's gain on the problem suite without the solver is not significant once the grader is fixed (p = 0.56).</p>
+<h2>Note on the Results</h2>
+<p>Every number in this report was produced by a script in the project repository; Appendix B lists the file each one comes from. Two kinds of number need to be read with care.</p>
+<ul>
+  <li><strong>Results on the test notes.</strong> Until the course notes are supplied, retrieval runs over 12 short OS notes that we wrote ourselves for testing, with 55 labelled questions. Because the same people wrote the notes and the questions, these numbers are an upper bound for what the real notes will give.</li>
+  <li><strong>Targets.</strong> What we expect, or require, once the course notes are available (Section 4.10). These have not been measured and are not presented as results.</li>
+</ul>
+<p>Three statements in our earlier documents are corrected here and explained in Section 5. No training artifact contains a "final training loss of 0.2710". The gain on the adjacent computer-science subjects is not statistically significant (p = 0.20), so it cannot be called transfer. And once the grader was fixed, the adapter's gain on the problem suite without the solver is not significant either (p = 0.56).</p>
 </section>
 
 <!-- ======================= 1 DATASET ======================= -->
 <section class="pb">
-<h2><span class="n">1</span>Dataset</h2>
+<h2>1.&nbsp;&nbsp;Dataset</h2>
 
 <h3>1.1 Training dataset</h3>
 <p>The training set is <strong><code>ostutor-sft</code> v3.0.0</strong>. It is built by one command (<code>python -m ostutor.build</code>, seed 42, about 6 minutes), and two consecutive builds are byte-identical. It has five categories, each serving one behaviour the tutor needs:</p>
@@ -200,19 +161,19 @@
     <tr><td>OOD holdout</td><td class="num">600</td><td>Problems in framings never used in training; extraction, delegation, correctness</td><td>Simulator-exact; parameters compared field by field</td></tr>
     <tr><td>General MMLU</td><td class="num">400</td><td>Catastrophic forgetting: general knowledge</td><td>Log-likelihood of the four options</td></tr>
     <tr><td>Adjacent CS (MMLU CS subjects)</td><td class="num">300</td><td>Forgetting or transfer in nearby subjects</td><td>Log-likelihood</td></tr>
-    <tr><td>OS theory MCQ</td><td class="num">70</td><td>Declarative OS knowledge</td><td>Log-likelihood; generated letter for the RAG experiment (§4.8)</td></tr>
+    <tr><td>OS theory MCQ</td><td class="num">70</td><td>Declarative OS knowledge</td><td>Log-likelihood; generated letter for the RAG experiment (Section 4.8)</td></tr>
     <tr><td>Fact-checker probes</td><td class="num">10</td><td>One question per misconception rule</td><td>Manual read of each answer (status <code>unreviewed</code>)</td></tr>
     <tr><td>RAG fixture queries</td><td class="num">55</td><td>45 in-scope questions labelled with note + section; 10 out-of-scope</td><td>Recall@k, MRR, abstention</td></tr>
   </tbody>
 </table>
-<p>Every training row was decontaminated against all 4,836 evaluation items before selection (§2.2).</p>
+<p>Every training row was decontaminated against all 4,836 evaluation items before selection (Section 2.2).</p>
 
 <h3>1.3 Retrieval knowledge base</h3>
 <p>The RAG layer reads a <strong>corpus directory</strong> with a <code>manifest.json</code>. Every document must declare <code>id</code>, <code>title</code>, <code>path</code>, <code>source</code>, <code>licence</code> and <code>permission</code>. The loader <em>refuses</em> a document that lacks any of these instead of skipping it quietly, so no text can enter the index unless its right to be there is recorded.</p>
 <table>
   <thead><tr><th>Corpus</th><th>Location</th><th class="num">Documents</th><th class="num">Chunks</th><th>Status</th></tr></thead>
   <tbody>
-    <tr><td>Course notes</td><td><code>data/rag/corpus/</code></td><td class="num">0</td><td class="num">0</td><td><span class="warn">Awaiting owner-supplied notes</span> (lecture notes, lab manuals, PPTs, question banks), with permission recorded per document</td></tr>
+    <tr><td>Course notes</td><td><code>data/rag/corpus/</code></td><td class="num">0</td><td class="num">0</td><td>Awaiting owner-supplied notes (lecture notes, lab manuals, PPTs, question banks), with permission recorded per document</td></tr>
     <tr><td>Test fixture</td><td><code>data/rag/fixture/</code></td><td class="num">12</td><td class="num">38</td><td>Team-written, CC0, no textbook text. Processes, threads, scheduling, synchronisation, deadlock, paging, page replacement, thrashing, segmentation, file systems, disk scheduling, system calls</td></tr>
   </tbody>
 </table>
@@ -221,7 +182,7 @@
 
 <!-- ======================= 2 PREPROCESSING ======================= -->
 <section class="pb">
-<h2><span class="n">2</span>Dataset Preprocessing</h2>
+<h2>2.&nbsp;&nbsp;Dataset Preprocessing</h2>
 
 <h3>2.1 The eleven-stage build</h3>
 <p><code>ostutor/build.py</code> runs every stage in order. It writes each stage's statistics to <code>reports/manifest.json</code> and fails the build if any release gate fails.</p>
@@ -270,39 +231,39 @@
     <tr><td>Integrity</td><td>SHA-256 over every chunk id and text</td><td>Every evaluation names the exact corpus it ran on</td></tr>
   </tbody>
 </table>
-<p>The fixture gives 38 chunks from 12 notes; the index builds in 7.3 s on the CPU <span class="tag f">fixture</span>.</p>
+<p>The test notes give 38 chunks from 12 notes, and the index builds in 7.3 s on the CPU.</p>
 </section>
 
 <!-- ======================= 3 CODE ======================= -->
 <section class="pb">
-<h2><span class="n">3</span>Code Implementation</h2>
-<p>Every screenshot below is rendered from the repository file at the stated line range, and the line numbers are the real ones. The same code appears as text in Appendix A, and the terminal images show captured output.</p>
+<h2>3.&nbsp;&nbsp;Code Implementation</h2>
+<p>The code figures below show the source files as they appear in VS Code, with the file name and line numbers visible in each one. The same code is reproduced as text in Appendix A. The terminal screenshots show the output of the commands named in them.</p>
 
 <h3>3.1 System architecture</h3>
 <figure>
-<svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial" font-size="10.5">
-  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#5d636e"/></marker></defs>
-  <g stroke="#16181d" stroke-width="1.2" fill="#fff">
-    <rect x="8" y="104" width="86" height="40" rx="5"/>
-    <rect x="124" y="104" width="92" height="40" rx="5" fill="#f5f6f8"/>
-    <rect x="262" y="14" width="140" height="40" rx="5"/>
-    <rect x="448" y="14" width="140" height="40" rx="5" fill="#e4efe7"/>
-    <rect x="262" y="104" width="140" height="40" rx="5" fill="#e7ecf5"/>
-    <rect x="448" y="104" width="140" height="40" rx="5"/>
-    <rect x="448" y="194" width="140" height="40" rx="5"/>
-    <rect x="262" y="194" width="140" height="40" rx="5" fill="#f6ecdc"/>
+<svg viewBox="0 0 640 250" xmlns="http://www.w3.org/2000/svg" font-family="Calibri, Carlito, Arial" font-size="11">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#404040"/></marker></defs>
+  <g stroke="#000" stroke-width="1" fill="#fff">
+    <rect x="8" y="104" width="86" height="40" rx="5" fill="#fff"/>
+    <rect x="124" y="104" width="92" height="40" rx="5" fill="#fff"/>
+    <rect x="262" y="14" width="140" height="40" rx="5" fill="#fff"/>
+    <rect x="448" y="14" width="140" height="40" rx="5" fill="#fff"/>
+    <rect x="262" y="104" width="140" height="40" rx="5" fill="#fff"/>
+    <rect x="448" y="104" width="140" height="40" rx="5" fill="#fff"/>
+    <rect x="448" y="194" width="140" height="40" rx="5" fill="#fff"/>
+    <rect x="262" y="194" width="140" height="40" rx="5" fill="#fff"/>
   </g>
   <g text-anchor="middle" fill="#16181d">
-    <text x="51" y="121">Student</text><text x="51" y="134" fill="#5d636e" font-size="9">Open WebUI</text>
-    <text x="170" y="121">Auto router</text><text x="170" y="134" fill="#5d636e" font-size="9">gateway.py</text>
-    <text x="332" y="31">Parameter extraction</text><text x="332" y="44" fill="#5d636e" font-size="9">base model, grounded</text>
-    <text x="518" y="31">Verified simulator</text><text x="518" y="44" fill="#5d636e" font-size="9">exact numbers</text>
-    <text x="332" y="121">RAG retrieval (CPU)</text><text x="332" y="134" fill="#5d636e" font-size="9">BM25 + MiniLM, cites [S1]</text>
-    <text x="518" y="121">Fine-tuned model</text><text x="518" y="134" fill="#5d636e" font-size="9">Qwen3-4B + LoRA v3</text>
-    <text x="518" y="211">Fact checker</text><text x="518" y="224" fill="#5d636e" font-size="9">10 correction rules</text>
-    <text x="332" y="211">Tutor mode</text><text x="332" y="224" fill="#5d636e" font-size="9">no solver, no RAG</text>
+    <text x="51" y="121">Student</text><text x="51" y="134" fill="#404040" font-size="9">Open WebUI</text>
+    <text x="170" y="121">Auto router</text><text x="170" y="134" fill="#404040" font-size="9">gateway.py</text>
+    <text x="332" y="31">Parameter extraction</text><text x="332" y="44" fill="#404040" font-size="9">base model, grounded</text>
+    <text x="518" y="31">Verified simulator</text><text x="518" y="44" fill="#404040" font-size="9">exact numbers</text>
+    <text x="332" y="121">RAG retrieval (CPU)</text><text x="332" y="134" fill="#404040" font-size="9">BM25 + MiniLM, cites [S1]</text>
+    <text x="518" y="121">Fine-tuned model</text><text x="518" y="134" fill="#404040" font-size="9">Qwen3-4B + LoRA v3</text>
+    <text x="518" y="211">Fact checker</text><text x="518" y="224" fill="#404040" font-size="9">10 correction rules</text>
+    <text x="332" y="211">Tutor mode</text><text x="332" y="224" fill="#404040" font-size="9">no solver, no RAG</text>
   </g>
-  <g stroke="#5d636e" stroke-width="1.1" fill="none" marker-end="url(#a)">
+  <g stroke="#000" stroke-width="1.1" fill="none" marker-end="url(#a)">
     <path d="M94,124 H122"/>
     <path d="M216,116 L260,40"/><path d="M402,34 H446"/>
     <path d="M216,124 H260"/><path d="M402,124 H446"/>
@@ -310,7 +271,7 @@
     <path d="M216,132 L260,210"/>
     <path d="M300,54 V102" stroke-dasharray="3 3"/>
   </g>
-  <g fill="#5d636e" font-size="8.6">
+  <g fill="#404040" font-size="8.6">
     <text x="232" y="74" text-anchor="end">solvable problem</text>
     <text x="239" y="100" text-anchor="middle">concept /</text>
     <text x="239" y="111" text-anchor="middle">analysis</text>
@@ -319,7 +280,7 @@
     <text x="424" y="28" text-anchor="middle">grounded</text>
   </g>
 </svg>
-<figcaption><strong>Figure 1.</strong> Request flow. The router picks a path. Solvable problems are computed by a simulator. Concept and analysis questions are grounded in retrieved course notes, answered by the fine-tuned model and fact-checked. A shown attempt goes to the Socratic tutor, which never receives a computed answer or a retrieved passage.</figcaption>
+<figcaption>Figure 1: Request flow. The router picks a path. Solvable problems are computed by a simulator. Concept and analysis questions are grounded in retrieved course notes, answered by the fine-tuned model and fact-checked. A shown attempt goes to the Socratic tutor, which never receives a computed answer or a retrieved passage.</figcaption>
 </figure>
 <table>
   <thead><tr><th>Layer</th><th>Component</th><th>Runs on</th></tr></thead>
@@ -334,9 +295,9 @@
 <h3>3.2 Data pipeline</h3>
 <p>Stages 3–5 of the build. Each stage writes its statistics into the manifest and prints what it removed, so a regression shows up as a changed count.</p>
 <figure><img src="shots/code_build_stages.png" alt="build.py stages 3 to 5">
-<figcaption><strong>Figure 2.</strong> <code>ostutor/build.py</code>: cleaning, deduplication and decontamination stages.</figcaption></figure>
+<figcaption>Figure 2: <code>ostutor/build.py</code>: cleaning, deduplication and decontamination stages.</figcaption></figure>
 <figure><img src="shots/code_decontaminate.png" alt="decontamination core">
-<figcaption><strong>Figure 3.</strong> The core of decontamination. Generated rows are judged by exact parameter fingerprint, prose rows by <em>distinctive</em> shared 13-grams only.</figcaption></figure>
+<figcaption>Figure 3: The core of decontamination. Generated rows are judged by exact parameter fingerprint, prose rows by <em>distinctive</em> shared 13-grams only.</figcaption></figure>
 
 <h3>3.3 Fine-tuning</h3>
 <p>QLoRA via Unsloth on Kaggle's free tier: 2 × Tesla T4 with DDP (<code>torchrun --nproc_per_node=2</code>), 735 optimiser steps, 3.5 hours. The settings and the reason for each:</p>
@@ -353,44 +314,44 @@
   </tbody>
 </table>
 <figure><img src="shots/code_lora.png" alt="LoRA configuration">
-<figcaption><strong>Figure 4.</strong> <code>train/kaggle_train.py</code>: the 4-bit base and the LoRA adapter on all seven projection matrices.</figcaption></figure>
+<figcaption>Figure 4: <code>train/kaggle_train.py</code>: the 4-bit base and the LoRA adapter on all seven projection matrices.</figcaption></figure>
 <figure><img src="shots/code_sftconfig.png" alt="trainer configuration">
-<figcaption><strong>Figure 5.</strong> The trainer configuration: no packing, fp16, 8-bit AdamW, NEFTune, step-wise validation with best-checkpoint restore.</figcaption></figure>
+<figcaption>Figure 5: The trainer configuration: no packing, fp16, 8-bit AdamW, NEFTune, step-wise validation with best-checkpoint restore.</figcaption></figure>
 
 <h3>3.4 Verified solver</h3>
 <p>The model never carries out a procedure. It <em>reads</em> the question into typed JSON. This step runs on the untuned base at LoRA scale 0, which reads more reliably: 84% extraction accuracy against 79% for the adapter. Every extracted number must then appear in the question. Grounded parameters go to a simulator, which computes the answer; anything ungrounded falls back to the model.</p>
 <figure><img src="shots/code_grounding.png" alt="grounding check">
-<figcaption><strong>Figure 6.</strong> <code>ostutor/solver.py</code>: the grounding check, which makes delegation trustworthy. It caught an invented Banker's <em>Available</em> vector [10, 5, 7] for a problem stating [3, 3, 2].</figcaption></figure>
+<figcaption>Figure 6: <code>ostutor/solver.py</code>: the grounding check, which makes delegation trustworthy. It caught an invented Banker's <em>Available</em> vector [10, 5, 7] for a problem stating [3, 3, 2].</figcaption></figure>
 
 <h3>3.5 RAG pipeline</h3>
 <p>The pipeline has three files. <code>corpus.py</code> validates the manifest and cuts the notes into citable chunks. <code>retrieve.py</code> ranks the chunks, decides whether any of them are relevant, and builds the prompt. <code>__init__.py</code> documents the design.</p>
 <figure><img src="shots/code_corpus.png" alt="corpus loader">
-<figcaption><strong>Figure 7.</strong> <code>ostutor/rag/corpus.py</code>: a document without source, licence or permission is refused, not skipped.</figcaption></figure>
+<figcaption>Figure 7: <code>ostutor/rag/corpus.py</code>: a document without source, licence or permission is refused, not skipped.</figcaption></figure>
 <figure><img src="shots/code_retrieve.png" alt="hybrid retrieval">
-<figcaption><strong>Figure 8.</strong> <code>ostutor/rag/retrieve.py</code>: BM25 and dense rankings, the abstain gate, and reciprocal-rank fusion (k = 60; Cormack et al., SIGIR 2009).</figcaption></figure>
-<p><strong>The abstain gate.</strong> A passage that is only the least-bad match is worse than no passage, because the model would cite it as support. When the gate decides the notes do not cover the question, retrieval returns nothing, and the answer is generated exactly as without RAG. The first gate (v1) used only the dense similarity, and it failed on the fixture (§4.7). The served gate (v2) keeps the passages if <em>either</em> signal is strong: cosine ≥ 0.45 or BM25 ≥ 6.0.</p>
+<figcaption>Figure 8: <code>ostutor/rag/retrieve.py</code>: BM25 and dense rankings, the abstain gate, and reciprocal-rank fusion (k = 60; Cormack et al., SIGIR 2009).</figcaption></figure>
+<p><strong>The abstain gate.</strong> A passage that is only the least-bad match is worse than no passage, because the model would cite it as support. When the gate decides the notes do not cover the question, retrieval returns nothing, and the answer is generated exactly as without RAG. The first gate (v1) used only the dense similarity, and it failed on the fixture (Section 4.7). The served gate (v2) keeps the passages if <em>either</em> signal is strong: cosine ≥ 0.45 or BM25 ≥ 6.0.</p>
 <figure><img src="shots/code_augment.png" alt="prompt construction">
-<figcaption><strong>Figure 9.</strong> The prompt keeps the <em>trained</em> system prompt word for word at the start, so the adapter still sees the prompt it learned the mode under. The notes follow, labelled [S1]…[S4], with an instruction never to invent a citation.</figcaption></figure>
+<figcaption>Figure 9: The prompt keeps the <em>trained</em> system prompt word for word at the start, so the adapter still sees the prompt it learned the mode under. The notes follow, labelled [S1]…[S4], with an instruction never to invent a citation.</figcaption></figure>
 
 <h3>3.6 Gateway integration</h3>
 <p>Retrieval is layer 2 of the gateway. It runs after the simulator layer, so a solvable problem is still computed, and before the fact checker, which checks the grounded draft. Only <code>explain</code> and <code>analyze</code> retrieve. Tutor mode never does, because a passage could state the answer the student is working towards. Retrieval is switched on by <code>OSTUTOR_RAG=&lt;corpus dir&gt;</code>; a gateway started without it behaves exactly as before. Answers end with a "Sources from your course notes" list, in both the streamed and the non-streamed path.</p>
 <figure><img src="shots/code_gateway_layers.png" alt="gateway layers">
-<figcaption><strong>Figure 10.</strong> <code>serve/gateway.py</code>: layer 1 is the simulator, layer 2 retrieval, layer 3 the fact checker.</figcaption></figure>
+<figcaption>Figure 10: <code>serve/gateway.py</code>: layer 1 is the simulator, layer 2 retrieval, layer 3 the fact checker.</figcaption></figure>
 
 <h3>3.7 Evaluation and tests</h3>
 <p>Every comparison in the project is <em>paired</em>: the same items are scored under two configurations. The right test for a paired yes/no outcome is McNemar's, and with 5–30 discordant items the exact binomial form is needed.</p>
 <figure><img src="shots/code_mcnemar.png" alt="exact McNemar">
-<figcaption><strong>Figure 11.</strong> <code>ostutor/evaluation/stats.py</code>: the exact two-sided McNemar test used for every p-value in Section 4.</figcaption></figure>
+<figcaption>Figure 11: <code>ostutor/evaluation/stats.py</code>: the exact two-sided McNemar test used for every p-value in Section 4.</figcaption></figure>
 <p>Four test suites need no GPU: <code>tools/test_pipeline.py</code> (data pipeline), <code>tools/test_router.py</code> (28 labelled routing cases, 0 misroutes allowed on shown attempts), <code>tools/test_g0.py</code> (55 checks on statistics, extraction scoring, grader regressions and the one-adapter guard), and the new <code>tools/test_rag.py</code> (29 checks). The gateway suite grew from 28 to 34 checks.</p>
 <figure><img src="shots/term_test_rag.png" alt="RAG tests">
-<figcaption><strong>Figure 12.</strong> <code>tools/test_rag.py</code>: 29/29 checks, covering manifest refusal, chunking, BM25, hybrid retrieval, abstention, prompt construction and citation parsing.</figcaption></figure>
+<figcaption>Figure 12: <code>tools/test_rag.py</code>: 29/29 checks, covering manifest refusal, chunking, BM25, hybrid retrieval, abstention, prompt construction and citation parsing.</figcaption></figure>
 <figure><img src="shots/term_test_gateway.png" alt="gateway tests">
-<figcaption><strong>Figure 13.</strong> <code>serve/test_gateway.py</code> (last lines): the six retrieval checks. Every earlier check is unchanged with retrieval off.</figcaption></figure>
+<figcaption>Figure 13: <code>serve/test_gateway.py</code> (last lines): the six retrieval checks. Every earlier check is unchanged with retrieval off.</figcaption></figure>
 </section>
 
 <!-- ======================= 4 METRICS ======================= -->
 <section class="pb">
-<h2><span class="n">4</span>Metrics (Assessment): Results and Discussion</h2>
+<h2>4.&nbsp;&nbsp;Metrics (Assessment): Results and Discussion</h2>
 
 <h3>4.1 Metrics and why each was chosen</h3>
 <table>
@@ -400,7 +361,7 @@
     <tr><td>Exact McNemar p</td><td>Is a before/after difference real?</td><td>Paired items; small discordant counts</td></tr>
     <tr><td>Right→wrong / wrong→right</td><td>Did an unchanged mean hide cancelling losses?</td><td>Forgetting can hide inside a flat average</td></tr>
     <tr><td>Extraction accuracy, delegation rate</td><td>Did the model read the problem correctly, and how often did the simulator answer?</td><td>Only answer-changing fields are scored (e.g. the quantum only for RR)</td></tr>
-    <tr><td>Validation / OOD loss</td><td>Did training fit without diverging?</td><td>A training-health signal, <em>not</em> a correctness measure (§4.2)</td></tr>
+    <tr><td>Validation / OOD loss</td><td>Did training fit without diverging?</td><td>A training-health signal, <em>not</em> a correctness measure (Section 4.2)</td></tr>
     <tr><td>Precision / recall (fact checker)</td><td>Does a correction fire when, and only when, it should?</td><td>False alarms damage trust; misses ship misconceptions</td></tr>
     <tr><td>Section recall@k, MRR@10</td><td>Did retrieval find the passage that answers the question?</td><td>Section-level is stricter than document-level, and a citation needs the right section</td></tr>
     <tr><td>Abstention rate</td><td>Does retrieval return nothing when the notes do not cover the question?</td><td>A wrong passage is cited as support</td></tr>
@@ -410,9 +371,9 @@
 </table>
 <p><strong>Why no AUC-ROC or F1 over the whole system.</strong> The tutor is not a scored binary classifier, so there is no threshold to sweep. Precision and recall are used where a binary decision exists: the fact checker and the abstain gate.</p>
 
-<h3>4.2 Training loss <span class="tag m">measured</span></h3>
+<h3>4.2 Training loss</h3>
 <figure><img class="chart" src="shots/loss_curve.svg" alt="loss curves">
-<figcaption><strong>Figure 14.</strong> v3 training run, from the trainer's own log (<code>outputs/ostutor-lora-v3/ostutor-lora/train_metrics.json</code>).</figcaption></figure>
+<figcaption>Figure 14: v3 training run, from the trainer's own log (<code>outputs/ostutor-lora-v3/ostutor-lora/train_metrics.json</code>).</figcaption></figure>
 <table>
   <thead><tr><th>Quantity</th><th class="num">Start (step 59)</th><th class="num">End (step 735)</th></tr></thead>
   <tbody>
@@ -423,7 +384,7 @@
 </table>
 <p>The validation loss fell at every one of 12 evaluations, so training was healthy. The training loss climbs from near zero to 0.31–0.33 after step ~550. The training order is engineered (rectifier interleaving, spaced replay), so the late batches have a different mix from the early ones; this was not investigated further, and validation kept falling through it. It does <strong>not</strong> show the model can solve problems. The OOD loss is low because that split is fully templated procedural text, yet the same model solves only 34 of 57 suite problems on its own. Teacher-forced loss measures how well the model predicts a correct answer it is shown, not whether it can produce one.</p>
 
-<h3>4.3 Procedural accuracy and ablation <span class="tag m">measured</span></h3>
+<h3>4.3 Procedural accuracy and ablation</h3>
 <p>All six configurations were measured on the served path: llama.cpp with one adapter per server, greedy decoding, 57 items. They were graded with the corrected grader (D-003 and D-004, Section 5).</p>
 <table>
   <thead><tr><th>Configuration</th><th class="num">Correct</th><th class="num">Accuracy</th><th class="num">Delegated to simulator</th></tr></thead>
@@ -440,23 +401,23 @@
 <table>
   <thead><tr><th>What is being tested</th><th>A → B</th><th class="num">Right→wrong</th><th class="num">Wrong→right</th><th class="num">p</th><th>Verdict</th></tr></thead>
   <tbody>
-    <tr><td>Solver, on v3</td><td>34 → 57</td><td class="num">0</td><td class="num">23</td><td class="num">&lt; 10⁻⁶</td><td class="ok">significant</td></tr>
-    <tr><td>Solver, on the base</td><td>30 → 49</td><td class="num">0</td><td class="num">19</td><td class="num">4 × 10⁻⁶</td><td class="ok">significant</td></tr>
-    <tr><td>Adapter, with the solver</td><td>49 → 57</td><td class="num">0</td><td class="num">8</td><td class="num">0.0078</td><td class="ok">significant</td></tr>
-    <tr><td>Adapter, without the solver</td><td>30 → 34</td><td class="num">11</td><td class="num">15</td><td class="num">0.557</td><td class="warn">not significant</td></tr>
-    <tr><td>v2.2 vs base, no solver</td><td>30 → 19</td><td class="num">17</td><td class="num">6</td><td class="num">0.035</td><td class="bad">v2.2 significantly worse</td></tr>
-    <tr><td>v2.2 → v3, no solver</td><td>19 → 34</td><td class="num">2</td><td class="num">17</td><td class="num">0.0007</td><td class="ok">significant</td></tr>
+    <tr><td>Solver, on v3</td><td>34 → 57</td><td class="num">0</td><td class="num">23</td><td class="num">&lt; 10⁻⁶</td><td>significant</td></tr>
+    <tr><td>Solver, on the base</td><td>30 → 49</td><td class="num">0</td><td class="num">19</td><td class="num">4 × 10⁻⁶</td><td>significant</td></tr>
+    <tr><td>Adapter, with the solver</td><td>49 → 57</td><td class="num">0</td><td class="num">8</td><td class="num">0.0078</td><td>significant</td></tr>
+    <tr><td>Adapter, without the solver</td><td>30 → 34</td><td class="num">11</td><td class="num">15</td><td class="num">0.557</td><td>not significant</td></tr>
+    <tr><td>v2.2 vs base, no solver</td><td>30 → 19</td><td class="num">17</td><td class="num">6</td><td class="num">0.035</td><td>v2.2 significantly worse</td></tr>
+    <tr><td>v2.2 → v3, no solver</td><td>19 → 34</td><td class="num">2</td><td class="num">17</td><td class="num">0.0007</td><td>significant</td></tr>
   </tbody>
 </table>
 <p><strong>Reading the ablation.</strong> The solver contributes most of the accuracy: +19 to +23 items, with zero losses. The adapter's measurable value is the 8 items the solver cannot take on its own (49 → 57, no losses). Every one of those 8 comes from the adapter answering the problems the solver declines. Without the solver, the adapter's +4 is indistinguishable from noise. v2.2 actively hurt the model, which is why v3 was rebuilt.</p>
 
-<h3>4.4 Out-of-distribution holdout <span class="tag m">measured</span></h3>
+<h3>4.4 Out-of-distribution holdout</h3>
 <table>
   <thead><tr><th>Kind</th><th class="num">n</th><th class="num">Extraction</th><th class="num">Delegated</th><th class="num">Correct</th><th class="num">Delegated but misread</th></tr></thead>
   <tbody>
     <tr><td>Banker's request</td><td class="num">91</td><td class="num">98.9%</td><td class="num">98.9%</td><td class="num">100.0%</td><td class="num">0</td></tr>
     <tr><td>Banker's safety</td><td class="num">96</td><td class="num">96.9%</td><td class="num">96.9%</td><td class="num">100.0%</td><td class="num">0</td></tr>
-    <tr><td>Disk scheduling</td><td class="num">80</td><td class="num">88.8%</td><td class="num">100.0%</td><td class="num"><span class="warn">92.5%</span></td><td class="num">9</td></tr>
+    <tr><td>Disk scheduling</td><td class="num">80</td><td class="num">88.8%</td><td class="num">100.0%</td><td class="num">92.5%</td><td class="num">9</td></tr>
     <tr><td>Free-space allocation</td><td class="num">74</td><td class="num">100.0%</td><td class="num">100.0%</td><td class="num">100.0%</td><td class="num">0</td></tr>
     <tr><td>Page replacement</td><td class="num">86</td><td class="num">98.8%</td><td class="num">100.0%</td><td class="num">100.0%</td><td class="num">1</td></tr>
     <tr><td>CPU scheduling</td><td class="num">91</td><td class="num">98.9%</td><td class="num">98.9%</td><td class="num">98.9%</td><td class="num">0</td></tr>
@@ -467,7 +428,7 @@
 <p class="caption">Source: <code>reports/g0/20261012-1429/ood.json</code>, <code>summary.md</code>. v3 + solver, end to end.</p>
 <p>7 of the 600 answers were wrong. Six were disk problems where the stated range "0–299" was read as size 299 instead of 300 cylinders. The re-extraction diagnostic reproduced this off-by-one in <strong>9 of 9</strong> misread items. Grounding cannot catch it, because 299 <em>does</em> appear in the question. The seventh wrong answer was a scheduling problem that was not delegated.</p>
 
-<h3>4.5 Catastrophic forgetting <span class="tag m">measured</span></h3>
+<h3>4.5 Catastrophic forgetting</h3>
 <table>
   <thead><tr><th>Benchmark (paired)</th><th class="num">Base</th><th class="num">v3</th><th class="num">Δ</th><th class="num">R→W</th><th class="num">W→R</th><th class="num">p</th></tr></thead>
   <tbody>
@@ -479,18 +440,18 @@
 <p class="caption">Source: <code>reports/forgetting_v3_paired.json</code>; p-values from <code>reports/g0/historical_significance.md</code>.</p>
 <p><strong>No effect is statistically detectable in either direction.</strong> That covers both the OS-theory dip and the adjacent-CS gain. The 70-item theory set is too small to decide a 4-point change, because the result hinges on 5 discordant questions; a 200-item set is planned. The base model scores identically, item for item, in two separate runs, so this evaluation is deterministic.</p>
 
-<h3>4.6 Fact checker <span class="tag m">measured</span></h3>
-<p>Ten probes were run, one per correction rule, and every v3 answer was read by hand. The checker produced <strong>1 true positive, 2 false positives, 1 false negative and 6 true negatives</strong>, so precision is 1/3 and recall is 1/2. Both false alarms were <em>correct</em> negated sentences: the rules match "suffers from Belady's anomaly" without seeing the "does not" before it. The miss was <code>seg_internal_frag</code>. On a broader set of 70 theory answers it flagged 0. <span class="src">Source: <code>reports/g0/20261012-1429/factcheck_v3.json</code>.</span></p>
+<h3>4.6 Fact checker</h3>
+<p>Ten probes were run, one per correction rule, and every v3 answer was read by hand. The checker produced <strong>1 true positive, 2 false positives, 1 false negative and 6 true negatives</strong>, so precision is 1/3 and recall is 1/2. Both false alarms were <em>correct</em> negated sentences: the rules match "suffers from Belady's anomaly" without seeing the "does not" before it. The miss was <code>seg_internal_frag</code>. On a broader set of 70 theory answers it flagged 0. Source: <code>reports/g0/20261012-1429/factcheck_v3.json</code>.</p>
 
-<h3>4.7 RAG: retrieval quality and latency <span class="tag f">fixture</span></h3>
+<h3>4.7 RAG: retrieval quality and latency</h3>
 <figure><img src="shots/term_rag_eval.png" alt="retrieval evaluation">
-<figcaption><strong>Figure 15.</strong> <code>tools/rag_eval.py</code> over the fixture: 45 in-scope and 10 out-of-scope questions, 5 timed passes each (the first discarded).</figcaption></figure>
+<figcaption>Figure 15: <code>tools/rag_eval.py</code> over the fixture: 45 in-scope and 10 out-of-scope questions, 5 timed passes each (the first discarded).</figcaption></figure>
 <table>
   <thead><tr><th>Configuration</th><th class="num">Section R@1</th><th class="num">Section R@4</th><th class="num">MRR@10</th><th class="num">False abstain</th><th class="num">Out-of-scope abstained</th><th class="num">p95 ms</th></tr></thead>
   <tbody>
-    <tr><td>BM25 only</td><td class="num">95.6%</td><td class="num">100.0%</td><td class="num">0.978</td><td class="num">0/45</td><td class="num"><span class="bad">5/10</span></td><td class="num">0.07</td></tr>
+    <tr><td>BM25 only</td><td class="num">95.6%</td><td class="num">100.0%</td><td class="num">0.978</td><td class="num">0/45</td><td class="num">5/10</td><td class="num">0.07</td></tr>
     <tr><td>Dense only (MiniLM)</td><td class="num">93.3%</td><td class="num">93.3%</td><td class="num">0.933</td><td class="num">2/45</td><td class="num">6/10</td><td class="num">6.97</td></tr>
-    <tr><td>Hybrid, v1 gate</td><td class="num">91.1%</td><td class="num">93.3%</td><td class="num">0.927</td><td class="num">2/45</td><td class="num"><span class="bad">6/10</span></td><td class="num">6.25</td></tr>
+    <tr><td>Hybrid, v1 gate</td><td class="num">91.1%</td><td class="num">93.3%</td><td class="num">0.927</td><td class="num">2/45</td><td class="num">6/10</td><td class="num">6.25</td></tr>
     <tr class="total"><td>Hybrid, v2 gate (served)</td><td class="num">93.3%</td><td class="num">95.6%</td><td class="num">0.944</td><td class="num">2/45</td><td class="num">10/10</td><td class="num">5.70</td></tr>
   </tbody>
 </table>
@@ -503,7 +464,7 @@
   <li><strong>Both remaining misses are false abstentions</strong> on terse questions: "Is SRTF preemptive?" and "When is busy waiting acceptable?". The answer is then generated without notes, which is the safe failure.</li>
 </ul>
 
-<h3>4.8 RAG: end to end on the served model <span class="tag f">fixture</span></h3>
+<h3>4.8 RAG: end to end on the served model</h3>
 @@E2E@@
 <p><strong>Reading the results.</strong></p>
 <ul>
@@ -511,7 +472,7 @@
   <li><strong>RAG fixed a misconception the fine-tuned model holds.</strong> Asked "Can LRU suffer from Belady's anomaly?", the model <em>without</em> notes answered "Yes, LRU (Least Recently Used) can suffer from Belady's anomaly", which is wrong and was flagged by the fact checker. <em>With</em> notes it answered "No, LRU … does not suffer from Belady's anomaly [S1]" and gave the stack-algorithm reason from the note. That was the only fact-checker flag in either arm (1 off, 0 on, of 55).</li>
   <li><strong>No measurable effect on the theory MCQ.</strong> Both arms scored 65/70, with one flip each way (p = 1.0), including on the 53 items where notes were retrieved. At 93% the model is near the ceiling of this set in this protocol, so the MCQ cannot show a gain. A harder 200-item set is needed (G3).</li>
   <li><strong>Speed is unaffected.</strong> Decoding stayed at ~43 tok/s with about 380 extra prompt tokens; the slowest answer with RAG was 41.7 tok/s, against a 20 tok/s floor. These are server-reported decode rates and exclude prompt processing, which is why they differ from the 26.9 tok/s wall-clock figure measured earlier through the full stack.</li>
-  <li><strong>A confound, stated plainly.</strong> The run capped answers at 700 tokens. 28 of 55 answers <em>without</em> notes hit the cap, against 7 of 55 with notes. So the shorter, faster answers with RAG (median 225 tokens, 5.5 s, against 700 tokens and 16.2 s) are partly an artefact of truncation. They show that grounded answers are more focused; they do not give a clean measure of speed-up.</li>
+  <li><strong>Truncation affects the length and time figures.</strong> The run capped answers at 700 tokens. 28 of 55 answers <em>without</em> notes hit the cap, against 7 of 55 with notes. So the shorter, faster answers with RAG (median 225 tokens, 5.5 s, against 700 tokens and 16.2 s) are partly an artefact of truncation. They show that grounded answers are more focused; they do not give a clean measure of speed-up.</li>
 </ul>
 
 <h3>4.9 Discussion</h3>
@@ -522,7 +483,7 @@
   <li><strong>Measurement found more errors than the model did.</strong> Two grader blind spots, a non-deterministic cache, a void benchmark and two unsupported claims all biased the numbers in the project's favour. Each was found by auditing the evaluation rather than the model (Section 5).</li>
 </ul>
 
-<h3>4.10 Expected outcome on the course notes <span class="tag t">target</span></h3>
+<h3>4.10 Expected outcome on the course notes</h3>
 <p>These are the acceptance targets for the course-notes run. None of them is a result yet.</p>
 <table>
   <thead><tr><th>Measure</th><th class="num">Fixture (measured)</th><th class="num">Target on course notes</th><th>How it will be measured</th></tr></thead>
@@ -530,18 +491,18 @@
     <tr><td>Retrieval p95 latency</td><td class="num">5.7 ms</td><td class="num">≤ 500 ms</td><td><code>tools/rag_eval.py</code></td></tr>
     <tr><td>Section recall@4</td><td class="num">95.6%</td><td class="num">≥ 85%</td><td>≥ 100 owner-written questions, labelled, held out from gate fitting</td></tr>
     <tr><td>Out-of-scope abstention</td><td class="num">10/10 (fitted)</td><td class="num">≥ 90%</td><td>Same held-out set</td></tr>
-    <tr><td>Answers citing a note, when given notes</td><td class="num">see §4.8</td><td class="num">≥ 90%</td><td><code>tools/rag_e2e.py</code></td></tr>
-    <tr><td>Invented citations</td><td class="num">see §4.8</td><td class="num">0</td><td><code>tools/rag_e2e.py</code></td></tr>
+    <tr><td>Answers citing a note, when given notes</td><td class="num">see Section 4.8</td><td class="num">≥ 90%</td><td><code>tools/rag_e2e.py</code></td></tr>
+    <tr><td>Invented citations</td><td class="num">see Section 4.8</td><td class="num">0</td><td><code>tools/rag_e2e.py</code></td></tr>
     <tr><td>OS theory MCQ (200 items) with RAG</td><td class="num">—</td><td class="num">≥ base (90%)</td><td>Paired McNemar, RAG off vs on</td></tr>
     <tr><td>Procedural suite, full system</td><td class="num">57/57</td><td class="num">57/57 (no regression)</td><td><code>tools/g0_ablation.py</code></td></tr>
-    <tr><td>Generation speed with notes in the prompt</td><td class="num">see §4.8</td><td class="num">≥ 20 tok/s</td><td>Server timings</td></tr>
+    <tr><td>Generation speed with notes in the prompt</td><td class="num">see Section 4.8</td><td class="num">≥ 20 tok/s</td><td>Server timings</td></tr>
   </tbody>
 </table>
 </section>
 
 <!-- ======================= 5 WRONG ======================= -->
 <section class="pb">
-<h2><span class="n">5</span>What Went Wrong</h2>
+<h2>5.&nbsp;&nbsp;What Went Wrong</h2>
 <p>These are listed by impact. Each entry gives what happened, how it was found, and what was done about it. The first group distorted <em>reported numbers</em>, which is the most serious kind of error for a project whose claims rest on measurement.</p>
 
 <h3>5.1 Errors in measurement and reporting</h3>
@@ -549,10 +510,10 @@
   <thead><tr><th style="width:24%">What went wrong</th><th>Effect</th><th style="width:30%">Fix / status</th></tr></thead>
   <tbody>
     <tr><td><strong>Void benchmark</strong>: v2.2 and v3 loaded into one llama-server and switched by per-request LoRA scale</td><td>Did not isolate the adapters: v3 scored 17/57 there and 36/57 alone, so every column of that benchmark was wrong</td><td>Declared void. One adapter per server, enforced by <code>check_adapters</code>, which refuses to measure otherwise</td></tr>
-    <tr><td><strong>Unsupported claims in submitted PDFs</strong>: "final training loss 0.2710", and "the flips confirm genuine transfer"</td><td>0.2710 appears in no training artifact. The transfer has p = 0.20</td><td>Withdrawn in <code>PROJECT_CONTEXT.md</code> and in this report. <span class="warn">The two earlier PDFs still need correcting (owner decision)</span></td></tr>
+    <tr><td><strong>Unsupported claims in submitted PDFs</strong>: "final training loss 0.2710", and "the flips confirm genuine transfer"</td><td>0.2710 appears in no training artifact. The transfer has p = 0.20</td><td>Withdrawn in <code>PROJECT_CONTEXT.md</code> and in this report. The two earlier PDFs still need correcting (owner decision)</td></tr>
     <tr><td><strong>Grader blind spots</strong> (D-003, D-004): LaTeX <code>\quad</code> separators, and a "Final Answer" line with a bare number</td><td>5 correct base-model answers were graded wrong. That inflated the adapter's apparent no-solver gain from p = 0.557 to p = 0.136</td><td>Fixed with regression tests. Re-grading 799 historical outputs changed 0 verdicts. Base-model failures are now hand-audited</td></tr>
     <tr><td><strong>Prompt cache made greedy decoding non-deterministic</strong> (D-005)</td><td>Same weights scored 36/57 and 34/57; only 23/57 outputs were identical</td><td>Evaluation sends <code>cache_prompt: false</code> (6/6 byte-identical repeats); serving keeps the cache. The deterministic rerun of G0 was interrupted and is still pending</td></tr>
-    <tr><td><strong>Teacher-forced loss read as correctness</strong></td><td>A low OOD loss (0.0139) was taken as evidence of generalisation</td><td>Loss is reported only as a training-health signal (§4.2)</td></tr>
+    <tr><td><strong>Teacher-forced loss read as correctness</strong></td><td>A low OOD loss (0.0139) was taken as evidence of generalisation</td><td>Loss is reported only as a training-health signal (Section 4.2)</td></tr>
   </tbody>
 </table>
 
@@ -560,10 +521,10 @@
 <table>
   <thead><tr><th style="width:24%">What went wrong</th><th>Effect</th><th style="width:30%">Fix / status</th></tr></thead>
   <tbody>
-    <tr><td><strong>Disk-size off-by-one</strong> in extraction ("0–299" read as 299)</td><td>6 confidently wrong OOD answers. Grounding passes it because 299 is in the text</td><td><span class="warn">Not fixed</span>: a student-facing change awaiting owner approval. Proposed: read an "a–b" range as b − a + 1 cylinders</td></tr>
-    <tr><td><strong>Fact checker ignores negation</strong> and misses one of its own rules</td><td>Precision 1/3, recall 1/2 on the probes</td><td><span class="warn">Not fixed</span>; awaiting approval. Proposed: a negation window before each pattern, and probes for every rule in the test suite</td></tr>
+    <tr><td><strong>Disk-size off-by-one</strong> in extraction ("0–299" read as 299)</td><td>6 confidently wrong OOD answers. Grounding passes it because 299 is in the text</td><td>Not fixed: a student-facing change awaiting owner approval. Proposed: read an "a–b" range as b − a + 1 cylinders</td></tr>
+    <tr><td><strong>Fact checker ignores negation</strong> and misses one of its own rules</td><td>Precision 1/3, recall 1/2 on the probes</td><td>Not fixed; awaiting approval. Proposed: a negation window before each pattern, and probes for every rule in the test suite</td></tr>
     <tr><td><strong>Fact checker silently returned the misconception</strong> when its redraft call failed (D-002)</td><td>A student would see "LRU suffers from Belady's anomaly" with no warning</td><td>Fixed: the correction is attached. The test was also non-hermetic (it passed only with the server up)</td></tr>
-    <tr><td><strong>Fact checker runs only on non-streaming requests</strong></td><td>Open WebUI streams by default, so in the UI the checker may never run. Not confirmed: the gateway logs for this deployment are empty</td><td><span class="warn">To verify</span>. Retrieval and its sources footer work on both paths</td></tr>
+    <tr><td><strong>Fact checker runs only on non-streaming requests</strong></td><td>Open WebUI streams by default, so in the UI the checker may never run. Not confirmed: the gateway logs for this deployment are empty</td><td>To verify. Retrieval and its sources footer work on both paths</td></tr>
     <tr><td><strong>v1 RAG abstain gate</strong></td><td>4 of 10 off-topic questions retrieved OS passages</td><td>Replaced by the v2 combined gate, which must be refitted on held-out real-notes questions</td></tr>
   </tbody>
 </table>
@@ -592,7 +553,7 @@
 
 <!-- ======================= 6 IMPROVEMENTS ======================= -->
 <section class="pb">
-<h2><span class="n">6</span>Alternative Flow (Improvements)</h2>
+<h2>6.&nbsp;&nbsp;Alternative Flow (Improvements)</h2>
 <p>For each stage: what we would do differently with hindsight, or next, and the evidence that motivates it.</p>
 
 <h3>6.1 Evaluate before training, not after</h3>
@@ -645,7 +606,7 @@
 <!-- ======================= APPENDIX A ======================= -->
 <section class="pb">
 <h2>Appendix A&nbsp;&nbsp;Code listings</h2>
-<p>The code shown in the screenshots of Section 3, as text. Each listing is cut from the repository at build time, so it matches the screenshot line for line.</p>
+<p>This appendix gives the code shown in the figures of Section 3 as text, with the same line numbers.</p>
 @@LISTINGS@@
 </section>
 
@@ -664,19 +625,29 @@
     <tr><td>Forgetting, paired</td><td><code>reports/forgetting_v3_paired.json</code>, <code>reports/g0/historical_significance.md</code></td><td><code>tools/run_forgetting_eval.py</code>, <code>tools/significance_history.py</code></td></tr>
     <tr><td>RAG retrieval</td><td><code>reports/rag/fixture_eval.md</code></td><td><code>tools/rag_eval.py</code></td></tr>
     <tr><td>RAG end to end</td><td><code>@@E2E_DIR@@</code></td><td><code>tools/rag_e2e.py</code></td></tr>
-    <tr><td>Generation speed 26.9 tok/s (wall clock, full stack)</td><td><code>PROJECT_CONTEXT.md</code> §7</td><td>Served stack, 300 tokens</td></tr>
+    <tr><td>Generation speed 26.9 tok/s (wall clock, full stack)</td><td><code>PROJECT_CONTEXT.md</code> Section 7</td><td>Served stack, 300 tokens</td></tr>
     <tr><td>Engineering decisions</td><td><code>docs/DECISIONS.md</code> (D-001 … D-006)</td><td>—</td></tr>
   </tbody>
 </table>
 <h3>Reproducing</h3>
-<pre style="font-family:Consolas,monospace;font-size:8.2pt;background:#f7f8fa;border:1px solid #d7dae0;border-radius:4px;padding:9px 11px;white-space:pre-wrap">python -m ostutor.build                                  # dataset, 11 stages, 19 gates
-python tools/test_pipeline.py; python tools/test_router.py; python tools/test_g0.py; python tools/test_rag.py
+<pre class="cmd"># build the dataset (11 stages, 19 release gates)
+python -m ostutor.build
+
+# tests
+python tools/test_pipeline.py
+python tools/test_router.py
+python tools/test_g0.py
+python tools/test_rag.py
 serve/.venv-webui/Scripts/python serve/test_gateway.py
-python tools/g0_ablation.py                              # suite + OOD + fact checker (GPU)
-python tools/rag_eval.py data/rag/fixture                # retrieval (CPU)
-python tools/rag_e2e.py data/rag/fixture                 # RAG off vs on, served model (GPU)
-$env:OSTUTOR_RAG="data/rag/corpus"; powershell -File serve\start_tutor.ps1   # serve with RAG
-python docs/build_code_shots.py; python docs/build_rag_report.py            # this document</pre>
+
+# evaluation
+python tools/g0_ablation.py                  # problem suite, OOD holdout, fact checker (GPU)
+python tools/rag_eval.py data/rag/fixture    # retrieval (CPU)
+python tools/rag_e2e.py data/rag/fixture     # RAG off vs on with the served model (GPU)
+
+# serve the tutor with retrieval switched on
+$env:OSTUTOR_RAG = "data/rag/corpus"
+powershell -File serve\start_tutor.ps1</pre>
 </section>
 
 </body>

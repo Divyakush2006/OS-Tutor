@@ -14,9 +14,6 @@ import re
 import sys
 from pathlib import Path
 
-from pygments import highlight
-from pygments.formatters import HtmlFormatter
-from pygments.lexers import PythonLexer
 from pypdf import PdfReader, PdfWriter
 
 DOCS = Path(__file__).resolve().parent
@@ -31,7 +28,7 @@ RAW_PDF = DOCS / "_rag_report_raw.pdf"
 OUT_PDF = DOCS / "OS-Tutor-Project-Report.pdf"
 
 ANCHORS = {
-    "s0": "Every number in this report carries",
+    "s0": "Every number in this report was produced",
     "s1": "1.1 Training dataset", "s1-1": "1.1 Training dataset", "s1-2": "1.2 Evaluation datasets",
     "s1-3": "1.3 Retrieval knowledge base",
     "s2": "2.1 The eleven-stage build", "s2-1": "2.1 The eleven-stage build",
@@ -46,17 +43,15 @@ ANCHORS = {
     "s4-7": "4.7 RAG: retrieval quality", "s4-8": "4.8 RAG: end to end",
     "s4-9": "4.9 Discussion", "s4-10": "4.10 Expected outcome",
     "s5": "5.1 Errors in measurement", "s6": "6.1 Evaluate before training",
-    "a": "The code shown in the screenshots", "b": "Reproducing",
+    "a": "This appendix gives the code shown", "b": "Reproducing",
 }
 
 
 def listings() -> str:
-    fmt = HtmlFormatter(style="default", nowrap=True)
-    out = [f"<style>{fmt.get_style_defs('.listing pre')}</style>", '<div class="listing">']
+    out = ['<div class="listing">']
     for n, (name, (path, a, b)) in enumerate(CODE.items(), 1):
         src = (ROOT / path).read_text(encoding="utf-8").splitlines()[a - 1:b]
-        body = highlight("\n".join(src) + "\n", PythonLexer(), fmt).rstrip("\n").split("\n")
-        lines = "\n".join(f'<span class="ln">{a + i}</span>{l}' for i, l in enumerate(body))
+        lines = "\n".join(f'<span class="ln">{a + i}</span>{html.escape(l)}' for i, l in enumerate(src))
         out.append(f"<h4>A.{n}&nbsp;&nbsp;{html.escape(name.replace('_', ' '))} "
                    f"<span>{html.escape(path)} : {a}–{b}</span></h4><pre>{lines}</pre>")
     return "\n".join(out + ["</div>"])
@@ -82,13 +77,13 @@ def e2e() -> tuple[str, str]:
     ins = e["in_scope_with_notes"]
     block = f"""
 <p>The served v3 model (one adapter, greedy decoding, prompt cache off) answered the same questions twice: once with the trained explain prompt alone, and once with the retrieved notes appended. Commit <code>{r['provenance']['commit'][:10]}</code>.</p>
-<p><strong>A. Theory MCQ, RAG off vs on.</strong> These are the 70 OS-theory items. The model is asked for the option letter, and retrieval uses only the question text, as a student would type it. This generated-letter protocol is not the logit-scored one behind the 85.71% in §4.5, so only the off-versus-on comparison is meaningful.</p>
+<p><strong>A. Theory MCQ, RAG off vs on.</strong> These are the 70 OS-theory items. The model is asked for the option letter, and retrieval uses only the question text, as a student would type it. This generated-letter protocol is not the logit-scored one behind the 85.71% in Section 4.5, so only the off-versus-on comparison is meaningful.</p>
 <table>
   <thead><tr><th>Items</th><th class="num">RAG off</th><th class="num">RAG on</th><th class="num">Right→wrong</th><th class="num">Wrong→right</th><th class="num">exact McNemar p</th></tr></thead>
   <tbody>{rows}</tbody>
 </table>
-<p class="caption">Source: <code>{rel}/results.json</code>. The fixture notes were written by the team, which had seen the fact-checker rules; they were not written from the MCQ items, but they cover the same canonical facts. Read this as an upper bound for what well-matched course notes can do.</p>
-<p><strong>B. Explain answers over the fixture questions.</strong></p>
+<p class="caption">Source: <code>{rel}/results.json</code>. The test notes were written by us after we had seen the fact-checker rules. They were not written from the MCQ items, but they cover the same standard facts, so this is an upper bound for what well-matched course notes can do.</p>
+<p><strong>B. Explain answers over the test-note questions.</strong></p>
 <table>
   <thead><tr><th>Measure</th><th class="num">RAG off</th><th class="num">RAG on</th></tr></thead>
   <tbody>
@@ -104,7 +99,7 @@ def e2e() -> tuple[str, str]:
   </tbody>
 </table>
 <figure><img src="shots/term_rag_e2e.png" alt="end-to-end summary">
-<figcaption><strong>Figure 16.</strong> The run's own summary file, <code>{rel}/summary.md</code>.</figcaption></figure>"""
+<figcaption>Figure 16: The run's own summary file, <code>{rel}/summary.md</code>.</figcaption></figure>"""
     return block, rel
 
 
@@ -178,13 +173,9 @@ def footer(n_pages):
     w, _ = A4
     for p in range(1, n_pages + 1):
         if p > 1:
-            c.setStrokeColor(Color(0.84, 0.85, 0.88))
-            c.setLineWidth(0.5)
-            c.line(18 * mm, 13 * mm, w - 18 * mm, 13 * mm)
-            c.setFillColor(Color(0.36, 0.39, 0.43))
-            c.setFont("Helvetica", 7.5)
-            c.drawString(18 * mm, 9 * mm, "OS Tutor  |  Project Report with RAG Integration")
-            c.drawRightString(w - 18 * mm, 9 * mm, f"Page {p} of {n_pages}")
+            c.setFillColor(Color(0, 0, 0))
+            c.setFont("Times-Roman", 11)
+            c.drawCentredString(w / 2, 13 * mm, str(p))
         c.showPage()
     c.save()
     buf.seek(0)
