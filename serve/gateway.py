@@ -313,15 +313,22 @@ def fact_checked(answer, system, question):
             "The following is correct and must be reflected in your answer:\n"
             + "\n".join(f"- {f}" for f in facts)
             + "\nRewrite the explanation so it is consistent with this.")
+
+    def corrected(draft):
+        # State the fact plainly rather than ship the misconception unmarked.
+        return ("> **Correction applied by the fact checker.**\n"
+                + "\n".join(f"> {f}" for f in facts) + "\n\n" + draft)
+
     try:
         second = _upstream(note, question, scale=1.0, max_tokens=2048)
     except Exception as e:
+        # The redraft is unavailable (server down, timeout). Returning the draft as-is
+        # would hand the student a known misconception with no warning, so the
+        # correction is attached to it instead.
         log.warning("fact-check retry failed: %s", e)
-        return answer, names
+        return corrected(answer), names
     if fact_flags(second):
-        # Still wrong: state the fact plainly rather than ship the misconception.
-        return ("> **Correction applied by the fact checker.**\n"
-                + "\n".join(f"> {f}" for f in facts) + "\n\n" + second), names
+        return corrected(second), names
     return second + ("\n\n---\n> _Checked against known OS misconceptions; one "
                      "statement was corrected before answering._"), names
 

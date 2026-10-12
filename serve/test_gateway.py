@@ -128,12 +128,32 @@ async def main():
     check("tutoring is not fact-check-rewritten either",
           not gateway.MODELS["ostutor-tutor"].get("factcheck"))
 
-    # The fact checker must state the correct fact, not merely drop the answer.
-    fixed, flagged = gateway.fact_checked(
-        "Yes, LRU suffers from Belady's anomaly.", "sys", "Does LRU suffer from it?")
-    check("a misconception in a draft is caught", flagged == ["lru_belady"], str(flagged))
-    check("the correction is surfaced to the student",
-          "never suffers" in fixed or "does not" in fixed.lower(), fixed[:120])
+    # The fact checker must state the correct fact, not merely drop the answer. Its redraft
+    # goes through gateway._upstream, a blocking call to the real model server, so it is
+    # stubbed here: these tests must not depend on whether llama-server happens to be up.
+    wrong = "Yes, LRU suffers from Belady's anomaly."
+    real_upstream = gateway._upstream
+    try:
+        gateway._upstream = lambda *a, **k: "No. LRU is a stack algorithm and is immune."
+        fixed, flagged = gateway.fact_checked(wrong, "sys", "Does LRU suffer from it?")
+        check("a misconception in a draft is caught", flagged == ["lru_belady"], str(flagged))
+        check("a clean redraft replaces the misconception",
+              "suffers from Belady" not in fixed and "stack algorithm" in fixed, fixed[:120])
+
+        gateway._upstream = lambda *a, **k: wrong
+        fixed, _ = gateway.fact_checked(wrong, "sys", "Does LRU suffer from it?")
+        check("a redraft that is still wrong gets the correction stated",
+              "Correction applied" in fixed and "never suffers" in fixed, fixed[:120])
+
+        def down(*a, **k):
+            raise ConnectionError("model server unreachable")
+        gateway._upstream = down
+        fixed, flagged = gateway.fact_checked(wrong, "sys", "Does LRU suffer from it?")
+        check("with the redraft unavailable, the correction is still surfaced",
+              "Correction applied" in fixed and "never suffers" in fixed, fixed[:120])
+        check("and the misconception is still flagged", flagged == ["lru_belady"], str(flagged))
+    finally:
+        gateway._upstream = real_upstream
 
     await c.post("/v1/chat/completions", json=dict(model="ostutor-solve", messages=[
         dict(role="system", content="custom"), dict(role="user", content="hi")]))
