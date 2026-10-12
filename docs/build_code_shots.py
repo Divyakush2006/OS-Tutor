@@ -36,16 +36,21 @@ CODE = {
     "lora": ("train/kaggle_train.py", 138, 144),
     "sftconfig": ("train/kaggle_train.py", 172, 199),
     "grounding": ("ostutor/solver.py", 351, 364),
-    "corpus": ("ostutor/rag/corpus.py", 70, 91),
-    "retrieve": ("ostutor/rag/retrieve.py", 88, 114),
-    "augment": ("ostutor/rag/retrieve.py", 121, 134),
-    "gateway_layers": ("serve/gateway.py", 383, 400),
+    "corpus": ("ostutor/rag/corpus.py", 96, 125),
+    "extract_pdf": ("ostutor/rag/extract.py", 102, 113),
+    "retrieve": ("ostutor/rag/retrieve.py", 117, 143),
+    "augment": ("ostutor/rag/retrieve.py", 150, 164),
+    "calibrate": ("tools/rag_eval.py", 69, 85),
+    "gateway_notfound": ("serve/gateway.py", 310, 329),
+    "gateway_layers": ("serve/gateway.py", 392, 409),
     "mcnemar": ("ostutor/evaluation/stats.py", 15, 30),
 }
 # other files shown as open (inactive) tabs next to each one
 NEIGHBOURS = {"ostutor/build.py": ["dedup.py", "config.py"], "ostutor/dedup.py": ["build.py", "clean.py"],
               "train/kaggle_train.py": ["build.py"], "ostutor/solver.py": ["gateway.py", "theory_filter.py"],
-              "ostutor/rag/corpus.py": ["retrieve.py", "manifest.json"],
+              "ostutor/rag/corpus.py": ["extract.py", "manifest.json"],
+              "ostutor/rag/extract.py": ["corpus.py", "ingest.py"],
+              "tools/rag_eval.py": ["corpus_questions.jsonl", "retrieve.py"],
               "ostutor/rag/retrieve.py": ["corpus.py", "gateway.py"],
               "serve/gateway.py": ["retrieve.py", "test_gateway.py"],
               "ostutor/evaluation/stats.py": ["harness.py", "g0_ablation.py"]}
@@ -273,8 +278,10 @@ def code_shot(name: str, path: str, a: int, b: int) -> None:
     shoot(page(body), OUT / f"code_{name}.png", 35 + 35 + 22 + n * LINE + 6 + 24 + 2)
 
 
-def term_shot(name: str, command: str, lines: list[str]) -> None:
-    rows = [f"<div>PS D:\\os project&gt; {html.escape(command)}</div>"]
+def term_shot(name: str, command: str, lines: list[str], command_visible: bool = True) -> None:
+    """command_visible=False: the command has scrolled out of view, as it does after a long
+    output; only the last lines and the new prompt show."""
+    rows = [f"<div>PS D:\\os project&gt; {html.escape(command)}</div>"] if command_visible else []
     rows += [f"<div>{html.escape(l) or ' '}</div>" for l in lines]
     rows.append('<div>PS D:\\os project&gt; <span style="background:#cccccc"> </span></div>')
     head = ('<div class="ph"><span>PROBLEMS</span><span>OUTPUT</span><span>DEBUG CONSOLE</span>'
@@ -361,9 +368,11 @@ def main() -> None:
     term_shot("test_gateway", "serve\\.venv-webui\\Scripts\\python serve\\test_gateway.py", gw[-12:])
     # Saved reports are printed, not re-run: re-running would overwrite the committed
     # numbers the document cites with a fresh (and, for latency, different) sample.
-    ev = ROOT / "reports/rag/fixture_eval.md"
-    term_shot("rag_eval", "Get-Content -Encoding UTF8 reports\\rag\\fixture_eval.md",
-              wrap(ev.read_text(encoding="utf-8").split("## Misses")[0].rstrip("\n").splitlines()))
+    ev = ROOT / "reports/rag/corpus_eval.md"
+    term_shot("rag_eval", "Get-Content -Encoding UTF8 reports\\rag\\corpus_eval.md",
+              wrap(ev.read_text(encoding="utf-8").split("## Hybrid misses")[0].rstrip("\n").splitlines()))
+    ing = [l for l in run(["-m", "ostutor.rag.ingest", "data/rag/corpus"]) if l.strip()]
+    term_shot("ingest", "python -m ostutor.rag.ingest data\\rag\\corpus", ing[-22:], command_visible=False)
     e2e = sorted((ROOT / "reports/rag").glob("e2e-*/summary.md"))
     if e2e:
         rel = str(e2e[-1].relative_to(ROOT))

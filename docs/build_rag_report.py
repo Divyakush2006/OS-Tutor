@@ -3,13 +3,11 @@
     python docs/build_code_shots.py      (first: screenshots and the loss chart)
     python docs/build_rag_report.py
 
-1. Fill the code listings (cut from the repository at the ranges the screenshots use)
-   and the end-to-end RAG results (read from the newest reports/rag/e2e-*/results.json).
+1. Fill the code listings (cut from the repository at the ranges the screenshots use).
 2. Render with headless Edge, find the page of every heading, write the page numbers
    into the contents, render again, then stamp footers and metadata.
 """
 import html
-import json
 import re
 import sys
 from pathlib import Path
@@ -41,7 +39,7 @@ ANCHORS = {
     "s4-3": "4.3 Procedural accuracy and", "s4-4": "4.4 Out-of-distribution holdout",
     "s4-5": "4.5 Catastrophic forgetting", "s4-6": "4.6 Fact checker",
     "s4-7": "4.7 RAG: retrieval quality", "s4-8": "4.8 RAG: end to end",
-    "s4-9": "4.9 Discussion", "s4-10": "4.10 Expected outcome",
+    "s4-9": "4.9 Discussion", "s4-10": "4.10 Targets and results",
     "s5": "5.1 Errors in measurement", "s6": "6.1 Evaluate before training",
     "a": "This appendix gives the code shown", "b": "Reproducing",
 }
@@ -57,57 +55,9 @@ def listings() -> str:
     return "\n".join(out + ["</div>"])
 
 
-def e2e() -> tuple[str, str]:
-    runs = sorted((ROOT / "reports/rag").glob("e2e-*/results.json"))
-    if not runs:
-        sys.exit("no reports/rag/e2e-*/results.json - run tools/rag_e2e.py first")
-    r = json.loads(runs[-1].read_text(encoding="utf-8"))
-    s, e = r["summary"], r["summary"]["explain"]
-    rel = str(runs[-1].parent.relative_to(ROOT)).replace("\\", "/")
-    a, c = s["mcq_all"], s["mcq_with_notes"]
-    pv = lambda p: "&lt; 0.0001" if p < 1e-4 else f"{p:.3f}"  # noqa: E731
-    rows = (f"<tr><td>All 70 items</td><td class='num'>{a['correct_a']}/70</td>"
-            f"<td class='num'>{a['correct_b']}/70</td><td class='num'>{a['right_to_wrong']}</td>"
-            f"<td class='num'>{a['wrong_to_right']}</td><td class='num'>{pv(a['mcnemar_p'])}</td></tr>")
-    if c:
-        rows += (f"<tr><td>{s['mcq_items_with_notes']} items where notes were retrieved</td>"
-                 f"<td class='num'>{c['correct_a']}/{c['n']}</td><td class='num'>{c['correct_b']}/{c['n']}</td>"
-                 f"<td class='num'>{c['right_to_wrong']}</td><td class='num'>{c['wrong_to_right']}</td>"
-                 f"<td class='num'>{pv(c['mcnemar_p'])}</td></tr>")
-    ins = e["in_scope_with_notes"]
-    block = f"""
-<p>The served v3 model (one adapter, greedy decoding, prompt cache off) answered the same questions twice: once with the trained explain prompt alone, and once with the retrieved notes appended. Commit <code>{r['provenance']['commit'][:10]}</code>.</p>
-<p><strong>A. Theory MCQ, RAG off vs on.</strong> These are the 70 OS-theory items. The model is asked for the option letter, and retrieval uses only the question text, as a student would type it. This generated-letter protocol is not the logit-scored one behind the 85.71% in Section 4.5, so only the off-versus-on comparison is meaningful.</p>
-<table>
-  <thead><tr><th>Items</th><th class="num">RAG off</th><th class="num">RAG on</th><th class="num">Right→wrong</th><th class="num">Wrong→right</th><th class="num">exact McNemar p</th></tr></thead>
-  <tbody>{rows}</tbody>
-</table>
-<p class="caption">Source: <code>{rel}/results.json</code>. The test notes were written by us after we had seen the fact-checker rules. They were not written from the MCQ items, but they cover the same standard facts, so this is an upper bound for what well-matched course notes can do.</p>
-<p><strong>B. Explain answers over the test-note questions.</strong></p>
-<table>
-  <thead><tr><th>Measure</th><th class="num">RAG off</th><th class="num">RAG on</th></tr></thead>
-  <tbody>
-    <tr><td>In-scope answers citing at least one note (of {ins} given notes)</td><td class="num">—</td><td class="num">{e['cited_at_least_once']}/{ins}</td></tr>
-    <tr><td>Invented citations ([S<i>n</i>] with no such note), all {len(r['explain'])} answers</td><td class="num">—</td><td class="num">{e['invented_citations']}</td></tr>
-    <tr><td>Out-of-scope questions given notes</td><td class="num">—</td><td class="num">{e['out_of_scope_given_notes']}/{e['out_of_scope']}</td></tr>
-    <tr><td>Answers flagged by the fact checker</td><td class="num">{e['fact_flags_off']}</td><td class="num">{e['fact_flags_on']}</td></tr>
-    <tr><td>Median prompt tokens (in-scope)</td><td class="num">{e['prompt_tokens_median']['off']}</td><td class="num">{e['prompt_tokens_median']['on']}</td></tr>
-    <tr><td>Median answer length, tokens</td><td class="num">{e['completion_tokens_median']['off']}</td><td class="num">{e['completion_tokens_median']['on']}</td></tr>
-    <tr><td>Median time to the full answer, s</td><td class="num">{e['seconds_median']['off']}</td><td class="num">{e['seconds_median']['on']}</td></tr>
-    <tr><td>Median generation speed, tok/s (server timings)</td><td class="num">{e['tok_s_median']['off']}</td><td class="num">{e['tok_s_median']['on']}</td></tr>
-    <tr><td>Slowest answer with RAG, tok/s (brief: ≥ 20)</td><td class="num">—</td><td class="num">{e['tok_s_min_on']}</td></tr>
-  </tbody>
-</table>
-<figure><img src="shots/term_rag_e2e.png" alt="end-to-end summary">
-<figcaption>Figure 16: The run's own summary file, <code>{rel}/summary.md</code>.</figcaption></figure>"""
-    return block, rel
-
-
 def main():
     page = SRC.read_text(encoding="utf-8")
-    block, rel = e2e()
-    page = page.replace("@@E2E@@", block).replace("@@E2E_DIR@@", f"{rel}/") \
-               .replace("@@LISTINGS@@", listings())
+    page = page.replace("@@LISTINGS@@", listings())
     if "@@" in page:
         sys.exit("an unfilled @@ marker remains")
     base.ANCHORS = ANCHORS

@@ -74,7 +74,7 @@
 <section class="pb">
 <h2>Abstract</h2>
 <p>This report describes OS Tutor, a tutor for Operating Systems built on Qwen3-4B-Instruct-2507 and fine-tuned with QLoRA on 11,760 curated training rows. The model is surrounded by three supporting components. Verified simulators compute the answer to every numerical problem, a retrieval (RAG) layer grounds concept explanations in course notes and cites them, and a fact checker corrects known misconceptions. On a 57-item hand-written problem suite the complete system scores 57/57, compared with 30/57 for the untuned model, and on a 600-item out-of-distribution holdout it scores 98.8%.</p>
-<p>The RAG layer has been implemented, tested and connected to the tutor. Retrieval runs on the CPU in under 7 ms per query. The course notes from the institution have not yet been supplied, so all retrieval results in this report were measured on a small set of test notes written by us. These results are therefore an upper bound, and the figures we expect on the real notes are given separately as targets.</p>
+<p>The RAG layer is built and connected to the tutor, and runs over a corpus of 105 documents: our professor's 42 course documents (lecture slides, assigned textbook chapters, handouts and lab material) plus openly licensed OS texts (Hailperin's <em>Operating Systems and Middleware</em> and 55 Wikipedia articles). On 124 labelled questions the correct passage is in the top five results 79.0% of the time, and retrieval takes 8.3 ms (95th percentile) on the CPU. Answers cite their sources and say so when the course materials do not cover a question. On a 200-question theory test, retrieval did not change accuracy (92.0% with it, 93.0% without).</p>
 <p>The report follows the order of the work: the datasets, how they were preprocessed, the implementation with code screenshots, the measured results, the problems we ran into, and what we would do differently.</p>
 </section>
 
@@ -110,7 +110,7 @@
     <li class="subi"><span class="t">4.7 RAG: retrieval quality and latency</span><span class="dots"></span><span class="pg" data-for="s4-7">0</span></li>
     <li class="subi"><span class="t">4.8 RAG: end to end on the served model</span><span class="dots"></span><span class="pg" data-for="s4-8">0</span></li>
     <li class="subi"><span class="t">4.9 Discussion</span><span class="dots"></span><span class="pg" data-for="s4-9">0</span></li>
-    <li class="subi"><span class="t">4.10 Expected outcome on the course notes</span><span class="dots"></span><span class="pg" data-for="s4-10">0</span></li>
+    <li class="subi"><span class="t">4.10 Targets and results</span><span class="dots"></span><span class="pg" data-for="s4-10">0</span></li>
     <li class="main"><span class="t">5&nbsp;&nbsp;What Went Wrong</span><span class="dots"></span><span class="pg" data-for="s5">0</span></li>
     <li class="main"><span class="t">6&nbsp;&nbsp;Alternative Flow (Improvements)</span><span class="dots"></span><span class="pg" data-for="s6">0</span></li>
     <li class="main"><span class="t">Appendix A&nbsp;&nbsp;Code listings</span><span class="dots"></span><span class="pg" data-for="a">0</span></li>
@@ -120,10 +120,11 @@
 
 <section class="pb">
 <h2>Note on the Results</h2>
-<p>Every number in this report was produced by a script in the project repository; Appendix B lists the file each one comes from. Two kinds of number need to be read with care.</p>
+<p>Every number in this report was produced by a script in the project repository; Appendix B lists the file each one comes from. Three points need to be kept in mind when reading them.</p>
 <ul>
-  <li><strong>Results on the test notes.</strong> Until the course notes are supplied, retrieval runs over 12 short OS notes that we wrote ourselves for testing, with 55 labelled questions. Because the same people wrote the notes and the questions, these numbers are an upper bound for what the real notes will give.</li>
-  <li><strong>Targets.</strong> What we expect, or require, once the course notes are available (Section 4.10). These have not been measured and are not presented as results.</li>
+  <li><strong>Who wrote the evaluation sets.</strong> The 164 retrieval questions and the 130 new theory MCQ items were written by the project team and have not yet been reviewed by the course instructor. They are marked <code>unreviewed</code> in the data files.</li>
+  <li><strong>The faithfulness judge.</strong> Whether a cited sentence is supported by its passage was judged by the untuned base model. We checked a sample of 40 of its verdicts by hand and found it lenient (Section 4.8). The required human check by the instructor is still open.</li>
+  <li><strong>Targets.</strong> Section 4.10 lists the targets set before the measurement next to what was measured. A target that was missed is reported as missed.</li>
 </ul>
 <p>Three statements in our earlier documents are corrected here and explained in Section 5. No training artifact contains a "final training loss of 0.2710". The gain on the adjacent computer-science subjects is not statistically significant (p = 0.20), so it cannot be called transfer. And once the grader was fixed, the adapter's gain on the problem suite without the solver is not significant either (p = 0.56).</p>
 </section>
@@ -161,23 +162,27 @@
     <tr><td>OOD holdout</td><td class="num">600</td><td>Problems in framings never used in training; extraction, delegation, correctness</td><td>Simulator-exact; parameters compared field by field</td></tr>
     <tr><td>General MMLU</td><td class="num">400</td><td>Catastrophic forgetting: general knowledge</td><td>Log-likelihood of the four options</td></tr>
     <tr><td>Adjacent CS (MMLU CS subjects)</td><td class="num">300</td><td>Forgetting or transfer in nearby subjects</td><td>Log-likelihood</td></tr>
-    <tr><td>OS theory MCQ</td><td class="num">70</td><td>Declarative OS knowledge</td><td>Log-likelihood; generated letter for the RAG experiment (Section 4.8)</td></tr>
+    <tr><td>OS theory MCQ</td><td class="num">70</td><td>Declarative OS knowledge</td><td>Log-likelihood of the four options</td></tr>
+    <tr><td>OS theory MCQ, expanded</td><td class="num">200</td><td>The 70 above plus 130 new items on topics they miss (IPC, real-time scheduling, allocators, SSDs, file systems, protection, virtualisation)</td><td>Generated letter; used for the RAG experiment (Section 4.8)</td></tr>
     <tr><td>Fact-checker probes</td><td class="num">10</td><td>One question per misconception rule</td><td>Manual read of each answer (status <code>unreviewed</code>)</td></tr>
-    <tr><td>RAG fixture queries</td><td class="num">55</td><td>45 in-scope questions labelled with note + section; 10 out-of-scope</td><td>Recall@k, MRR, abstention</td></tr>
+    <tr><td>Retrieval questions</td><td class="num">164</td><td>124 questions labelled with the document and an evidence phrase from the answering passage (75 answered by course material, 49 by online texts) and 40 questions the corpus does not cover; split in half into dev and test</td><td>Recall@k, MRR, abstention</td></tr>
   </tbody>
 </table>
 <p>Every training row was decontaminated against all 4,836 evaluation items before selection (Section 2.2).</p>
 
 <h3>1.3 Retrieval knowledge base</h3>
-<p>The RAG layer reads a <strong>corpus directory</strong> with a <code>manifest.json</code>. Every document must declare <code>id</code>, <code>title</code>, <code>path</code>, <code>source</code>, <code>licence</code> and <code>permission</code>. The loader <em>refuses</em> a document that lacks any of these instead of skipping it quietly, so no text can enter the index unless its right to be there is recorded.</p>
+<p>The knowledge base is the directory <code>data/rag/corpus/</code>. Its <code>manifest.json</code> records, for every document, the source, the owner, the licence or permission, the date it was added and a SHA-256 checksum. Ingestion refuses the whole corpus if any of this is missing, if a file has changed since it was recorded, or if a file is present without a manifest entry.</p>
 <table>
-  <thead><tr><th>Corpus</th><th>Location</th><th class="num">Documents</th><th class="num">Chunks</th><th>Status</th></tr></thead>
+  <thead><tr><th>Part</th><th class="num">Documents</th><th class="num">Chunks</th><th>Contents</th><th>Licence / permission</th></tr></thead>
   <tbody>
-    <tr><td>Course notes</td><td><code>data/rag/corpus/</code></td><td class="num">0</td><td class="num">0</td><td>Awaiting owner-supplied notes (lecture notes, lab manuals, PPTs, question banks), with permission recorded per document</td></tr>
-    <tr><td>Test fixture</td><td><code>data/rag/fixture/</code></td><td class="num">12</td><td class="num">38</td><td>Team-written, CC0, no textbook text. Processes, threads, scheduling, synchronisation, deadlock, paging, page replacement, thrashing, segmentation, file systems, disk scheduling, system calls</td></tr>
+    <tr><td>Course material from our professor</td><td class="num">42</td><td class="num">827</td><td>Lecture slides (introduction, processes, limited direct execution, scheduling, MLFQ, proportional share, multiprocessor scheduling, segmentation, paging, page tables, virtual memory, demand paging, locks, semaphores, condition variables, concurrency bugs, threads, memory allocation), nine assigned OSTEP chapters, handouts (deadlock, paging problems, IPC, readers-writers, dining philosophers) and lab material (Unix commands, shell programming)</td><td>Supplied by the project owners for use in this tutor; not for redistribution</td></tr>
+    <tr><td>Hailperin, <em>Operating Systems and Middleware</em>, rev. 1.3.1</td><td class="num">8</td><td rowspan="2" class="num">1,956</td><td>The OS chapters: introduction, threads, scheduling, synchronisation and deadlocks, virtual memory, processes and protection, files, security</td><td>CC BY-SA 3.0</td></tr>
+    <tr><td>Wikipedia</td><td class="num">55</td><td>One article per OS topic, from the operating system and system call to inodes, the FAT, disk scheduling and DMA</td><td>CC BY-SA 4.0</td></tr>
+    <tr class="total"><td>Total</td><td class="num">105</td><td class="num">2,783</td><td colspan="2"></td></tr>
   </tbody>
 </table>
-<p>The brief suggests building the knowledge base from Silberschatz, lab manuals, PPTs and past papers. We add no textbook text the owners have not supplied and given permission for.</p>
+<p class="caption">Source: <code>data/rag/corpus/manifest.json</code>; per-document chunk counts from <code>python -m ostutor.rag.ingest data/rag/corpus</code>.</p>
+<p>The professor's material came as one archive of 54 files. Twelve were left out, each with its reason recorded in the manifest: three byte-identical copies, four diagram images with no text, an Office lock file, the assignment brief, two PDF versions of handouts that were also supplied as Word files, and one legacy Word file that Office could not convert automatically. The online texts were added because the course material leaves gaps, for example file-system implementation and disk scheduling. Only text whose licence allows reuse with attribution was used. OSTEP is free to read but not openly licensed, so only the chapters the professor supplied are included. Each online document is fixed to an exact version: a git commit for the book and a revision number for each Wikipedia article.</p>
 </section>
 
 <!-- ======================= 2 PREPROCESSING ======================= -->
@@ -223,15 +228,19 @@
 <table>
   <thead><tr><th style="width:24%">Step</th><th>Choice</th><th style="width:34%">Why</th></tr></thead>
   <tbody>
-    <tr><td>Validate the manifest</td><td>Six required fields per document; duplicates and missing licence or permission are errors</td><td>The brief requires provenance and permission for every document</td></tr>
-    <tr><td>Split by heading</td><td>Each Markdown heading starts a section; the chunk carries its note title and section name</td><td>A citation must name a place a student can find</td></tr>
+    <tr><td>Convert legacy formats</td><td>Fourteen <code>.ppt</code> files converted to <code>.pptx</code> with PowerPoint itself (<code>tools/convert_office_legacy.ps1</code>)</td><td>The extractor reads the modern formats; Office converts its own files losslessly</td></tr>
+    <tr><td>Extract with structure</td><td>Slides become "Slide N: title"; Word headings stay headings; PDF pages become sections, with large-font lines promoted to headings; the Hailperin LaTeX source is converted with pandoc</td><td>A citation must name a place a student can find: a slide, a page, a section</td></tr>
+    <tr><td>Remove running headers</td><td>A PDF line that appears on at least a third of the pages is dropped</td><td>The OSTEP chapters print the book name and page header on every page, which was being glued into the middle of passages</td></tr>
+    <tr><td>Normalise text</td><td>Unicode NFKC, which turns the typographic ligature "ﬁ" back into "fi"</td><td>Otherwise a student typing "file" never matches "ﬁle" in a typeset PDF</td></tr>
+    <tr><td>Validate the manifest</td><td>Source, owner, date, checksum and licence or permission per document; unlisted or changed files refuse the corpus</td><td>The brief requires provenance and permission for every document</td></tr>
+    <tr><td>Split by heading</td><td>Each heading starts a section; the chunk carries its document title and the full heading path</td><td>The citation then reads, for example, "Synchronization and Deadlocks — Deadlock › The Deadlock Problem"</td></tr>
     <tr><td>Window long sections</td><td>≤ 180 words per chunk with a 30-word overlap</td><td>One idea per chunk; a sentence cut at a boundary is still whole in one of the two chunks</td></tr>
     <tr><td>Lexical index</td><td>Lower-case alphanumeric tokens, a short stop-word list, BM25 (k₁ = 1.5, b = 0.75)</td><td>Exact OS terms (TLB, inode, Belady) matter</td></tr>
     <tr><td>Dense index</td><td>all-MiniLM-L6-v2 (Apache-2.0, 22M parameters), normalised embeddings of section + text, loaded from the local cache only</td><td>Catches paraphrase; runs on the CPU; no query leaves the machine</td></tr>
-    <tr><td>Integrity</td><td>SHA-256 over every chunk id and text</td><td>Every evaluation names the exact corpus it ran on</td></tr>
+    <tr><td>Integrity</td><td>SHA-256 over every chunk id, title, section and text; embeddings cached under that hash</td><td>Every evaluation names the exact corpus it ran on, and a restart does not re-embed</td></tr>
   </tbody>
 </table>
-<p>The test notes give 38 chunks from 12 notes, and the index builds in 7.3 s on the CPU.</p>
+<p>The 105 documents give 2,783 chunks (median 180 words). A full build takes about 46 s on the CPU, and reloading an unchanged corpus takes about 7 s, most of it loading the embedding model.</p>
 </section>
 
 <!-- ======================= 3 CODE ======================= -->
@@ -324,29 +333,37 @@
 <figcaption>Figure 6: <code>ostutor/solver.py</code>: the grounding check, which makes delegation trustworthy. It caught an invented Banker's <em>Available</em> vector [10, 5, 7] for a problem stating [3, 3, 2].</figcaption></figure>
 
 <h3>3.5 RAG pipeline</h3>
-<p>The pipeline has three files. <code>corpus.py</code> validates the manifest and cuts the notes into citable chunks. <code>retrieve.py</code> ranks the chunks, decides whether any of them are relevant, and builds the prompt. <code>__init__.py</code> documents the design.</p>
-<figure><img src="shots/code_corpus.png" alt="corpus loader">
-<figcaption>Figure 7: <code>ostutor/rag/corpus.py</code>: a document without source, licence or permission is refused, not skipped.</figcaption></figure>
+<p>The pipeline has four files. <code>extract.py</code> turns PDF, PPTX, DOCX, Markdown and text into Markdown whose headings are the citation anchors. <code>corpus.py</code> validates the manifest and cuts the documents into citable chunks. <code>retrieve.py</code> ranks the chunks, decides whether any of them are relevant, and builds the prompt. <code>ingest.py</code> is the command the course staff use to add material (<code>add</code>) and rebuild the index.</p>
+<figure><img src="shots/code_corpus.png" alt="manifest validation">
+<figcaption>Figure 7: <code>ostutor/rag/corpus.py</code>: manifest validation. A missing field, a changed checksum or an unlisted file refuses the whole corpus.</figcaption></figure>
+<figure><img src="shots/code_extract_pdf.png" alt="running header removal">
+<figcaption>Figure 8: <code>ostutor/rag/extract.py</code>: lines repeated on a third of a PDF's pages are running headers and are dropped.</figcaption></figure>
 <figure><img src="shots/code_retrieve.png" alt="hybrid retrieval">
-<figcaption>Figure 8: <code>ostutor/rag/retrieve.py</code>: BM25 and dense rankings, the abstain gate, and reciprocal-rank fusion (k = 60; Cormack et al., SIGIR 2009).</figcaption></figure>
-<p><strong>The abstain gate.</strong> A passage that is only the least-bad match is worse than no passage, because the model would cite it as support. When the gate decides the notes do not cover the question, retrieval returns nothing, and the answer is generated exactly as without RAG. The first gate (v1) used only the dense similarity, and it failed on the fixture (Section 4.7). The served gate (v2) keeps the passages if <em>either</em> signal is strong: cosine ≥ 0.45 or BM25 ≥ 6.0.</p>
+<figcaption>Figure 9: <code>ostutor/rag/retrieve.py</code>: BM25 and dense rankings, the abstain gate, and reciprocal-rank fusion (k = 60; Cormack et al., SIGIR 2009).</figcaption></figure>
+<p><strong>The abstain gate.</strong> A passage that is only the least-bad match is worse than no passage, because the model would cite it as support. The gate keeps the passages if <em>either</em> signal is strong: the best dense similarity, or the best BM25 score. BM25 scores grow with the size of the corpus, so the two thresholds are fitted for each corpus. For the course corpus they are cosine ≥ 0.59 or BM25 ≥ 18.5, fitted on the dev half of the questions only (Figure 14).</p>
 <figure><img src="shots/code_augment.png" alt="prompt construction">
-<figcaption>Figure 9: The prompt keeps the <em>trained</em> system prompt word for word at the start, so the adapter still sees the prompt it learned the mode under. The notes follow, labelled [S1]…[S4], with an instruction never to invent a citation.</figcaption></figure>
+<figcaption>Figure 10: The prompt keeps the <em>trained</em> system prompt word for word at the start, so the adapter still sees the prompt it learned the mode under. The notes follow, labelled [S1]…[S4], with an instruction never to invent a citation.</figcaption></figure>
 
 <h3>3.6 Gateway integration</h3>
-<p>Retrieval is layer 2 of the gateway. It runs after the simulator layer, so a solvable problem is still computed, and before the fact checker, which checks the grounded draft. Only <code>explain</code> and <code>analyze</code> retrieve. Tutor mode never does, because a passage could state the answer the student is working towards. Retrieval is switched on by <code>OSTUTOR_RAG=&lt;corpus dir&gt;</code>; a gateway started without it behaves exactly as before. Answers end with a "Sources from your course notes" list, in both the streamed and the non-streamed path.</p>
+<p>Retrieval is layer 2 of the gateway. It runs after the simulator layer, so a solvable problem is still computed and retrieval is not even consulted for it (a gateway test checks this). It runs before the fact checker, which checks the grounded draft. Only <code>explain</code> and <code>analyze</code> retrieve. Tutor mode never does, because a passage could state the answer the student is working towards. Retrieval is switched on by <code>OSTUTOR_RAG=data/rag/corpus</code>; a gateway started without it behaves exactly as before. Answers end with a "Sources from your course notes" list. When the gate abstains, they end instead with "Not found in the course materials", so general knowledge is never passed off as course content.</p>
 <figure><img src="shots/code_gateway_layers.png" alt="gateway layers">
-<figcaption>Figure 10: <code>serve/gateway.py</code>: layer 1 is the simulator, layer 2 retrieval, layer 3 the fact checker.</figcaption></figure>
+<figcaption>Figure 11: <code>serve/gateway.py</code>: layer 1 is the simulator, layer 2 retrieval, layer 3 the fact checker.</figcaption></figure>
+<figure><img src="shots/code_gateway_notfound.png" alt="not found notice">
+<figcaption>Figure 12: <code>serve/gateway.py</code>: the prompt and footer for a question, including the notice when the course materials do not cover it.</figcaption></figure>
 
 <h3>3.7 Evaluation and tests</h3>
 <p>Every comparison in the project is <em>paired</em>: the same items are scored under two configurations. The right test for a paired yes/no outcome is McNemar's, and with 5–30 discordant items the exact binomial form is needed.</p>
 <figure><img src="shots/code_mcnemar.png" alt="exact McNemar">
-<figcaption>Figure 11: <code>ostutor/evaluation/stats.py</code>: the exact two-sided McNemar test used for every p-value in Section 4.</figcaption></figure>
-<p>Four test suites need no GPU: <code>tools/test_pipeline.py</code> (data pipeline), <code>tools/test_router.py</code> (28 labelled routing cases, 0 misroutes allowed on shown attempts), <code>tools/test_g0.py</code> (55 checks on statistics, extraction scoring, grader regressions and the one-adapter guard), and the new <code>tools/test_rag.py</code> (29 checks). The gateway suite grew from 28 to 34 checks.</p>
+<figcaption>Figure 13: <code>ostutor/evaluation/stats.py</code>: the exact two-sided McNemar test used for every p-value in Section 4.</figcaption></figure>
+<figure><img src="shots/code_calibrate.png" alt="gate calibration">
+<figcaption>Figure 14: <code>tools/rag_eval.py</code>: the gate is fitted on the dev questions only. It must keep notes for at least 95% of in-scope questions, and among those settings it withholds notes from the most off-topic ones. It is then reported on the test half.</figcaption></figure>
+<figure><img src="shots/term_ingest.png" alt="ingesting the corpus">
+<figcaption>Figure 15: The end of <code>python -m ostutor.rag.ingest data\rag\corpus</code>: chunks per document, then the corpus total.</figcaption></figure>
+<p>Four test suites need no GPU: <code>tools/test_pipeline.py</code> (data pipeline), <code>tools/test_router.py</code> (28 labelled routing cases, 0 misroutes allowed on shown attempts), <code>tools/test_g0.py</code> (55 checks on statistics, extraction scoring, grader regressions and the one-adapter guard), and <code>tools/test_rag.py</code> (46 checks). The gateway suite grew from 28 to 37 checks.</p>
 <figure><img src="shots/term_test_rag.png" alt="RAG tests">
-<figcaption>Figure 12: <code>tools/test_rag.py</code>: 29/29 checks, covering manifest refusal, chunking, BM25, hybrid retrieval, abstention, prompt construction and citation parsing.</figcaption></figure>
+<figcaption>Figure 16: <code>tools/test_rag.py</code>: 46/46 checks, covering the manifest rules, checksum and unlisted-file refusal, extraction of slides, Word and PDF, retrieval, the gate, the prompt and citations.</figcaption></figure>
 <figure><img src="shots/term_test_gateway.png" alt="gateway tests">
-<figcaption>Figure 13: <code>serve/test_gateway.py</code> (last lines): the six retrieval checks. Every earlier check is unchanged with retrieval off.</figcaption></figure>
+<figcaption>Figure 17: <code>serve/test_gateway.py</code> (last lines): the retrieval checks. Every earlier check is unchanged with retrieval off.</figcaption></figure>
 </section>
 
 <!-- ======================= 4 METRICS ======================= -->
@@ -373,7 +390,7 @@
 
 <h3>4.2 Training loss</h3>
 <figure><img class="chart" src="shots/loss_curve.svg" alt="loss curves">
-<figcaption>Figure 14: v3 training run, from the trainer's own log (<code>outputs/ostutor-lora-v3/ostutor-lora/train_metrics.json</code>).</figcaption></figure>
+<figcaption>Figure 18: v3 training run, from the trainer's own log (<code>outputs/ostutor-lora-v3/ostutor-lora/train_metrics.json</code>).</figcaption></figure>
 <table>
   <thead><tr><th>Quantity</th><th class="num">Start (step 59)</th><th class="num">End (step 735)</th></tr></thead>
   <tbody>
@@ -445,57 +462,108 @@
 
 <h3>4.7 RAG: retrieval quality and latency</h3>
 <figure><img src="shots/term_rag_eval.png" alt="retrieval evaluation">
-<figcaption>Figure 15: <code>tools/rag_eval.py</code> over the fixture: 45 in-scope and 10 out-of-scope questions, 5 timed passes each (the first discarded).</figcaption></figure>
+<figcaption>Figure 19: <code>tools/rag_eval.py</code> over the course corpus: 124 in-scope and 40 out-of-scope questions, 5 timed passes each (the first discarded).</figcaption></figure>
 <table>
-  <thead><tr><th>Configuration</th><th class="num">Section R@1</th><th class="num">Section R@4</th><th class="num">MRR@10</th><th class="num">False abstain</th><th class="num">Out-of-scope abstained</th><th class="num">p95 ms</th></tr></thead>
+  <thead><tr><th>Retrieval</th><th class="num">Recall@1</th><th class="num">Recall@5</th><th class="num">Document recall@5</th><th class="num">MRR@10</th><th class="num">p95 latency</th></tr></thead>
   <tbody>
-    <tr><td>BM25 only</td><td class="num">95.6%</td><td class="num">100.0%</td><td class="num">0.978</td><td class="num">0/45</td><td class="num">5/10</td><td class="num">0.07</td></tr>
-    <tr><td>Dense only (MiniLM)</td><td class="num">93.3%</td><td class="num">93.3%</td><td class="num">0.933</td><td class="num">2/45</td><td class="num">6/10</td><td class="num">6.97</td></tr>
-    <tr><td>Hybrid, v1 gate</td><td class="num">91.1%</td><td class="num">93.3%</td><td class="num">0.927</td><td class="num">2/45</td><td class="num">6/10</td><td class="num">6.25</td></tr>
-    <tr class="total"><td>Hybrid, v2 gate (served)</td><td class="num">93.3%</td><td class="num">95.6%</td><td class="num">0.944</td><td class="num">2/45</td><td class="num">10/10</td><td class="num">5.70</td></tr>
+    <tr><td>BM25 only</td><td class="num">46.8%</td><td class="num">75.8%</td><td class="num">88.7%</td><td class="num">0.586</td><td class="num">0.7 ms</td></tr>
+    <tr><td>Dense only (MiniLM)</td><td class="num">46.0%</td><td class="num">75.0%</td><td class="num">84.7%</td><td class="num">0.585</td><td class="num">7.8 ms</td></tr>
+    <tr class="total"><td>Hybrid (served)</td><td class="num">46.0%</td><td class="num">79.0%</td><td class="num">87.9%</td><td class="num">0.615</td><td class="num">8.3 ms</td></tr>
   </tbody>
 </table>
-<p class="caption">Source: <code>reports/rag/fixture_eval.md</code> (the committed run). Latency is CPU-only, per query, after warm-up.</p>
+<p class="caption">Source: <code>reports/rag/corpus_eval.md</code>. A hit is a chunk from the labelled document that contains the labelled evidence phrase. Latency is CPU-only, per query.</p>
+<table>
+  <thead><tr><th>"Not covered" gate (cosine ≥ 0.59 or BM25 ≥ 18.5)</th><th class="num">In-scope questions given notes</th><th class="num">Out-of-scope questions given none</th></tr></thead>
+  <tbody>
+    <tr><td>Dev half (used to fit the gate)</td><td class="num">60/62</td><td class="num">20/20</td></tr>
+    <tr><td>Test half (not used for fitting)</td><td class="num">59/62</td><td class="num">18/20</td></tr>
+  </tbody>
+</table>
 <ul>
-  <li><strong>Latency is not a concern.</strong> p95 is 5.7 ms against the brief's 500 ms.</li>
-  <li><strong>The v1 gate failed.</strong> It was chosen before any measurement, and it let 4 of the 10 off-topic questions retrieve OS passages. Dense similarity alone cannot separate the two classes: in-scope questions go as low as 0.34 and out-of-scope ones as high as 0.40.</li>
-  <li><strong>The v2 gate is optimistic.</strong> It was fitted on these same 55 questions, so its 10/10 is not an independent result. It must be refitted on held-out questions over the real notes.</li>
-  <li><strong>BM25 beat the hybrid on the fixture.</strong> The likely reason: the same person wrote the notes and the questions, so they share vocabulary. Real student questions will paraphrase more, which is the case the dense half exists for. The decision stays open until real-notes data exists.</li>
-  <li><strong>Both remaining misses are false abstentions</strong> on terse questions: "Is SRTF preemptive?" and "When is busy waiting acceptable?". The answer is then generated without notes, which is the safe failure.</li>
+  <li><strong>Recall@5 is 79.0%, and 74.7% when the answer is in the course material</strong> (85.7% for the online texts). The measure counts only the one labelled passage. Many misses retrieved a different document that also answers the question, for example the Wikipedia article on process states instead of the lecture slide on them. Document-level recall is 87.9%.</li>
+  <li><strong>A larger embedding model did not help significantly.</strong> multilingual-e5-base raised hybrid recall@5 to 81.5%. Paired, MiniLM missed 11 questions that e5 found and e5 missed 8 that MiniLM found (exact McNemar p = 0.65). e5 also costs three times the latency (25 ms p95), a 5.5-minute index build and about 1 GB more memory, so MiniLM was kept (<code>reports/rag/corpus_multilingual-e5-base_eval.md</code>).</li>
+  <li><strong>The gate generalises to the held-out half.</strong> It withheld notes from 18 of 20 off-topic questions and gave them to 59 of 62 in-scope ones. The thresholds had to be refitted for this corpus: the value fitted earlier on our 12 test notes (BM25 ≥ 6.0) would have given notes to 37 of the 40 off-topic questions, because BM25 scores are larger on a larger corpus.</li>
+  <li><strong>Latency is far inside the 500 ms budget</strong> at 8.3 ms.</li>
 </ul>
 
 <h3>4.8 RAG: end to end on the served model</h3>
-@@E2E@@
+<p>All of these were measured on the served model: one adapter per server, greedy decoding, prompt cache off.</p>
+<p><strong>A. Theory MCQ, 200 items.</strong> The model is asked for the option letter, and retrieval uses only the question text, as a student would type it. This generated-letter protocol differs from the log-likelihood one behind the 90.00% and 85.71% in Section 4.5, so the base model was measured again here.</p>
+<table>
+  <thead><tr><th>Configuration</th><th class="num">Correct</th><th class="num">Accuracy</th><th class="num">On the 130 new items</th></tr></thead>
+  <tbody>
+    <tr><td>Base model, no retrieval</td><td class="num">185/200</td><td class="num">92.50%</td><td class="num">121/130</td></tr>
+    <tr><td>Base model, with retrieval</td><td class="num">186/200</td><td class="num">93.00%</td><td class="num">121/130</td></tr>
+    <tr><td>Fine-tuned v3, no retrieval</td><td class="num">186/200</td><td class="num">93.00%</td><td class="num">121/130</td></tr>
+    <tr class="total"><td>Fine-tuned v3, with retrieval (served)</td><td class="num">184/200</td><td class="num">92.00%</td><td class="num">120/130</td></tr>
+  </tbody>
+</table>
+<table>
+  <thead><tr><th>Comparison</th><th class="num">Right→wrong</th><th class="num">Wrong→right</th><th class="num">exact McNemar p</th></tr></thead>
+  <tbody>
+    <tr><td>Base → v3 with retrieval</td><td class="num">5</td><td class="num">4</td><td class="num">1.000</td></tr>
+    <tr><td>v3 → v3 with retrieval</td><td class="num">6</td><td class="num">4</td><td class="num">0.754</td></tr>
+    <tr><td>Base → base with retrieval</td><td class="num">3</td><td class="num">4</td><td class="num">1.000</td></tr>
+    <tr><td>Base → v3 (no retrieval)</td><td class="num">1</td><td class="num">2</td><td class="num">1.000</td></tr>
+  </tbody>
+</table>
+<p class="caption">Source: <code>reports/rag/e2e-20261012-2239/summary.md</code>. The gate gave notes for 152 of the 200 questions.</p>
+<p><strong>B. Explain answers.</strong> The 62 test-half questions were answered by v3 with retrieval on.</p>
+<table>
+  <thead><tr><th>Measure</th><th class="num">Result</th></tr></thead>
+  <tbody>
+    <tr><td>Questions given notes by the gate</td><td class="num">59/62</td></tr>
+    <tr><td>Notes included the labelled document</td><td class="num">46/59</td></tr>
+    <tr><td>Answers citing at least one note</td><td class="num">50/59</td></tr>
+    <tr><td>Invented citations (an [S<i>n</i>] with no such note)</td><td class="num">0</td></tr>
+    <tr><td>Answers flagged by the fact checker</td><td class="num">0</td></tr>
+    <tr><td>Median prompt / answer length</td><td class="num">816 / 262 tokens</td></tr>
+    <tr><td>Median time to the full answer</td><td class="num">6.5 s</td></tr>
+    <tr><td>Decode speed, median / slowest (brief: ≥ 20 tok/s)</td><td class="num">42.9 / 41.6 tok/s</td></tr>
+  </tbody>
+</table>
+<p><strong>C. Faithfulness.</strong> Every sentence carrying a citation was checked against the passage it cites: 143 sentence–passage pairs.</p>
+<table>
+  <thead><tr><th>Check</th><th class="num">Supported</th></tr></thead>
+  <tbody>
+    <tr><td>Base-model judge, all 143 pairs</td><td class="num">117/143 (81.8%)</td></tr>
+    <tr><td>Our own check of a random 40 of them, strict rule</td><td class="num">24/40 (60%)</td></tr>
+    <tr><td>Base-model judge on the same 40</td><td class="num">29/40 (72.5%)</td></tr>
+  </tbody>
+</table>
+<figure><img src="shots/term_rag_e2e.png" alt="end-to-end summary">
+<figcaption>Figure 20: The run's own summary file, <code>reports/rag/e2e-20261012-2239/summary.md</code>.</figcaption></figure>
 <p><strong>Reading the results.</strong></p>
 <ul>
-  <li><strong>Citations behave as designed.</strong> 41 of 43 answers that were given notes cited them, and no answer cited a note that does not exist. The two that did not cite (SSTF starvation, invoking a system call) still restated the note's content. All 10 off-topic questions received no notes, so their answers were generated exactly as without RAG.</li>
-  <li><strong>RAG fixed a misconception the fine-tuned model holds.</strong> Asked "Can LRU suffer from Belady's anomaly?", the model <em>without</em> notes answered "Yes, LRU (Least Recently Used) can suffer from Belady's anomaly", which is wrong and was flagged by the fact checker. <em>With</em> notes it answered "No, LRU … does not suffer from Belady's anomaly [S1]" and gave the stack-algorithm reason from the note. That was the only fact-checker flag in either arm (1 off, 0 on, of 55).</li>
-  <li><strong>No measurable effect on the theory MCQ.</strong> Both arms scored 65/70, with one flip each way (p = 1.0), including on the 53 items where notes were retrieved. At 93% the model is near the ceiling of this set in this protocol, so the MCQ cannot show a gain. A harder 200-item set is needed (G3).</li>
-  <li><strong>Speed is unaffected.</strong> Decoding stayed at ~43 tok/s with about 380 extra prompt tokens; the slowest answer with RAG was 41.7 tok/s, against a 20 tok/s floor. These are server-reported decode rates and exclude prompt processing, which is why they differ from the 26.9 tok/s wall-clock figure measured earlier through the full stack.</li>
-  <li><strong>Truncation affects the length and time figures.</strong> The run capped answers at 700 tokens. 28 of 55 answers <em>without</em> notes hit the cap, against 7 of 55 with notes. So the shorter, faster answers with RAG (median 225 tokens, 5.5 s, against 700 tokens and 16.2 s) are partly an artefact of truncation. They show that grounded answers are more focused; they do not give a clean measure of speed-up.</li>
+  <li><strong>The MCQ target was not met, and retrieval made no measurable difference.</strong> The target was "v3 with retrieval ≥ base"; it scored 184 against 185, and the difference is one question (p = 1.0). All four configurations are within two questions of each other. The base model already answers 92.5% of these questions correctly without notes, so there is little left for notes to fix. On this larger set the fine-tuned model is also no worse than the base, unlike the 70-item log-likelihood result.</li>
+  <li><strong>Citations are honest but sparse.</strong> No answer cited a note that does not exist, and 50 of 59 answers cited at least once. But only 132 of the 446 answer sentences carry a citation. The rest are the model's own explanation, which the student cannot check against the notes.</li>
+  <li><strong>About 60% of cited sentences are fully supported</strong> on our strict reading: everything the sentence says must be in the cited passage. The usual failure is a correct quotation followed by the model's own elaboration in the same sentence, or an example the passage does not contain. One answer quoted a passage accurately and then added a worked address example with wrong arithmetic. The base-model judge is too lenient: where we disagreed with it, it had said "supported" 8 times and we had said so 3 times. So its 81.8% overstates faithfulness.</li>
+  <li><strong>Speed is unaffected.</strong> A median prompt of 816 tokens, most of it retrieved notes, did not slow decoding (42.9 tok/s against the 20 tok/s floor). These are server-reported decode rates and exclude prompt processing, which is why they differ from the 26.9 tok/s wall-clock figure measured earlier through the full stack.</li>
 </ul>
 
 <h3>4.9 Discussion</h3>
 <ul>
-  <li><strong>Each layer guards a different failure.</strong> The simulator guards procedures: a 4B model cannot execute a long schedule reliably, but it can read one. Retrieval guards declarative claims by tying each one to a passage the student can check. The fact checker guards a known list of misconceptions. Tutor mode is shielded from all three, because its job is to <em>withhold</em> the answer.</li>
-  <li><strong>Fine-tuning's measured value is narrower than first claimed.</strong> With the solver, the adapter adds 8 significant items. Without it, there is no significant gain over the untuned base. Its other contributions are the trained output formats, the Socratic behaviour and the shell mode, and none of these is yet measured by a number (G3).</li>
-  <li><strong>RAG addresses the one measured weakness.</strong> Declarative OS knowledge is the area where fine-tuning did not help and may have slightly hurt (85.71% vs 90.00%, not significant). Retrieval is the brief's recommended remedy for exactly this, and Section 4.8 tests it.</li>
-  <li><strong>Measurement found more errors than the model did.</strong> Two grader blind spots, a non-deterministic cache, a void benchmark and two unsupported claims all biased the numbers in the project's favour. Each was found by auditing the evaluation rather than the model (Section 5).</li>
+  <li><strong>Each layer guards a different failure.</strong> The simulator guards procedures: a 4B model cannot execute a long schedule reliably, but it can read one. Retrieval ties declarative claims to passages the student can check. The fact checker guards a known list of misconceptions. Tutor mode is shielded from all three, because its job is to <em>withhold</em> the answer.</li>
+  <li><strong>Fine-tuning's measured value is narrower than first claimed.</strong> With the solver, the adapter adds 8 significant items. Without it, there is no significant gain over the untuned base on the problem suite, and none on the 200-item theory set. Its other contributions are the trained output formats, the Socratic behaviour and the shell mode, and none of these is yet measured by a number (G3).</li>
+  <li><strong>Retrieval's value is traceability, not accuracy, so far.</strong> It did not raise MCQ accuracy, which was already near its ceiling. What it adds is an answer tied to the course's own slides and readings, with the source named, and an explicit warning when the course does not cover the question. Whether that helps students learn is not measured yet.</li>
+  <li><strong>Measurement found more errors than the model did.</strong> Two grader blind spots, a non-deterministic cache, a void benchmark, two unsupported claims and a lenient faithfulness judge all biased the numbers in the project's favour. Each was found by auditing the evaluation rather than the model (Section 5).</li>
 </ul>
 
-<h3>4.10 Expected outcome on the course notes</h3>
-<p>These are the acceptance targets for the course-notes run. None of them is a result yet.</p>
+<h3>4.10 Targets and results</h3>
+<p>These targets were set before the course-corpus run, partly by the brief and partly by us.</p>
 <table>
-  <thead><tr><th>Measure</th><th class="num">Fixture (measured)</th><th class="num">Target on course notes</th><th>How it will be measured</th></tr></thead>
+  <thead><tr><th>Measure</th><th class="num">Target</th><th class="num">Measured</th><th>Met?</th></tr></thead>
   <tbody>
-    <tr><td>Retrieval p95 latency</td><td class="num">5.7 ms</td><td class="num">≤ 500 ms</td><td><code>tools/rag_eval.py</code></td></tr>
-    <tr><td>Section recall@4</td><td class="num">95.6%</td><td class="num">≥ 85%</td><td>≥ 100 owner-written questions, labelled, held out from gate fitting</td></tr>
-    <tr><td>Out-of-scope abstention</td><td class="num">10/10 (fitted)</td><td class="num">≥ 90%</td><td>Same held-out set</td></tr>
-    <tr><td>Answers citing a note, when given notes</td><td class="num">see Section 4.8</td><td class="num">≥ 90%</td><td><code>tools/rag_e2e.py</code></td></tr>
-    <tr><td>Invented citations</td><td class="num">see Section 4.8</td><td class="num">0</td><td><code>tools/rag_e2e.py</code></td></tr>
-    <tr><td>OS theory MCQ (200 items) with RAG</td><td class="num">—</td><td class="num">≥ base (90%)</td><td>Paired McNemar, RAG off vs on</td></tr>
-    <tr><td>Procedural suite, full system</td><td class="num">57/57</td><td class="num">57/57 (no regression)</td><td><code>tools/g0_ablation.py</code></td></tr>
-    <tr><td>Generation speed with notes in the prompt</td><td class="num">see Section 4.8</td><td class="num">≥ 20 tok/s</td><td>Server timings</td></tr>
+    <tr><td>Retrieval p95 latency</td><td class="num">≤ 500 ms</td><td class="num">8.3 ms</td><td>Yes</td></tr>
+    <tr><td>Labelled question set</td><td class="num">≥ 100 items</td><td class="num">124 + 40</td><td>Yes</td></tr>
+    <tr><td>Recall@5 (passage level)</td><td class="num">≥ 85%</td><td class="num">79.0%</td><td>No</td></tr>
+    <tr><td>Off-topic questions given no notes (test half)</td><td class="num">≥ 90%</td><td class="num">18/20 = 90%</td><td>Yes, at the limit</td></tr>
+    <tr><td>Answers citing a note, when given notes</td><td class="num">≥ 90%</td><td class="num">50/59 = 85%</td><td>No</td></tr>
+    <tr><td>Invented citations</td><td class="num">0</td><td class="num">0</td><td>Yes</td></tr>
+    <tr><td>Theory MCQ (200 items), v3 with retrieval</td><td class="num">≥ base</td><td class="num">92.0% vs 92.5%</td><td>No (one question; p = 1.0)</td></tr>
+    <tr><td>Faithfulness: human check of ≥ 30 claims</td><td class="num">done</td><td class="num">sample prepared; our check 24/40</td><td>Pending the instructor's check</td></tr>
+    <tr><td>Generation speed with notes in the prompt</td><td class="num">≥ 20 tok/s</td><td class="num">41.6 tok/s slowest</td><td>Yes</td></tr>
+    <tr><td>Procedural suite, full system</td><td class="num">57/57</td><td class="num">unchanged: retrieval never runs for solvable problems</td><td>Yes (by design; tested)</td></tr>
   </tbody>
 </table>
 </section>
@@ -525,7 +593,12 @@
     <tr><td><strong>Fact checker ignores negation</strong> and misses one of its own rules</td><td>Precision 1/3, recall 1/2 on the probes</td><td>Not fixed; awaiting approval. Proposed: a negation window before each pattern, and probes for every rule in the test suite</td></tr>
     <tr><td><strong>Fact checker silently returned the misconception</strong> when its redraft call failed (D-002)</td><td>A student would see "LRU suffers from Belady's anomaly" with no warning</td><td>Fixed: the correction is attached. The test was also non-hermetic (it passed only with the server up)</td></tr>
     <tr><td><strong>Fact checker runs only on non-streaming requests</strong></td><td>Open WebUI streams by default, so in the UI the checker may never run. Not confirmed: the gateway logs for this deployment are empty</td><td>To verify. Retrieval and its sources footer work on both paths</td></tr>
-    <tr><td><strong>v1 RAG abstain gate</strong></td><td>4 of 10 off-topic questions retrieved OS passages</td><td>Replaced by the v2 combined gate, which must be refitted on held-out real-notes questions</td></tr>
+    <tr><td><strong>The first RAG abstain gate</strong> used dense similarity alone</td><td>On our test notes, 4 of 10 off-topic questions retrieved OS passages</td><td>Replaced by a two-signal gate; its thresholds are now fitted per corpus on held-out questions</td></tr>
+    <tr><td><strong>Thresholds fitted on one corpus do not carry over</strong></td><td>The test-note thresholds would have given notes to 37 of the 40 off-topic questions on the course corpus</td><td>Refitted on the dev half (18.5); stored with the corpus in <code>gate.json</code></td></tr>
+    <tr><td><strong>OSTEP running headers inside passages</strong></td><td>"OPERATING SYSTEMS [VERSION 1.01] WWW.OSTEP.ORG" appeared mid-sentence in 11 of the 27 sampled OSTEP passages</td><td>Lines repeated on a third of the pages are dropped</td></tr>
+    <tr><td><strong>Ligatures in typeset PDFs</strong></td><td>"ﬁle" never matched a query for "file"</td><td>NFKC normalisation</td></tr>
+    <tr><td><strong>Sparse citations and a lenient judge</strong></td><td>Only 132 of 446 answer sentences cite a note; the base-model judge rates 81.8% supported where our strict check finds about 60%</td><td>Not fixed. Proposed in Section 6.4</td></tr>
+    <tr><td><strong>One legacy Word file could not be converted</strong></td><td>Word automation waited on an invisible dialog; the lab handout is missing from the corpus</td><td>Recorded as excluded; it can be added by saving it as .docx</td></tr>
   </tbody>
 </table>
 
@@ -547,7 +620,8 @@
 <ul>
   <li><strong>A benchmark chain waited an hour polling itself.</strong> <code>busy("benchmark.py")</code> matched <code>run_full_benchmark.py</code>. Polling for a free GPU between jobs also raced and crashed the next job. Fixed: match the full path, and require several consecutive clear polls.</li>
   <li><strong>Git normalised 57 CRLF files to LF.</strong> The repository was staged before line-ending conversion was disabled, which would have silently changed bytes the dataset manifest hashes. Fixed and verified file by file (D-001).</li>
-  <li><strong>RAG fixture is not independent.</strong> The notes and questions share an author, and the v2 gate was fitted on them. This is acknowledged in every RAG number, but it is a real limitation.</li>
+  <li><strong>The evaluation questions are ours.</strong> The retrieval questions and the new MCQ items were written by the team, not by the instructor, and were written while looking at the passages. We tried to phrase them as students would, but they are likely easier than real student questions.</li>
+  <li><strong>Wikipedia article identifiers lost characters.</strong> "Bélády's anomaly" became <code>wiki-b-l-dy-s-anomaly</code> and "Producer–consumer" lost its dash, which broke two question labels. Titles are now transliterated before the identifier is made.</li>
 </ul>
 </section>
 
@@ -569,7 +643,7 @@
 <ul>
   <li><strong>Targeted declarative replay</strong> for the OS-theory topics that regressed, or a LoRA-scale sweep, so theory accuracy can recover to ≥ base without retraining everything.</li>
   <li><strong>Grow tutoring supply with genuine material.</strong> Tutoring is the scarcest category and bounds the whole dataset. Rewordings would add memorisation pressure, not supply.</li>
-  <li><strong>A 200-item theory MCQ</strong>, so a 4-point change no longer hinges on 5 questions.</li>
+  <li><strong>Harder theory questions.</strong> The 200-item set now exists, but every configuration scores 92–93% on it, so it can no longer separate them. Questions that need reasoning across concepts, written or reviewed by the instructor, would show differences that this set cannot.</li>
 </ul>
 
 <h3>6.3 Model</h3>
@@ -580,8 +654,10 @@
 
 <h3>6.4 Retrieval</h3>
 <ul>
-  <li><strong>Collect held-out real questions first.</strong> At least 100 owner-written questions over the course notes, labelled with note and section, half for fitting the gate and half for reporting.</li>
-  <li><strong>Try a stronger embedder if recall is low.</strong> bge-code-v1, multilingual-e5-base and Qwen3-Embedding-0.6B are already in the local cache. Add a small cross-encoder re-ranker over the top 10 if section recall@1 is the bottleneck.</li>
+  <li><strong>Make the model cite every sentence it takes from the notes.</strong> The prompt currently asks for citations "where the answer relies on the notes"; a stricter instruction, or a short worked example of a fully cited answer, should raise the 132-of-446 coverage. The change should be compared on the dev questions before being reported on the test half.</li>
+  <li><strong>Check answers against their sources before showing them.</strong> Split the answer into sentences and drop or flag any cited sentence its passage does not support. A stronger judge than the 4B base model is needed for that: our check found the current one too lenient.</li>
+  <li><strong>Questions from the instructor and from students.</strong> Real questions, labelled by the instructor with every passage that answers them (not just one), would give a fairer recall figure than our single-passage labels.</li>
+  <li><strong>A re-ranker rather than a bigger embedder.</strong> A larger embedder bought 2.5 points of recall that were not significant. A small cross-encoder that re-scores the top 20 attacks the actual weakness, which is ranking the right passage first (recall@1 is 46%).</li>
   <li><strong>Learned or calibrated abstention.</strong> Use a logistic model over (max cosine, max BM25, margin between the top two) instead of hand-set thresholds, with precision and recall reported on held-out data.</li>
   <li><strong>Grounding checks on the answer, not just the prompt.</strong> Verify that each cited sentence is supported by the cited passage (entailment, or overlap as a first step). The fact checker becomes a check against the notes instead of a fixed rule list.</li>
   <li><strong>Retrieval for tutor hints, but behind a leak filter.</strong> Passages could make Socratic hints more accurate, but only if a filter guarantees no passage states the final answer. That needs its own answer-leak measurement first (G3).</li>
@@ -623,10 +699,12 @@
     <tr><td>Disk off-by-one, cache determinism</td><td><code>reports/g0/20261012-1429/diagnostics.json</code></td><td><code>tools/g0_diagnostics.py</code></td></tr>
     <tr><td>Fact-checker probes</td><td><code>reports/g0/20261012-1429/factcheck_v3.json</code></td><td><code>tools/g0_ablation.py</code></td></tr>
     <tr><td>Forgetting, paired</td><td><code>reports/forgetting_v3_paired.json</code>, <code>reports/g0/historical_significance.md</code></td><td><code>tools/run_forgetting_eval.py</code>, <code>tools/significance_history.py</code></td></tr>
-    <tr><td>RAG retrieval</td><td><code>reports/rag/fixture_eval.md</code></td><td><code>tools/rag_eval.py</code></td></tr>
-    <tr><td>RAG end to end</td><td><code>@@E2E_DIR@@</code></td><td><code>tools/rag_e2e.py</code></td></tr>
+    <tr><td>RAG corpus and exclusions</td><td><code>data/rag/corpus/manifest.json</code></td><td><code>tools/import_rag_sources.py</code>, <code>tools/fetch_open_os_sources.py</code></td></tr>
+    <tr><td>RAG retrieval and the gate</td><td><code>reports/rag/corpus_eval.md</code>, <code>data/rag/corpus/gate.json</code></td><td><code>tools/rag_eval.py --calibrate</code></td></tr>
+    <tr><td>Embedder comparison</td><td><code>reports/rag/corpus_multilingual-e5-base_eval.md</code></td><td><code>tools/rag_eval.py --embed-model</code></td></tr>
+    <tr><td>RAG end to end, faithfulness</td><td><code>reports/rag/e2e-20261012-2239/</code> (<code>summary.md</code>, <code>judge_sample_engineer_check.json</code>)</td><td><code>tools/rag_e2e.py</code></td></tr>
     <tr><td>Generation speed 26.9 tok/s (wall clock, full stack)</td><td><code>PROJECT_CONTEXT.md</code> Section 7</td><td>Served stack, 300 tokens</td></tr>
-    <tr><td>Engineering decisions</td><td><code>docs/DECISIONS.md</code> (D-001 … D-006)</td><td>—</td></tr>
+    <tr><td>Engineering decisions</td><td><code>docs/DECISIONS.md</code> (D-001 … D-008)</td><td>—</td></tr>
   </tbody>
 </table>
 <h3>Reproducing</h3>
@@ -642,8 +720,9 @@ serve/.venv-webui/Scripts/python serve/test_gateway.py
 
 # evaluation
 python tools/g0_ablation.py                  # problem suite, OOD holdout, fact checker (GPU)
-python tools/rag_eval.py data/rag/fixture    # retrieval (CPU)
-python tools/rag_e2e.py data/rag/fixture     # RAG off vs on with the served model (GPU)
+python -m ostutor.rag.ingest data/rag/corpus          # build the retrieval index (CPU)
+python tools/rag_eval.py data/rag/corpus --calibrate  # retrieval + gate (CPU)
+python tools/rag_e2e.py data/rag/corpus               # MCQ, explain answers, faithfulness (GPU)
 
 # serve the tutor with retrieval switched on
 $env:OSTUTOR_RAG = "data/rag/corpus"

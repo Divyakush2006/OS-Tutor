@@ -76,10 +76,10 @@ def build(root: Path, dense: bool = True) -> dict:
         raise SystemExit(f"REFUSED: {e}")
     per_doc = Counter(c.doc_id for c in r.chunks)
     docs = r.manifest["documents"]
+    for d in docs:
+        print(f"  {per_doc.get(d['id'], 0):5d}  {d['id']:<44} {(d.get('licence') or d.get('permission'))[:40]}")
     print(f"{len(docs)} documents, {len(r.chunks)} chunks, corpus {r.manifest['chunks_sha256'][:12]}, "
           f"built in {time.perf_counter() - t:.1f} s")
-    for d in docs:
-        print(f"  {per_doc.get(d['id'], 0):5d}  {d['id']:<44} {d.get('licence') or d.get('permission')[:40]}")
     empty = [d["id"] for d in docs if not per_doc.get(d["id"])]
     if empty:
         print(f"WARNING: {len(empty)} document(s) produced no text (scanned images?): {', '.join(empty)}")
