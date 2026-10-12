@@ -1,0 +1,811 @@
+{
+  "model": "D:\\os project\\models\\Qwen3-4B-Instruct-2507",
+  "adapter": "outputs/ostutor-lora",
+  "limit": 40,
+  "four_bit": true,
+  "suites": {
+    "os_solve_indist": {
+      "n": 40,
+      "final_answer_accuracy": 0.325,
+      "step_accuracy": 0.2545,
+      "by_topic": {
+        "banker_request": {
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "banker_safety": {
+          "n": 8,
+          "accuracy": 0.625
+        },
+        "disk": {
+          "n": 2,
+          "accuracy": 0.5
+        },
+        "freespace": {
+          "n": 4,
+          "accuracy": 0.0
+        },
+        "paging": {
+          "n": 8,
+          "accuracy": 0.375
+        },
+        "scheduling": {
+          "n": 9,
+          "accuracy": 0.1111
+        },
+        "translate": {
+          "n": 8,
+          "accuracy": 0.25
+        }
+      },
+      "seconds": 1756.7,
+      "max_new_tokens": 1100,
+      "truncation_rate": 0.0,
+      "accuracy_when_finished": 0.325,
+      "items": [
+        {
+          "suite": "os_solve_indist",
+          "index": 0,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 751,
+          "truncated": false,
+          "output": "**Algorithm: Round Robin (q=2)**\n\n**Step 1 - build the schedule**\n- t=1: T1 runs 2 (quantum 2, remaining 11)\n- t=3: T2 runs 2 (quantum 2, remaining 12)\n- t=5: T3 runs 2 (quantum 2, remaining 2)\n- t=7: T4 runs 2 (quantum 2, remaining 3)\n- t=9: T1 runs 2 (quantum 2, remaining 9)\n- t=11: T2 runs 2 (quantum 2, remaining 10)\n- t=13: T3 runs 2 (quantum 2, remaining 0)\n- t=15: T4 runs 2 (quantum 2, remaining 1)\n- t=17: T1 runs 2 (quantum 2, remaining 7)\n- t=19: T2 runs 2 (quantum 2, remaining 8)\n- t=21: T1 runs 2 (quantum 2, remaining 5)\n- t=23: T2 runs 2 (quantum 2, remaining 6)\n- t=25: T1 runs 2 (quantum 2, remaining 3)\n- t=27: T2 runs 2 (quantum 2, remaining 4)\n- t=29: T1 runs 2 (quantum 2, remaining 1)\n- t=31: T2 runs 2 (quantum 2, remaining 2)\n- t=33: T1 completes\n- t=33: T2 runs 2 (quantum 2, remaining 0)\n- t=35: T4 completes\n- t=35: T3 completed at t=15, so it never ran\n- t=35: T4 completed at t=17, so it never ran\n\n**Step 2 - Gantt chart**\n```\n| T1 | T2 | T3 | T4 | T1 | T2 | T3 | T4 | T1 | T2 | T1 | T2 | T1 | T2 | T1 | T2 |\n1 3 5 7 9 11 13 15 17 19 21 23 25 27 29 31 33 35\n```\n\n**Step 3 - per-process times**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|------------|---------|\n| T1 | 1 | 11 | 35 | 34 | 23 |\n| T2 | 4 | 12 | 35 | 31 | 19 |\n| T3 | 10 | 2 | 15 | 5 | 3 |\n| T4 | 10 | 3 | 17 | 7 | 4 |\n\nTurnaround = Completion - Arrival; Waiting = Turnaround - Burst\n\n**Step 4 - averages**\n\n- Average waiting time = (23 + 19 + 3 + 4) / 4 = **12.0**\n- Average turnaround time = (34 + 31 + 5 + 7) / 4 = **19.25**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 1,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 510,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P  | Need A | Need B | Need C |\n|----|--------|--------|--------|\n| J1 | 3       | 6       | 2       |\n| J2 | 3       | 0       | 5       |\n| J3 | 0       | 1       | 1       |\n| J4 | 1       | 2       | 0       |\n\n**Step 2 - run the safety algorithm**\n\n- J1: Need [3, 6, 2] > Work [5, 5, 5] -> cannot run yet\n- J2: Need [3, 0, 5] > Work [5, 5, 5] -> cannot run yet\n- J3: Need [0, 1, 1] <= Work [5, 5, 5] -> run it. Work = [5, 5, 5] + Allocation [7, 1, 3] = [12, 6, 8]\n- J1: Need [3, 6, 2] <= Work [12, 6, 8] -> run it. Work = [12, 6, 8] + Allocation [0, 2, 3] = [12, 8, 11]\n- J2: Need [3, 0, 5] <= Work [12, 8, 11] -> run it. Work = [12, 8, 11] + Allocation [0, 2, 1] = [12, 10, 12]\n- J4: Need [1, 2, 0] <= Work [12, 10, 12] -> run it. Work = [12, 10, 12] + Allocation [3, 0, 0] = [15, 10, 12]\n\n**Step 3 - conclusion**\n\nAll 4 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< J3, J1, J2, J4 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 2,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 181,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [5, 0, 0, 5] <= Need [5, 1, 2, 6] -> OK\n- Test 2: Request [5, 0, 0, 5] <= Available [5, 5, 1, 2] -> OK\n- Test 3: pretend to grant. Available = [5, 5, 1, 2] - [5, 0, 0, 5] = [0, 5, 1, -3] -> OK\n- Resulting state is UNSAFE (not reachable from here, but reachable from another order)\n\n**Conclusion: GRANT the request.** The system proceeds to that state, which is UNSAFE, so the process must wait."
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 3,
+          "kind": "scheduling",
+          "final_correct": true,
+          "new_tokens": 347,
+          "truncated": false,
+          "output": "**Algorithm: FCFS**\n\n**Step 1 - build the schedule**\n- t=0: CPU idle until t=6 (no process has arrived)\n- t=6: A runs (arrived t=6, burst 10)\n- t=16: B runs (arrived t=12, burst 7)\n- t=23: C runs (arrived t=14, burst 3)\n- t=26: D runs (arrived t=20, burst 4)\n\n**Step 2 - Gantt chart**\n```\n| A | B | C | D |\n6 16 23 26 30\n```\n\n**Step 3 - per-process times**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|------------|---------|\n| A | 6 | 10 | 16 | 10 | 0 |\n| B | 12 | 7 | 23 | 11 | 4 |\n| C | 14 | 3 | 26 | 12 | 9 |\n| D | 20 | 4 | 30 | 10 | 6 |\n\nTurnaround = Completion - Arrival; Waiting = Turnaround - Burst\n\n**Step 4 - averages**\n\n- Average waiting time = (0 + 4 + 9 + 6) / 4 = **4.75**\n- Average turnaround time = (10 + 11 + 12 + 10) / 4 = **9.75**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 4,
+          "kind": "banker_safety",
+          "final_correct": false,
+          "new_tokens": 619,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P       | Need A | Need B | Need C | Need D |\n|---------|--------|--------|--------|--------|\n| alpha   | 0       | 0       | 1       | 3       |\n| beta    | 2       | 4       | 1       | 1       |\n| gamma   | 1       | 0       | 6       | 2       |\n| delta   | 1       | 1       | 0       | 2       |\n| epsilon | 4       | 5       | 0       | 0       |\n\n**Step 2 - run the safety algorithm**\n\n- alpha: Need [0, 0, 1, 3] <= Work [3, 6, 1, 5] -> run it. Work = [3, 6, 1, 5] + Allocation [1, 0, 3, 0] = [4, 6, 4, 5]\n- beta: Need [2, 4, 1, 1] <= Work [4, 6, 4, 5] -> run it. Work = [4, 6, 4, 5] + Allocation [2, 0, 1, 6] = [6, 6, 5, 11]\n- gamma: Need [1, 0, 6, 2] <= Work [6, 6, 5, 11] -> run it. Work = [6, 6, 5, 11] + Allocation [4, 0, 1, 2] = [10, 6, 6, 13]\n- delta: Need [1, 1, 0, 2] <= Work [10, 6, 6, 13] -> run it. Work = [10, 6, 6, 13] + Allocation [2, 0, 5, 3] = [12, 6, 11, 16]\n- epsilon: Need [4, 5, 0, 0] <= Work [12, 6, 11, 16] -> run it. Work = [12, 6, 11, 16] + Allocation [1, 0, 1, 1] = [13, 6, 12, 17]\n\n**Step 3 - conclusion**\n\nAll 5 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< alpha, beta, gamma, delta, epsilon >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 5,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 457,
+          "truncated": false,
+          "output": "**Algorithm: FCFS**\n\n**Step 1 - build the schedule**\n- t=0: T1 runs (arrived t=0, burst 11)\n- t=11: T2 runs (arrived t=1, burst 2)\n- t=13: T3 runs (arrived t=2, burst 1)\n- t=14: T4 runs (arrived t=4, burst 7)\n- t=21: T5 runs (arrived t=4, burst 9)\n- t=30: T6 runs (arrived t=4, burst 12)\n\n**Step 2 - Gantt chart**\n```\n| T1 | T2 | T3 | T4 | T5 | T6 |\n0 11 13 14 21 30 42\n```\n\n**Step 3 - per-process times**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|------------|---------|\n| T1 | 0 | 11 | 11 | 11 | 0 |\n| T2 | 1 | 2 | 13 | 12 | 10 |\n| T3 | 2 | 1 | 14 | 12 | 11 |\n| T4 | 4 | 7 | 21 | 17 | 10 |\n| T5 | 4 | 9 | 30 | 26 | 17 |\n| T6 | 4 | 12 | 42 | 38 | 26 |\n\nTurnaround = Completion - Arrival; Waiting = Turnaround - Burst\n\n**Step 4 - averages**\n\n- Average waiting time = (0 + 10 + 11 + 10 + 17 + 26) / 6 = **12.0**\n- Average turnaround time = (11 + 12 + 12 + 17 + 26 + 38) / 6 = **18.67**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 6,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 176,
+          "truncated": false,
+          "output": "**Policy: WORST-fit**\n\n- request 342: WORST fit -> hole 2 (free 457 -> 115)\n- request 118: WORST fit -> hole 4 (free 425 -> 307)\n- request 252: WORST fit -> hole 2 (free 115 -> 63)\n- request 433: no hole large enough -> must WAIT\n- request 340: no hole large enough -> must WAIT\n\n**Placement:** [2, 4, 2, None, None]\n**Remaining free space per hole:** [235, 58, 63, 358, 307]\n**Total external fragmentation = 921 KB**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 7,
+          "kind": "paging",
+          "final_correct": false,
+          "new_tokens": 341,
+          "truncated": false,
+          "output": "**Policy: FIFO, 4 frames**\n\n| # | Ref | Hit/Fault | Evicted | Frames |\n|---|-----|-----------|---------|--------|\n| 1 | 1 | FAULT | - | [1] |\n| 2 | 7 | FAULT | - | [1, 7] |\n| 3 | 4 | FAULT | - | [1, 7, 4] |\n| 4 | 0 | FAULT | - | [1, 7, 4, 0] |\n| 5 | 4 | HIT | - | [1, 7, 4, 0] |\n| 6 | 2 | FAULT | 1 | [2, 7, 4, 0] |\n| 7 | 0 | HIT | - | [2, 7, 4, 0] |\n| 8 | 0 | HIT | - | [2, 7, 4, 0] |\n| 9 | 2 | HIT | - | [2, 7, 4, 0] |\n| 10 | 7 | HIT | - | [2, 7, 4, 0] |\n| 11 | 5 | FAULT | 7 | [2, 5, 4, 0] |\n| 12 | 2 | HIT | - | [2, 5, 4, 0] |\n\n**Total page faults = 7** (hits = 5, hit ratio = 0.4167)"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 8,
+          "kind": "translate",
+          "final_correct": false,
+          "new_tokens": 94,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(1142 / 1024) = 1\n- page offset = 1142 mod 1024 = 118\n- page table[1] = frame 9\n- physical address = 9 x 1024 + 118 = 9374\n\n**Physical address = 9374**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 9,
+          "kind": "paging",
+          "final_correct": true,
+          "new_tokens": 535,
+          "truncated": false,
+          "output": "**Policy: OPT, 4 frames**\n\n| # | Ref | Hit/Fault | Evicted | Frames |\n|---|-----|-----------|---------|--------|\n| 1 | 0 | FAULT | - | [0] |\n| 2 | 4 | FAULT | - | [0, 4] |\n| 3 | 1 | FAULT | - | [0, 4, 1] |\n| 4 | 1 | HIT | - | [0, 4, 1] |\n| 5 | 1 | HIT | - | [0, 4, 1] |\n| 6 | 0 | HIT | - | [0, 4, 1] |\n| 7 | 0 | HIT | - | [0, 4, 1] |\n| 8 | 1 | HIT | - | [0, 4, 1] |\n| 9 | 3 | FAULT | - | [0, 4, 1, 3] |\n| 10 | 6 | FAULT | 0 | [6, 4, 1, 3] |\n| 11 | 4 | HIT | - | [6, 4, 1, 3] |\n| 12 | 1 | HIT | - | [6, 4, 1, 3] |\n| 13 | 6 | HIT | - | [6, 4, 1, 3] |\n| 14 | 3 | HIT | - | [6, 4, 1, 3] |\n| 15 | 5 | FAULT | 4 | [6, 5, 1, 3] |\n| 16 | 0 | FAULT | 1 | [6, 5, 0, 3] |\n| 17 | 2 | FAULT | 3 | [6, 5, 0, 2] |\n| 18 | 7 | FAULT | 6 | [7, 5, 0, 2] |\n| 19 | 6 | FAULT | 5 | [7, 6, 0, 2] |\n| 20 | 4 | FAULT | 0 | [7, 6, 4, 2] |\n\n**Total page faults = 9** (hits = 11, hit ratio = 0.55)"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 10,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 706,
+          "truncated": false,
+          "output": "**Algorithm: Round Robin (q=3)**\n\n**Step 1 - build the schedule**\n- t=0: CPU idle until t=2\n- t=2: T1 runs 3 (quantum 3, remaining 12)\n- t=5: T2 runs 1 (quantum 3, remaining 1)\n- t=6: T3 runs 3 (quantum 3, remaining 4)\n- t=9: T4 runs 3 (quantum 3, remaining 11)\n- t=12: T5 runs 3 (quantum 3, remaining 5)\n- t=15: T1 runs 3 (quantum 3, remaining 9)\n- t=18: T3 runs 1 (quantum 3, remaining 1)\n- t=19: T4 runs 3 (quantum 3, remaining 8)\n- t=22: T5 runs 2 (quantum 3, remaining 2)\n- t=24: T1 runs 3 (quantum 3, remaining 6)\n- t=27: T4 runs 3 (quantum 3, remaining 5)\n- t=30: T5 runs 1 (quantum 3, remaining 1)\n- t=31: T1 runs 3 (quantum 3, remaining 3)\n- t=34: T4 runs 2 (quantum 3, remaining 2)\n- t=36: T1 completes\n- t=36: T2 completes\n- t=36: T3 completes\n- t=36: T5 completes\n- t=36: T4 completes\n\n**Step 2 - Gantt chart**\n```\n| T1 | T2 | T3 | T4 | T5 | T1 | T3 | T4 | T5 | T1 | T4 | T5 | T1 | T4 |\n2 5 6 9 12 15 18 19 22 24 27 30 31 34 36\n```\n\n**Step 3 - per-process times**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|------------|---------|\n| T1 | 2 | 12 | 34 | 32 | 20 |\n| T2 | 4 | 1 | 6 | 2 | 1 |\n| T3 | 4 | 4 | 19 | 15 | 11 |\n| T4 | 5 | 11 | 36 | 31 | 20 |\n| T5 | 6 | 5 | 36 | 30 | 25 |\n\nTurnaround = Completion - Arrival; Waiting = Turnaround - Burst\n\n**Step 4 - averages**\n\n- Average waiting time = (20 + 1 + 11 + 20 + 25) / 5 = **15.4**\n- Average turnaround time = (32 + 2 + 15 + 31 + 30) / 5 = **22.0**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 11,
+          "kind": "paging",
+          "final_correct": false,
+          "new_tokens": 455,
+          "truncated": false,
+          "output": "**Policy: LRU, 4 frames**\n\n| # | Ref | Hit/Fault | Evicted | Frames |\n|---|-----|-----------|---------|--------|\n| 1 | 5 | FAULT | - | [5] |\n| 2 | 8 | FAULT | - | [5, 8] |\n| 3 | 7 | FAULT | - | [5, 8, 7] |\n| 4 | 1 | FAULT | - | [5, 8, 7, 1] |\n| 5 | 0 | FAULT | 5 | [0, 8, 7, 1] |\n| 6 | 0 | HIT | - | [0, 8, 7, 1] |\n| 7 | 5 | FAULT | 8 | [0, 5, 7, 1] |\n| 8 | 6 | FAULT | 7 | [0, 5, 6, 1] |\n| 9 | 7 | FAULT | 1 | [0, 5, 6, 7] |\n| 10 | 7 | HIT | - | [0, 5, 6, 7] |\n| 11 | 1 | FAULT | 0 | [1, 5, 6, 7] |\n| 12 | 4 | FAULT | 5 | [1, 4, 6, 7] |\n| 13 | 0 | FAULT | 6 | [1, 4, 0, 7] |\n| 14 | 4 | HIT | - | [1, 4, 0, 7] |\n| 15 | 4 | HIT | - | [1, 4, 0, 7] |\n| 16 | 5 | FAULT | 7 | [1, 4, 0, 5] |\n\n**Total page faults = 11** (hits = 5, hit ratio = 0.3125)"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 12,
+          "kind": "paging",
+          "final_correct": true,
+          "new_tokens": 418,
+          "truncated": false,
+          "output": "**Policy: OPT, 4 frames**\n\n| # | Ref | Hit/Fault | Evicted | Frames |\n|---|-----|-----------|---------|--------|\n| 1 | 8 | FAULT | - | [8] |\n| 2 | 4 | FAULT | - | [8, 4] |\n| 3 | 2 | FAULT | - | [8, 4, 2] |\n| 4 | 1 | FAULT | - | [8, 4, 2, 1] |\n| 5 | 3 | FAULT | 8 | [3, 4, 2, 1] |\n| 6 | 4 | HIT | - | [3, 4, 2, 1] |\n| 7 | 0 | FAULT | 2 | [3, 4, 0, 1] |\n| 8 | 1 | HIT | - | [3, 4, 0, 1] |\n| 9 | 0 | HIT | - | [3, 4, 0, 1] |\n| 10 | 5 | FAULT | 3 | [5, 4, 0, 1] |\n| 11 | 0 | HIT | - | [5, 4, 0, 1] |\n| 12 | 0 | HIT | - | [5, 4, 0, 1] |\n| 13 | 0 | HIT | - | [5, 4, 0, 1] |\n| 14 | 1 | HIT | - | [5, 4, 0, 1] |\n| 15 | 5 | HIT | - | [5, 4, 0, 1] |\n\n**Total page faults = 7** (hits = 8, hit ratio = 0.5333)"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 13,
+          "kind": "paging",
+          "final_correct": false,
+          "new_tokens": 393,
+          "truncated": false,
+          "output": "**Policy: CLOCK, 4 frames**\n\n| # | Ref | Hit/Fault | Evicted | Frames |\n|---|-----|-----------|---------|--------|\n| 1 | 4 | FAULT | - | [4] |\n| 2 | 0 | FAULT | - | [4, 0] |\n| 3 | 5 | FAULT | - | [4, 0, 5] |\n| 4 | 1 | FAULT | - | [4, 0, 5, 1] |\n| 5 | 2 | FAULT | 4 | [2, 0, 5, 1] |\n| 6 | 1 | HIT | - | [2, 0, 5, 1] |\n| 7 | 2 | HIT | - | [2, 0, 5, 1] |\n| 8 | 0 | HIT | - | [2, 0, 5, 1] |\n| 9 | 3 | FAULT | 5 | [2, 0, 3, 1] |\n| 10 | 1 | HIT | - | [2, 0, 3, 1] |\n| 11 | 3 | HIT | - | [2, 0, 3, 1] |\n| 12 | 1 | HIT | - | [2, 0, 3, 1] |\n| 13 | 0 | HIT | - | [2, 0, 3, 1] |\n| 14 | 4 | FAULT | 2 | [4, 0, 3, 1] |\n\n**Total page faults = 8** (hits = 6, hit ratio = 0.4286)"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 14,
+          "kind": "translate",
+          "final_correct": true,
+          "new_tokens": 94,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(4871 / 2048) = 2\n- page offset = 4871 mod 2048 = 775\n- page table[2] = frame 2\n- physical address = 2 x 2048 + 775 = 4871\n\n**Physical address = 4871**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 15,
+          "kind": "paging",
+          "final_correct": false,
+          "new_tokens": 372,
+          "truncated": false,
+          "output": "**Policy: OPT, 3 frames**\n\n| # | Ref | Hit/Fault | Evicted | Frames |\n|---|-----|-----------|---------|--------|\n| 1 | 2 | FAULT | - | [2] |\n| 2 | 0 | FAULT | - | [2, 0] |\n| 3 | 4 | FAULT | - | [2, 0, 4] |\n| 4 | 2 | HIT | - | [2, 0, 4] |\n| 5 | 3 | FAULT | 2 | [3, 0, 4] |\n| 6 | 5 | FAULT | 0 | [3, 5, 4] |\n| 7 | 6 | FAULT | 4 | [3, 5, 6] |\n| 8 | 7 | FAULT | 3 | [7, 5, 6] |\n| 9 | 3 | FAULT | 5 | [7, 3, 6] |\n| 10 | 7 | HIT | - | [7, 3, 6] |\n| 11 | 5 | FAULT | 6 | [7, 3, 5] |\n| 12 | 4 | FAULT | 7 | [4, 3, 5] |\n| 13 | 0 | FAULT | 3 | [4, 0, 5] |\n| 14 | 7 | FAULT | 5 | [4, 0, 7] |\n\n**Total page faults = 12** (hits = 2, hit ratio = 0.1429)"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 16,
+          "kind": "paging",
+          "final_correct": false,
+          "new_tokens": 475,
+          "truncated": false,
+          "output": "**Policy: OPT, 3 frames**\n\n| # | Ref | Hit/Fault | Evicted | Frames |\n|---|-----|-----------|---------|--------|\n| 1 | 1 | FAULT | - | [1] |\n| 2 | 5 | FAULT | - | [1, 5] |\n| 3 | 1 | HIT | - | [1, 5] |\n| 4 | 2 | FAULT | - | [1, 5, 2] |\n| 5 | 3 | FAULT | 1 | [3, 5, 2] |\n| 6 | 0 | FAULT | 5 | [3, 0, 2] |\n| 7 | 4 | FAULT | 2 | [3, 0, 4] |\n| 8 | 3 | HIT | - | [3, 0, 4] |\n| 9 | 8 | FAULT | 3 | [8, 0, 4] |\n| 10 | 5 | FAULT | 0 | [8, 5, 4] |\n| 11 | 4 | HIT | - | [8, 5, 4] |\n| 12 | 4 | HIT | - | [8, 5, 4] |\n| 13 | 8 | HIT | - | [8, 5, 4] |\n| 14 | 1 | FAULT | 8 | [1, 5, 4] |\n| 15 | 1 | HIT | - | [1, 5, 4] |\n| 16 | 4 | HIT | - | [1, 5, 4] |\n| 17 | 5 | HIT | - | [1, 5, 4] |\n| 18 | 6 | FAULT | 4 | [1, 5, 6] |\n| 19 | 1 | HIT | - | [1, 5, 6] |\n\n**Total page faults = 10** (hits = 9, hit ratio = 0.4737)"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 17,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 154,
+          "truncated": false,
+          "output": "**Policy: FIRST-fit**\n\n- request 305: FIRST fit -> hole 1 (free 521 -> 216)\n- request 302: FIRST fit -> hole 2 (free 544 -> 242)\n- request 187: FIRST fit -> hole 0 (free 160 -> 0)\n- request 216: FIRST fit -> hole 3 (free 271 -> 55)\n\n**Placement:** [1, 2, 0, 3]\n**Remaining free space per hole:** [0, 216, 242, 55]\n**Total external fragmentation = 513 KB**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 18,
+          "kind": "translate",
+          "final_correct": false,
+          "new_tokens": 98,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(4604 / 1024) = 4\n- page offset = 4604 mod 1024 = 524\n- page table[4] = frame 25\n- physical address = 25 x 1024 + 524 = 26124\n\n**Physical address = 26124**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 19,
+          "kind": "translate",
+          "final_correct": true,
+          "new_tokens": 90,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(680 / 1024) = 0\n- page offset = 680 mod 1024 = 680\n- page table[0] = frame 0\n- physical address = 0 x 1024 + 680 = 680\n\n**Physical address = 680**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 20,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 522,
+          "truncated": false,
+          "output": "**Algorithm: FCFS**\n\n**Step 1 - build the schedule**\n- t=0: CPU idle until t=0 (no process has arrived)\n- t=0: 3901 runs (arrived t=0, burst 8)\n- t=8: 3928 runs (arrived t=0, burst 10)\n- t=18: 3939 runs (arrived t=0, burst 9)\n- t=27: 3943 runs (arrived t=0, burst 11)\n- t=38: 3993 runs (arrived t=0, burst 3)\n- t=41: 3971 runs (arrived t=0, burst 9)\n\n**Step 2 - Gantt chart**\n```\n| 3901 | 3928 | 3939 | 3943 | 3993 | 3971 |\n0 8 18 27 38 41 50\n```\n\n**Step 3 - per-process times**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|------------|---------|\n| 3901 | 0 | 8 | 8 | 8 | 0 |\n| 3928 | 0 | 10 | 18 | 18 | 8 |\n| 3939 | 0 | 9 | 27 | 27 | 18 |\n| 3943 | 0 | 11 | 38 | 38 | 27 |\n| 3971 | 0 | 9 | 50 | 50 | 41 |\n| 3993 | 0 | 3 | 41 | 41 | 38 |\n\nTurnaround = Completion - Arrival; Waiting = Turnaround - Burst\n\n**Step 4 - averages**\n\n- Average waiting time = (0 + 8 + 18 + 27 + 41 + 38) / 6 = **22.33**\n- Average turnaround time = (8 + 18 + 27 + 38 + 50 + 41) / 6 = **31.33**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 21,
+          "kind": "banker_safety",
+          "final_correct": false,
+          "new_tokens": 514,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P  | Need A | Need B | Need C |\n|----|--------|--------|--------|\n| P1 | 1       | 4       | 3       |\n| P2 | 2       | 0       | 2       |\n| P3 | 1       | 1       | 1       |\n| P4 | 0       | 1       | 0       |\n| P5 | 3       | 7       | 1       |\n\n**Step 2 - run the safety algorithm**\n\n- P1: Need [1, 4, 3] > Work [5, 1, 1] -> cannot run yet\n- P2: Need [2, 0, 2] <= Work [5, 1, 1] -> run it. Work = [5, 1, 1] + Allocation [4, 0, 2] = [9, 1, 3]\n- P1: Need [1, 4, 3] > Work [9, 1, 3] -> cannot run yet\n- P3: Need [1, 1, 1] <= Work [9, 1, 3] -> run it. Work = [9, 1, 3] + Allocation [6, 2, 2] = [15, 3, 5]\n- P1: Need [1, 4, 3] <= Work [15, 3, 5] -> run it. Work = [15, 3, 5] + Allocation [3, 2, 0] = [18, 5, 5]\n- P4: Need [0, 1, 0] <= Work [18, 5, 5] -> run it. Work = [18, 5, 5] + Allocation [0, 7, 0] = [18, 12, 5]\n- P5: Need [3, 7, 1] > Work [18, 12, 5] -> cannot run yet\n\n**Step 3 - conclusion**\n\nUnsafe. P5 cannot run; its Need [3, 7, 1] exceeds the current Work [18, 12, 5]."
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 22,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 465,
+          "truncated": false,
+          "output": "**Algorithm: SRTF (preemptive SJF)**\n\n**Step 1 - build the schedule**\n- t=3: start A (remaining 8)\n- t=11: A completes\n- t=11: start B (remaining 8)\n- t=19: B completes\n- t=19: start D (remaining 9)\n- t=28: D completes\n- t=28: start E (remaining 10)\n- t=38: E completes\n- t=38: start F (remaining 12)\n- t=50: F completes\n- t=50: start C (remaining 11)\n- t=61: C completes\n\n**Step 2 - Gantt chart**\n```\n| A | B | D | E | F | C |\n3 11 19 28 38 50 61\n```\n\n**Step 3 - per-process times**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|------------|---------|\n| A | 3 | 8 | 11 | 8 | 0 |\n| B | 3 | 8 | 19 | 16 | 8 |\n| C | 9 | 11 | 61 | 52 | 41 |\n| D | 15 | 9 | 28 | 13 | 4 |\n| E | 16 | 10 | 38 | 22 | 12 |\n| F | 19 | 12 | 50 | 31 | 19 |\n\nTurnaround = Completion - Arrival; Waiting = Turnaround - Burst\n\n**Step 4 - averages**\n\n- Average waiting time = (0 + 8 + 41 + 4 + 12 + 19) / 6 = **14.67**\n- Average turnaround time = (8 + 16 + 52 + 13 + 22 + 31) / 6 = **23.33**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 23,
+          "kind": "translate",
+          "final_correct": false,
+          "new_tokens": 98,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(4342 / 1024) = 4\n- page offset = 4342 mod 1024 = 274\n- page table[4] = frame 27\n- physical address = 27 x 1024 + 274 = 27982\n\n**Physical address = 27982**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 24,
+          "kind": "translate",
+          "final_correct": false,
+          "new_tokens": 98,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(8601 / 2048) = 4\n- page offset = 8601 mod 2048 = 357\n- page table[4] = frame 21\n- physical address = 21 x 2048 + 357 = 43325\n\n**Physical address = 43325**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 25,
+          "kind": "translate",
+          "final_correct": false,
+          "new_tokens": 100,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(18159 / 4096) = 4\n- page offset = 18159 mod 4096 = 2271\n- page table[4] = frame 9\n- physical address = 9 x 4096 + 2271 = 38937\n\n**Physical address = 38937**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 26,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 184,
+          "truncated": false,
+          "output": "**Policy: WORST-fit**\n\n- request 382: WORST fit -> hole 1 (free 382 -> 0)\n- request 224: WORST fit -> hole 2 (free 542 -> 318)\n- request 83: WORST fit -> hole 2 (free 318 -> 235)\n- request 321: WORST fit -> hole 2 (free 235 -> 14)\n- request 419: no hole large enough -> must WAIT\n\n**Placement:** [1, 2, 2, 2, None]\n**Remaining free space per hole:** [63, 0, 14, 114, 214]\n**Total external fragmentation = 405 KB**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 27,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 458,
+          "truncated": false,
+          "output": "**Algorithm: SRTF (preemptive SJF)**\n\n**Step 1 - build the schedule**\n- t=1: start A (remaining 7)\n- t=4: PREEMPT A -> B is ready (remaining 7) and B is smallest\n- t=4: start B (remaining 7)\n- t=11: PREEMPT B -> A is ready (remaining 7) and A is smallest\n- t=11: start A (remaining 7)\n- t=18: A completes\n- t=18: start C (remaining 4)\n- t=22: C completes\n- t=22: start D (remaining 7)\n- t=29: D completes\n- t=29: start E (remaining 5)\n- t=34: E completes\n\n**Step 2 - Gantt chart**\n```\n| A | B | A | C | D | E |\n1 4 11 18 22 29 34\n```\n\n**Step 3 - per-process times**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|------------|---------|\n| A | 1 | 7 | 18 | 17 | 10 |\n| B | 1 | 7 | 11 | 10 | 3 |\n| C | 3 | 4 | 22 | 19 | 15 |\n| D | 4 | 7 | 29 | 25 | 18 |\n| E | 6 | 5 | 34 | 28 | 23 |\n\nTurnaround = Completion - Arrival; Waiting = Turnaround - Burst\n\n**Step 4 - averages**\n\n- Average waiting time = (10 + 3 + 15 + 18 + 23) / 5 = **13.8**\n- Average turnaround time = (17 + 10 + 19 + 25 + 28) / 5 = **19.8**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 28,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 550,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P  | Need A | Need B | Need C |\n|----|--------|--------|--------|\n| J1 | 1       | 0       | 2       |\n| J2 | 0       | 3       | 7       |\n| J3 | 3       | 0       | 3       |\n| J4 | 0       | 2       | 7       |\n| J5 | 3       | 3       | 4       |\n\n**Step 2 - run the safety algorithm**\n\n- J1: Need [1, 0, 2] <= Work [4, 5, 2] -> run it. Work = [4, 5, 2] + Allocation [0, 0, 6] = [4, 5, 8]\n- J2: Need [0, 3, 7] > Work [4, 5, 8] -> cannot run yet\n- J3: Need [3, 0, 3] <= Work [4, 5, 8] -> run it. Work = [4, 5, 8] + Allocation [2, 2, 1] = [6, 7, 9]\n- J2: Need [0, 3, 7] <= Work [6, 7, 9] -> run it. Work = [6, 7, 9] + Allocation [0, 5, 0] = [6, 12, 9]\n- J4: Need [0, 2, 7] <= Work [6, 12, 9] -> run it. Work = [6, 12, 9] + Allocation [1, 0, 1] = [7, 12, 10]\n- J5: Need [3, 3, 4] <= Work [7, 12, 10] -> run it. Work = [7, 12, 10] + Allocation [1, 4, 2] = [8, 16, 12]\n\n**Step 3 - conclusion**\n\nAll 5 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< J1, J3, J2, J4, J5 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 29,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 569,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P     | Need A | Need B | Need C | Need D |\n|-------|--------|--------|--------|--------|\n| alpha | 0       | 3       | 1       | 1       |\n| beta  | 5       | 2       | 3       | 7       |\n| gamma | 6       | 1       | 1       | 2       |\n| delta | 0       | 2       | 2       | 2       |\n\n**Step 2 - run the safety algorithm**\n\n- alpha: Need [0, 3, 1, 1] <= Work [3, 3, 2, 4] -> run it. Work = [3, 3, 2, 4] + Allocation [3, 0, 0, 3] = [6, 3, 2, 7]\n- beta: Need [5, 2, 3, 7] > Work [6, 3, 2, 7] -> cannot run yet\n- gamma: Need [6, 1, 1, 2] > Work [6, 3, 2, 7] -> cannot run yet\n- delta: Need [0, 2, 2, 2] <= Work [6, 3, 2, 7] -> run it. Work = [6, 3, 2, 7] + Allocation [1, 3, 1, 0] = [7, 6, 3, 7]\n- beta: Need [5, 2, 3, 7] <= Work [7, 6, 3, 7] -> run it. Work = [7, 6, 3, 7] + Allocation [0, 1, 2, 1] = [7, 7, 5, 8]\n- gamma: Need [6, 1, 1, 2] <= Work [7, 7, 5, 8] -> run it. Work = [7, 7, 5, 8] + Allocation [2, 2, 3, 1] = [9, 9, 8, 9]\n\n**Step 3 - conclusion**\n\nAll 4 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< alpha, delta, beta, gamma >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 30,
+          "kind": "disk",
+          "final_correct": true,
+          "new_tokens": 191,
+          "truncated": false,
+          "output": "**Policy: LOOK**\n\n- LOOK up: like SCAN but reverses at the LAST REQUEST, never travelling to the disk edge\n- 147 -> 165 (+18, running total 18)\n- 165 -> 191 (+26, running total 44)\n- 191 -> 231 (+40, running total 84)\n- 231 -> 284 (+53, running total 137)\n- 284 -> 94 (+190, running total 327)\n- 94 -> 65 (+29, running total 356)\n\n**Service order:** 165 -> 191 -> 231 -> 284 -> 94 -> 65\n**Total head movement = 356 cylinders**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 31,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 409,
+          "truncated": false,
+          "output": "**Algorithm: Priority (non-preemptive)**\n\n**Step 1 - build the schedule**\n- t=0: run A (priority 3, highest ready)\n- t=8: run C (priority 2, highest ready)\n- t=16: run E (priority 2, highest ready)\n- t=17: run F (priority 3, highest ready)\n- t=28: run D (priority 5, highest ready)\n- t=29: run B (priority 5, highest ready)\n\n**Step 2 - Gantt chart**\n```\n| A | C | E | F | D | B |\n0 8 16 17 28 29 38\n```\n\n**Step 3 - per-process times**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|------------|---------|\n| A | 0 | 8 | 8 | 8 | 0 |\n| B | 4 | 9 | 38 | 34 | 25 |\n| C | 7 | 8 | 16 | 9 | 1 |\n| D | 12 | 1 | 29 | 17 | 16 |\n| E | 15 | 1 | 17 | 2 | 1 |\n| F | 16 | 11 | 28 | 12 | 1 |\n\nTurnaround = Completion - Arrival; Waiting = Turnaround - Burst\n\n**Step 4 - averages**\n\n- Average waiting time = (0 + 25 + 1 + 16 + 1 + 1) / 6 = **8.5**\n- Average turnaround time = (8 + 34 + 9 + 17 + 2 + 12) / 6 = **14.0**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 32,
+          "kind": "disk",
+          "final_correct": false,
+          "new_tokens": 250,
+          "truncated": false,
+          "output": "**Policy: SCAN**\n\n- SCAN down: service [49, 32, 55, 92, 102], go to the end of the disk, then reverse\n- 107 -> 49 (+58, running total 58)\n- 49 -> 32 (+17, running total 75)\n- 32 -> 55 (+23, running total 98)\n- 55 -> 92 (+37, running total 135)\n- 92 -> 102 (+10, running total 145)\n- 102 -> 146 (+44, running total 189)\n- 146 -> 152 (+6, running total 195)\n- 152 -> 122 (+30, running total 225)\n\n**Service order:** 49 -> 32 -> 55 -> 92 -> 102 -> 146 -> 152 -> 122\n**Total head movement = 225 cylinders**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 33,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 531,
+          "truncated": false,
+          "output": "**Algorithm: Round Robin (q=5)**\n\n**Step 1 - build the schedule**\n- t=0: J1 runs 5 (quantum 5, remaining 2)\n- t=5: J1 completes\n- t=5: J2 runs 5 (quantum 5, remaining 1)\n- t=10: J2 completes\n- t=10: J3 runs 5 (quantum 5, remaining 11)\n- t=15: J4 runs 5 (quantum 5, remaining 4)\n- t=20: J4 completes\n- t=20: J5 runs 5 (quantum 5, remaining 6)\n- t=25: J5 runs 5 (quantum 5, remaining 1)\n- t=30: J5 completes\n- t=30: J3 runs 5 (quantum 5, remaining 6)\n- t=35: J3 runs 5 (quantum 5, remaining 1)\n- t=40: J3 completes\n\n**Step 2 - Gantt chart**\n```\n| J1 | J2 | J3 | J4 | J5 | J3 | J5 | J3 |\n0 5 10 15 20 25 30 35 40\n```\n\n**Step 3 - per-process times**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|------------|---------|\n| J1 | 0 | 2 | 5 | 5 | 3 |\n| J2 | 0 | 1 | 10 | 10 | 9 |\n| J3 | 0 | 11 | 40 | 40 | 29 |\n| J4 | 0 | 4 | 20 | 20 | 16 |\n| J5 | 0 | 6 | 30 | 30 | 24 |\n\nTurnaround = Completion - Arrival; Waiting = Turnaround - Burst\n\n**Step 4 - averages**\n\n- Average waiting time = (3 + 9 + 29 + 16 + 24) / 5 = **14.2**\n- Average turnaround time = (5 + 10 + 40 + 20 + 30) / 5 = **21.0**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 34,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 532,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P  | Need A | Need B | Need C | Need D |\n|----|--------|--------|--------|--------|\n| T1 | 2       | 4       | 0       | 1       |\n| T2 | 1       | 2       | 0       | 0       |\n| T3 | 2       | 1       | 4       | 0       |\n| T4 | 1       | 7       | 0       | 1       |\n\n**Step 2 - run the safety algorithm**\n\n- T1: Need [2, 4, 0, 1] <= Work [2, 6, 5, 5] -> run it. Work = [2, 6, 5, 5] + Allocation [6, 2, 0, 0] = [8, 8, 5, 5]\n- T2: Need [1, 2, 0, 0] <= Work [8, 8, 5, 5] -> run it. Work = [8, 8, 5, 5] + Allocation [0, 0, 5, 5] = [8, 8, 10, 10]\n- T3: Need [2, 1, 4, 0] <= Work [8, 8, 10, 10] -> run it. Work = [8, 8, 10, 10] + Allocation [3, 2, 1, 4] = [11, 10, 11, 14]\n- T4: Need [1, 7, 0, 1] <= Work [11, 10, 11, 14] -> run it. Work = [11, 10, 11, 14] + Allocation [0, 1, 5, 0] = [11, 11, 16, 14]\n\n**Step 3 - conclusion**\n\nAll 4 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< T1, T2, T3, T4 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 35,
+          "kind": "translate",
+          "final_correct": false,
+          "new_tokens": 100,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(3510 / 2048) = 1\n- page offset = 3510 mod 2048 = 1462\n- page table[1] = frame 21\n- physical address = 21 x 2048 + 1462 = 43998\n\n**Physical address = 43998**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 36,
+          "kind": "banker_safety",
+          "final_correct": false,
+          "new_tokens": 562,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P  | Need A | Need B | Need C |\n|----|--------|--------|--------|\n| T1 | 0 | 0 | 8 |\n| T2 | 6 | 3 | 0 |\n| T3 | 3 | 5 | 5 |\n| T4 | 1 | 1 | 2 |\n| T5 | 2 | 3 | 2 |\n\n**Step 2 - run the safety algorithm**\n\n- T1: Need [0, 0, 8] <= Work [1, 2, 2] -> run it. Work = [1, 2, 2] + Allocation [5, 1, 0] = [6, 3, 2]\n- T2: Need [6, 3, 0] <= Work [6, 3, 2] -> run it. Work = [6, 3, 2] + Allocation [0, 3, 0] = [6, 6, 2]\n- T3: Need [3, 5, 5] > Work [6, 6, 2] -> cannot run yet\n- T4: Need [1, 1, 2] <= Work [6, 6, 2] -> run it. Work = [6, 6, 2] + Allocation [2, 1, 0] = [8, 7, 2]\n- T3: Need [3, 5, 5] > Work [8, 7, 2] -> cannot run yet\n- T5: Need [2, 3, 2] <= Work [8, 7, 2] -> run it. Work = [8, 7, 2] + Allocation [5, 5, 3] = [13, 12, 5]\n- T3: Need [3, 5, 5] <= Work [13, 12, 5] -> run it. Work = [13, 12, 5] + Allocation [5, 3, 3] = [18, 15, 8]\n\n**Step 3 - conclusion**\n\nAll 5 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< T1, T2, T4, T5, T3 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 37,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 142,
+          "truncated": false,
+          "output": "**Policy: FIRST-fit**\n\n- request 188: FIRST fit -> hole 0 (free 462 -> 274)\n- request 145: FIRST fit -> hole 1 (free 524 -> 379)\n- request 47: FIRST fit -> hole 0 (free 274 -> 227)\n\n**Placement:** [0, 1, 0]\n**Remaining free space per hole:** [227, 379, 243, 503, 349, 135]\n**Total external fragmentation = 1836 KB**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 38,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 525,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P  | Need A | Need B | Need C | Need D |\n|----|--------|--------|--------|--------|\n| T1 | 2       | 0       | 0       | 0       |\n| T2 | 2       | 1       | 5       | 0       |\n| T3 | 0       | 0       | 0       | 2       |\n| T4 | 3       | 3       | 3       | 0       |\n\n**Step 2 - run the safety algorithm**\n\n- T1: Need [2, 0, 0, 0] <= Work [3, 2, 3, 3] -> run it. Work = [3, 2, 3, 3] + Allocation [5, 4, 2, 0] = [8, 6, 5, 3]\n- T2: Need [2, 1, 5, 0] <= Work [8, 6, 5, 3] -> run it. Work = [8, 6, 5, 3] + Allocation [2, 4, 1, 1] = [10, 10, 6, 4]\n- T3: Need [0, 0, 0, 2] <= Work [10, 10, 6, 4] -> run it. Work = [10, 10, 6, 4] + Allocation [2, 0, 2, 3] = [12, 10, 8, 7]\n- T4: Need [3, 3, 3, 0] <= Work [12, 10, 8, 7] -> run it. Work = [12, 10, 8, 7] + Allocation [1, 5, 1, 6] = [13, 15, 9, 13]\n\n**Step 3 - conclusion**\n\nAll 4 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< T1, T2, T3, T4 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 39,
+          "kind": "paging",
+          "final_correct": true,
+          "new_tokens": 416,
+          "truncated": false,
+          "output": "**Policy: CLOCK, 4 frames**\n\n| # | Ref | Hit/Fault | Evicted | Frames |\n|---|-----|-----------|---------|--------|\n| 1 | 3 | FAULT | - | [3] |\n| 2 | 1 | FAULT | - | [3, 1] |\n| 3 | 0 | FAULT | - | [3, 1, 0] |\n| 4 | 3 | HIT | - | [3, 1, 0] |\n| 5 | 2 | FAULT | - | [3, 1, 0, 2] |\n| 6 | 0 | HIT | - | [3, 1, 0, 2] |\n| 7 | 4 | FAULT | 3 | [4, 1, 0, 2] |\n| 8 | 4 | HIT | - | [4, 1, 0, 2] |\n| 9 | 7 | FAULT | 1 | [4, 7, 0, 2] |\n| 10 | 1 | FAULT | 0 | [4, 7, 1, 2] |\n| 11 | 1 | HIT | - | [4, 7, 1, 2] |\n| 12 | 2 | HIT | - | [4, 7, 1, 2] |\n| 13 | 1 | HIT | - | [4, 7, 1, 2] |\n| 14 | 5 | FAULT | 2 | [4, 7, 1, 5] |\n| 15 | 2 | FAULT | 4 | [2, 7, 1, 5] |\n\n**Total page faults = 9** (hits = 6, hit ratio = 0.4)"
+        }
+      ]
+    },
+    "os_solve_ood": {
+      "n": 40,
+      "final_answer_accuracy": 0.325,
+      "step_accuracy": 0.1556,
+      "by_topic": {
+        "banker_request": {
+          "n": 11,
+          "accuracy": 0.8182
+        },
+        "banker_safety": {
+          "n": 9,
+          "accuracy": 0.4444
+        },
+        "disk": {
+          "n": 5,
+          "accuracy": 0.0
+        },
+        "freespace": {
+          "n": 7,
+          "accuracy": 0.0
+        },
+        "paging": {
+          "n": 1,
+          "accuracy": 0.0
+        },
+        "scheduling": {
+          "n": 4,
+          "accuracy": 0.0
+        },
+        "translate": {
+          "n": 3,
+          "accuracy": 0.0
+        }
+      },
+      "seconds": 2487.3,
+      "max_new_tokens": 1100,
+      "truncation_rate": 0.025,
+      "accuracy_when_finished": 0.3333,
+      "items": [
+        {
+          "suite": "os_solve_ood",
+          "index": 0,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 788,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [0, 0, 0, 0] <= Need [0, 2, 0, 1] -> OK\n- Test 2: Request [0, 0, 0, 0] <= Allocation [8, 2, 2, 4] -> OK\n- Test 3: pretend to grant. Available = [10, 10, 10, 10] - [0, 0, 0, 0] = [10, 10, 10, 10]; Allocation[T6] = [8, 2, 2, 4]. Now run the safety algorithm.\n- Need = Max - Allocation\n- Work = Available = [10, 10, 10, 10]\n- T1: Need [5, 5, 1, 4] <= Work [10, 10, 10, 10] -> run it. Work = [10, 10, 10, 10] + Allocation [1, 0, 7, 1] = [11, 10, 17, 11]\n- T2: Need [8, 0, 1, 6] <= Work [11, 10, 17, 11] -> run it. Work = [11, 10, 17, 11] + Allocation [0, 4, 0, 1] = [11, 14, 17, 12]\n- T3: Need [2, 0, 0, 2] <= Work [11, 14, 17, 12] -> run it. Work = [11, 14, 17, 12] + Allocation [0, 2, 0, 6] = [11, 16, 17, 18]\n- T4: Need [2, 0, 4, 0] <= Work [11, 16, 17, 18] -> run it. Work = [11, 16, 17, 18] + Allocation [1, 0, 2, 3] = [12, 16, 19, 21]\n- T5: Need [1, 0, 1, 1] <= Work [12, 16, 19, 21] -> run it. Work = [12, 16, 19, 21] + Allocation [0, 0, 5, 5] = [12, 16, 24, 26]\n- T6: Need [0, 2, 0, 1] <= Work [12, 16, 24, 26] -> run it. Work = [12, 16, 24, 26] + Allocation [8, 2, 2, 4] = [20, 18, 26, 30]\n- SAFE. Safe sequence: < T1, T2, T3, T4, T5, T6 >\n- Resulting state is SAFE (sequence < T1, T2, T3, T4, T5, T6 >) -> GRANT the request\n\n**Conclusion: the request is GRANTED.**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 1,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 776,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [1, 0, 1, 0] <= Need [2, 0, 3, 0] -> OK\n- Test 2: Request [1, 0, 1, 0] <= Allocation [0, 1, 3, 1] -> OK\n- Test 3: pretend to grant. Available = [10, 10, 10, 10] - [1, 0, 1, 0] = [9, 10, 9, 9]; Allocation[T2] = [1, 1, 3, 1]. Now run the safety algorithm.\n- Need = Max - Allocation\n- Work = Available = [9, 10, 9, 9]\n- T1: Need [1, 1, 5, 0] <= Work [9, 10, 9, 9] -> run it. Work = [9, 10, 9, 9] + Allocation [3, 0, 3, 1] = [12, 10, 12, 10]\n- T2: Need [1, 0, 3, 0] <= Work [12, 10, 12, 10] -> run it. Work = [12, 10, 12, 10] + Allocation [1, 1, 3, 1] = [13, 11, 15, 11]\n- T3: Need [1, 5, 0, 5] <= Work [13, 11, 15, 11] -> run it. Work = [13, 11, 15, 11] + Allocation [5, 3, 2, 0] = [18, 14, 17, 11]\n- T4: Need [1, 0, 2, 4] <= Work [18, 14, 17, 11] -> run it. Work = [18, 14, 17, 11] + Allocation [2, 3, 4, 1] = [20, 17, 21, 12]\n- T5: Need [1, 0, 1, 0] <= Work [20, 17, 21, 12] -> run it. Work = [20, 17, 21, 12] + Allocation [1, 5, 4, 0] = [21, 22, 25, 12]\n- T6: Need [5, 2, 1, 2] <= Work [21, 22, 25, 12] -> run it. Work = [21, 22, 25, 12] + Allocation [0, 3, 7, 1] = [21, 25, 32, 13]\n- SAFE. Safe sequence: < T1, T2, T3, T4, T5, T6 >\n- Resulting state is SAFE (sequence < T1, T2, T3, T4, T5, T6 >) -> GRANT the request\n\n**Conclusion: the request is GRANTED.**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 2,
+          "kind": "disk",
+          "final_correct": false,
+          "new_tokens": 351,
+          "truncated": false,
+          "output": "**Policy: LOOK**\n\n- LOOK up: like SCAN but reverses at the LAST REQUEST, never travelling to the disk edge\n- 26 -> 40 (+14, running total 14)\n- 40 -> 41 (+1, running total 15)\n- 41 -> 5 (+36, running total 51)\n- 5 -> 76 (+71, running total 122)\n- 76 -> 79 (+3, running total 125)\n- 79 -> 94 (+15, running total 140)\n- 94 -> 115 (+21, running total 161)\n- 115 -> 126 (+11, running total 172)\n- 126 -> 133 (+7, running total 179)\n- 133 -> 134 (+1, running total 180)\n- 134 -> 161 (+27, running total 207)\n- 161 -> 171 (+10, running total 217)\n- 171 -> 181 (+10, running total 227)\n\n**Service order:** 40 -> 41 -> 5 -> 76 -> 79 -> 94 -> 115 -> 126 -> 133 -> 134 -> 161 -> 171 -> 181\n**Total head movement = 227 cylinders**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 3,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 229,
+          "truncated": false,
+          "output": "**Policy: WORST-fit**\n\n- request 480: WORST fit -> hole 5 (free 600 -> 120)\n- request 466: WORST fit -> hole 5 (free 120 -> 0)\n- request 519: WORST fit -> hole 0 (free 519 -> 0)\n- request 271: WORST fit -> hole 4 (free 480 -> 209)\n- request 107: WORST fit -> hole 4 (free 209 -> 102)\n- request 480: WORST fit -> hole 4 (free 102 -> 0)\n\n**Placement:** [5, 5, 0, 4, 4, 4]\n**Remaining free space per hole:** [0, 466, 107, 271, 0, 0]\n**Total external fragmentation = 1324 KB**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 4,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 789,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P    | Need A | Need B | Need C | Need D |\n|------|--------|--------|--------|--------|\n| 5179 | 0       | 0       | 1       | 1       |\n| 5199 | 0       | 3       | 4       | 0       |\n| 5209 | 7       | 0       | 1       | 0       |\n| 5212 | 3       | 6       | 4       | 1       |\n| 5275 | 0       | 3       | 3       | 2       |\n| 5329 | 0       | 5       | 7       | 0       |\n\n**Step 2 - run the safety algorithm**\n\n- 5179: Need [0, 0, 1, 1] <= Work [3, 3, 3, 3] -> run it. Work = [3, 3, 3, 3] + Allocation [1, 1, 2, 2] = [4, 4, 5, 5]\n- 5199: Need [0, 3, 4, 0] <= Work [4, 4, 5, 5] -> run it. Work = [4, 4, 5, 5] + Allocation [6, 2, 1, 1] = [10, 6, 6, 6]\n- 5209: Need [7, 0, 1, 0] <= Work [10, 6, 6, 6] -> run it. Work = [10, 6, 6, 6] + Allocation [0, 0, 0, 5] = [10, 6, 6, 11]\n- 5212: Need [3, 6, 4, 1] <= Work [10, 6, 6, 11] -> run it. Work = [10, 6, 6, 11] + Allocation [3, 1, 1, 0] = [13, 7, 7, 11]\n- 5275: Need [0, 3, 3, 2] <= Work [13, 7, 7, 11] -> run it. Work = [13, 7, 7, 11] + Allocation [7, 0, 5, 1] = [20, 7, 12, 12]\n- 5329: Need [0, 5, 7, 0] <= Work [20, 7, 12, 12] -> run it. Work = [20, 7, 12, 12] + Allocation [0, 1, 0, 0] = [20, 8, 12, 12]\n\n**Step 3 - conclusion**\n\nAll 6 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< 5179, 5199, 5209, 5212, 5275, 5329 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 5,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 670,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P    | Need A | Need B | Need C |\n|------|--------|--------|--------|\n| 4711 | 3       | 3       | 0       |\n| 4730 | 0       | 0       | 1       |\n| 4721 | 0       | 3       | 0       |\n| 4729 | 0       | 0       | 0       |\n| 4775 | 0       | 1       | 2       |\n| 4731 | 3       | 0       | 0       |\n\n**Step 2 - run the safety algorithm**\n\n- 4711: Need [3, 3, 0] <= Work [5, 5, 5] -> run it. Work = [5, 5, 5] + Allocation [0, 5, 0] = [5, 10, 5]\n- 4730: Need [0, 0, 1] <= Work [5, 10, 5] -> run it. Work = [5, 10, 5] + Allocation [1, 0, 2] = [6, 10, 7]\n- 4721: Need [0, 3, 0] <= Work [6, 10, 7] -> run it. Work = [6, 10, 7] + Allocation [5, 2, 1] = [11, 12, 8]\n- 4729: Need [0, 0, 0] <= Work [11, 12, 8] -> run it. Work = [11, 12, 8] + Allocation [2, 0, 0] = [13, 12, 8]\n- 4775: Need [0, 1, 2] <= Work [13, 12, 8] -> run it. Work = [13, 12, 8] + Allocation [4, 4, 0] = [17, 16, 8]\n- 4731: Need [3, 0, 0] <= Work [17, 16, 8] -> run it. Work = [17, 16, 8] + Allocation [4, 0, 2] = [21, 16, 10]\n\n**Step 3 - conclusion**\n\nAll 6 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< 4711, 4730, 4721, 4729, 4775, 4731 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 6,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 187,
+          "truncated": false,
+          "output": "**Policy: FIRST-fit**\n\n- request 120: FIRST fit -> hole 0 (free 283 -> 163)\n- request 180: FIRST fit -> hole 1 (free 213 -> 33)\n- request 200: FIRST fit -> hole 3 (free 343 -> 143)\n- request 100: FIRST fit -> hole 3 (free 143 -> 43)\n- request 150: FIRST fit -> hole 4 (free 106 -> 56)\n\n**Placement:** [0, 1, 3, 3, 4]\n**Remaining free space per hole:** [163, 33, 177, 43, 56]\n**Total external fragmentation = 472 KB**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 7,
+          "kind": "disk",
+          "final_correct": false,
+          "new_tokens": 405,
+          "truncated": false,
+          "output": "**Policy: SCAN**\n\n- SCAN up: service [208, 237, 236, 209, 279], go to the end of the disk, then reverse\n- 130 -> 208 (+78, running total 78)\n- 208 -> 237 (+29, running total 107)\n- 237 -> 236 (+1, running total 108)\n- 236 -> 279 (+43, running total 151)\n- 279 -> 250 (+29, running total 180)\n- 250 -> 181 (+69, running total 249)\n- 181 -> 139 (+42, running total 291)\n- 139 -> 67 (+72, running total 363)\n- 67 -> 57 (+10, running total 373)\n- 57 -> 38 (+19, running total 392)\n- 38 -> 36 (+2, running total 394)\n- 36 -> 27 (+9, running total 403)\n- 27 -> 17 (+10, running total 413)\n- 17 -> 130 (+113, running total 526)\n\n**Service order:** 208 -> 237 -> 236 -> 279 -> 250 -> 181 -> 139 -> 67 -> 57 -> 38 -> 36 -> 27 -> 17 -> 130\n**Total head movement = 526 cylinders**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 8,
+          "kind": "banker_safety",
+          "final_correct": false,
+          "new_tokens": 762,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P    | Need A | Need B | Need C |\n|------|--------|--------|--------|\n| 3413 | 0       | 1       | 0       |\n| 3417 | 2       | 2       | 2       |\n| 3423 | 4       | 1       | 0       |\n| 3455 | 6       | 1       | 2       |\n| 3433 | 7       | 0       | 1       |\n| 3543 | 5       | 1       | 0       |\n| 3563 | 5       | 2       | 2       |\n\n**Step 2 - run the safety algorithm**\n\n- 3413: Need [0, 1, 0] <= Work [3, 3, 5] -> run it. Work = [3, 3, 5] + Allocation [1, 0, 2] = [4, 3, 7]\n- 3417: Need [2, 2, 2] <= Work [4, 3, 7] -> run it. Work = [4, 3, 7] + Allocation [2, 6, 3] = [6, 9, 10]\n- 3423: Need [4, 1, 0] <= Work [6, 9, 10] -> run it. Work = [6, 9, 10] + Allocation [1, 1, 5] = [7, 10, 15]\n- 3455: Need [6, 1, 2] <= Work [7, 10, 15] -> run it. Work = [7, 10, 15] + Allocation [0, 0, 3] = [7, 10, 18]\n- 3433: Need [7, 0, 1] <= Work [7, 10, 18] -> run it. Work = [7, 10, 18] + Allocation [0, 1, 6] = [7, 11, 24]\n- 3543: Need [5, 1, 0] <= Work [7, 11, 24] -> run it. Work = [7, 11, 24] + Allocation [1, 2, 2] = [8, 13, 26]\n- 3563: Need [5, 2, 2] <= Work [8, 13, 26] -> run it. Work = [8, 13, 26] + Allocation [2, 0, 1] = [10, 13, 27]\n\n**Step 3 - conclusion**\n\nAll 7 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< 3413, 3417, 3423, 3455, 3433, 3543, 3563 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 9,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 700,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P  | Need A | Need B | Need C |\n|----|--------|--------|--------|\n| T1 | 1       | 2       | 0       |\n| T2 | 2       | 1       | 1       |\n| T3 | 4       | 3       | 3       |\n| T4 | 0       | 2       | 6       |\n| T5 | 0       | 0       | 4       |\n| T6 | 0       | 1       | 0       |\n| T7 | 0       | 1       | 1       |\n\n**Step 2 - run the safety algorithm**\n\n- T1: Need [1, 2, 0] <= Work [5, 5, 10] -> run it. Work = [5, 5, 10] + Allocation [0, 0, 7] = [5, 5, 17]\n- T2: Need [2, 1, 1] <= Work [5, 5, 17] -> run it. Work = [5, 5, 17] + Allocation [1, 1, 2] = [6, 6, 19]\n- T3: Need [4, 3, 3] <= Work [6, 6, 19] -> run it. Work = [6, 6, 19] + Allocation [3, 0, 1] = [9, 6, 20]\n- T4: Need [0, 2, 6] <= Work [9, 6, 20] -> run it. Work = [9, 6, 20] + Allocation [5, 1, 1] = [14, 7, 21]\n- T5: Need [0, 0, 4] <= Work [14, 7, 21] -> run it. Work = [14, 7, 21] + Allocation [3, 2, 2] = [17, 9, 23]\n- T6: Need [0, 1, 0] <= Work [17, 9, 23] -> run it. Work = [17, 9, 23] + Allocation [0, 0, 3] = [17, 9, 26]\n- T7: Need [0, 1, 1] <= Work [17, 9, 26] -> run it. Work = [17, 9, 26] + Allocation [0, 0, 1] = [17, 9, 27]\n\n**Step 3 - conclusion**\n\nAll 7 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< T1, T2, T3, T4, T5, T6, T7 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 10,
+          "kind": "translate",
+          "final_correct": false,
+          "new_tokens": 102,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(11800 / 2048) = 5\n- page offset = 11800 mod 2048 = 1504\n- page table[5] = frame 27\n- physical address = 27 x 2048 + 1504 = 56384\n\n**Physical address = 56384**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 11,
+          "kind": "translate",
+          "final_correct": false,
+          "new_tokens": 96,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(4114 / 1024) = 4\n- page offset = 4114 mod 1024 = 14\n- page table[4] = frame 18\n- physical address = 18 x 1024 + 14 = 18466\n\n**Physical address = 18466**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 12,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 574,
+          "truncated": false,
+          "output": "**Algorithm: Priority (non-preemptive)**\n\n**Step 1 - build the schedule**\n- t=0: run alpha to completion (priority 3)\n- t=12: run beta to completion (priority 3)\n- t=22: run gamma to completion (priority 3)\n- t=28: run delta to completion (priority 2)\n- t=37: run epsilon to completion (priority 5)\n- t=42: run zeta to completion (priority 2)\n- t=51: run eta to completion (priority 1)\n- t=61: run theta to completion (priority 3)\n- t=62: run iota to completion (priority 3)\n\n**Step 2 - Gantt chart**\n```\n| alpha | beta | gamma | delta | epsilon | zeta | eta | theta | iota |\n0 12 22 28 37 42 51 61 62 63\n```\n\n**Step 3 - per-process times**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|------------|---------|\n| alpha | 0 | 12 | 12 | 12 | 0 |\n| beta | 2 | 10 | 22 | 20 | 10 |\n| delta | 6 | 9 | 37 | 31 | 22 |\n| epsilon | 7 | 5 | 42 | 35 | 30 |\n| eta | 10 | 10 | 61 | 51 | 41 |\n| gamma | 4 | 6 | 28 | 24 | 18 |\n| iota | 13 | 1 | 63 | 50 | 49 |\n| theta | 11 | 1 | 62 | 51 | 50 |\n| zeta | 9 | 12 | 51 | 42 | 30 |\n\nTurnaround = Completion - Arrival; Waiting = Turnaround - Burst\n\n**Step 4 - averages**\n\n- Average waiting time = (0 + 10 + 22 + 30 + 41 + 18 + 49 + 50 + 30) / 9 = **26.44**\n- Average turnaround time = (12 + 20 + 31 + 35 + 51 + 24 + 50 + 51 + 50) / 9 = **33.78**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 13,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 237,
+          "truncated": false,
+          "output": "**Policy: WORST-fit**\n\n- request 120: WORST fit -> hole 3 (free 600 -> 480)\n- request 200: WORST fit -> hole 3 (free 480 -> 280)\n- request 300: WORST fit -> hole 3 (free 280 -> 80)\n- request 100: WORST fit -> hole 1 (free 578 -> 478)\n- request 200: WORST fit -> hole 1 (free 478 -> 278)\n- request 100: WORST fit -> hole 1 (free 278 -> 178)\n\n**Placement:** [3, 3, 3, 1, 1, 1]\n**Remaining free space per hole:** [450, 178, 97, 80, 293, 72]\n**Total external fragmentation = 1160 KB**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 14,
+          "kind": "paging",
+          "final_correct": false,
+          "new_tokens": 793,
+          "truncated": false,
+          "output": "**Policy: FIFO, 4 frames**\n\n| # | Ref | Hit/Fault | Evicted | Frames |\n|---|-----|-----------|---------|--------|\n| 1 | 1 | FAULT | - | [1] |\n| 2 | 2 | FAULT | - | [1, 2] |\n| 3 | 4 | FAULT | - | [1, 2, 4] |\n| 4 | 1 | HIT | - | [1, 2, 4] |\n| 5 | 3 | FAULT | - | [1, 2, 4, 3] |\n| 6 | 8 | FAULT | 1 | [8, 2, 4, 3] |\n| 7 | 7 | FAULT | 2 | [8, 7, 4, 3] |\n| 8 | 4 | HIT | - | [8, 7, 4, 3] |\n| 9 | 6 | FAULT | 4 | [8, 7, 6, 3] |\n| 10 | 0 | FAULT | 3 | [8, 7, 6, 0] |\n| 11 | 4 | FAULT | 8 | [4, 7, 6, 0] |\n| 12 | 4 | HIT | - | [4, 7, 6, 0] |\n| 13 | 0 | HIT | - | [4, 7, 6, 0] |\n| 14 | 0 | HIT | - | [4, 7, 6, 0] |\n| 15 | 4 | HIT | - | [4, 7, 6, 0] |\n| 16 | 8 | FAULT | 7 | [4, 8, 6, 0] |\n| 17 | 0 | HIT | - | [4, 8, 6, 0] |\n| 18 | 3 | FAULT | 6 | [4, 8, 3, 0] |\n| 19 | 5 | FAULT | 0 | [4, 8, 3, 5] |\n| 20 | 0 | FAULT | 4 | [0, 8, 3, 5] |\n| 21 | 5 | HIT | - | [0, 8, 3, 5] |\n| 22 | 1 | FAULT | 8 | [0, 1, 3, 5] |\n| 23 | 2 | FAULT | 3 | [0, 1, 2, 5] |\n| 24 | 7 | FAULT | 5 | [0, 1, 2, 7] |\n| 25 | 2 | HIT | - | [0, 1, 2, 7] |\n| 26 | 3 | FAULT | 0 | [3, 1, 2, 7] |\n| 27 | 0 | FAULT | 1 | [3, 0, 2, 7] |\n| 28 | 8 | FAULT | 2 | [3, 0, 8, 7] |\n| 29 | 2 | FAULT | 7 | [3, 0, 8, 2] |\n\n**Total page faults = 18** (hits = 12, hit ratio = 0.4846)"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 15,
+          "kind": "banker_request",
+          "final_correct": false,
+          "new_tokens": 457,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [1, 1, 0, 1] <= Need [1, 1, 0, 1] -> OK\n- Test 2: Request [1, 1, 0, 1] <= Available [1, 1, 1, 1] -> OK\n- Test 3: pretend to grant. Available = [1, 1, 1, 1] - [1, 1, 0, 1] = [0, 0, 1, 0]; Allocation[4] = [1, 4, 1, 3]. Now run the safety algorithm.\n- Need = Max - Allocation\n- Work = Available = [0, 0, 1, 0]\n- P1: Need [0, 1, 2, 0] > Work [0, 0, 1, 0] -> cannot run yet\n- P2: Need [1, 6, 6, 1] > Work [0, 0, 1, 0] -> cannot run yet\n- P3: Need [0, 5, 0, 2] > Work [0, 0, 1, 0] -> cannot run yet\n- P4: Need [0, 1, 0, 1] > Work [0, 0, 1, 0] -> cannot run yet\n- P5: Need [0, 4, 1, 4] > Work [0, 0, 1, 0] -> cannot run yet\n- P6: Need [0, 3, 6, 1] > Work [0, 0, 1, 0] -> cannot run yet\n- UNSAFE - no safe sequence exists; processes {1, 2, 3, 4, 5, 6} can never finish\n- Resulting state is UNSAFE -> DENY the request; processes wait in the unsafe state\n\n**Conclusion: the request is DENIED.**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 16,
+          "kind": "banker_safety",
+          "final_correct": false,
+          "new_tokens": 514,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P    | Need A | Need B | Need C | Need D |\n|------|--------|--------|--------|--------|\n| 3194 | 0       | 5       | 1       | 5       |\n| 3205 | 0       | 3       | 0       | 2       |\n| 3218 | 0       | 1       | 1       | 0       |\n| 3212 | 2       | 0       | 0       | 1       |\n| 3306 | 1       | 0       | 1       | 3       |\n| 3234 | 0       | 1       | 0       | 0       |\n\n**Step 2 - run the safety algorithm**\n\n- 3194: Need [0, 5, 1, 5] <= Work [5, 2, 3, 0] -> cannot run yet\n- 3205: Need [0, 3, 0, 2] <= Work [5, 2, 3, 0] -> cannot run yet\n- 3218: Need [0, 1, 1, 0] <= Work [5, 2, 3, 0] -> cannot run yet\n- 3212: Need [2, 0, 0, 1] <= Work [5, 2, 3, 0] -> cannot run yet\n- 3306: Need [1, 0, 1, 3] <= Work [5, 2, 3, 0] -> cannot run yet\n- 3234: Need [0, 1, 0, 0] <= Work [5, 2, 3, 0] -> cannot run yet\n\n**Step 3 - conclusion**\n\nAll six processes [3194, 3205, 3218, 3212, 3306, 3234] can never acquire the last three resources (B, C, D). The system is in an **unsafe state**.\n\n_Safe sequences exist only in SAFE states. This unsafe state has no safe sequence._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 17,
+          "kind": "banker_safety",
+          "final_correct": false,
+          "new_tokens": 775,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P  | Need A | Need B | Need C |\n|----|--------|--------|--------|\n| T1 | 1       | 7       | 1       |\n| T2 | 0       | 2       | 4       |\n| T3 | 4       | 3       | 2       |\n| T4 | 2       | 0       | 0       |\n| T5 | 0       | 0       | 0       |\n| T6 | 0       | 0       | 2       |\n| T7 | 2       | 0       | 1       |\n\n**Step 2 - run the safety algorithm**\n\n- T1: Need [1, 7, 1] > Work [7, 7, 7] -> cannot run yet\n- T2: Need [0, 2, 4] <= Work [7, 7, 7] -> run it. Work = [7, 7, 7] + Allocation [1, 0, 4] = [8, 7, 11]\n- T1: Need [1, 7, 1] > Work [8, 7, 11] -> cannot run yet\n- T3: Need [4, 3, 2] <= Work [8, 7, 11] -> run it. Work = [8, 7, 11] + Allocation [2, 1, 4] = [10, 8, 15]\n- T1: Need [1, 7, 1] <= Work [10, 8, 15] -> run it. Work = [10, 8, 15] + Allocation [4, 0, 1] = [14, 8, 16]\n- T4: Need [2, 0, 0] <= Work [14, 8, 16] -> run it. Work = [14, 8, 16] + Allocation [6, 6, 0] = [20, 14, 16]\n- T5: Need [0, 0, 0] <= Work [20, 14, 16] -> run it. Work = [20, 14, 16] + Allocation [6, 2, 0] = [26, 16, 16]\n- T6: Need [0, 0, 2] <= Work [26, 16, 16] -> run it. Work = [26, 16, 16] + Allocation [0, 0, 0] = [26, 16, 16]\n- T7: Need [2, 0, 1] <= Work [26, 16, 16] -> run it. Work = [26, 16, 16] + Allocation [0, 0, 4] = [26, 16, 20]\n\n**Step 3 - conclusion**\n\nAll 7 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< T2, T3, T1, T4, T5, T6, T7 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 18,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 593,
+          "truncated": false,
+          "output": "**Algorithm: FCFS**\n\n**Step 1 - build the schedule**\n- t=0: CPU idle until t=1 (no process has arrived)\n- t=1: T1 runs (arrived t=1, burst 12)\n- t=13: T2 runs (arrived t=3, burst 3)\n- t=16: T3 runs (arrived t=5, burst 3)\n- t=19: T4 runs (arrived t=8, burst 11)\n- t=30: T5 runs (arrived t=11, burst 8)\n- t=38: T6 runs (arrived t=15, burst 7)\n- t=45: T7 runs (arrived t=19, burst 4)\n- t=49: T8 runs (arrived t=23, burst 5)\n\n**Step 2 - Gantt chart**\n```\n| T1 | T2 | T3 | T4 | T5 | T6 | T7 | T8 |\n1 13 16 19 30 38 45 49 54\n```\n\n**Step 3 - per-process times**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|------------|---------|\n| T1 | 1 | 12 | 13 | 12 | 0 |\n| T2 | 3 | 3 | 16 | 13 | 10 |\n| T3 | 5 | 3 | 19 | 14 | 11 |\n| T4 | 8 | 11 | 30 | 22 | 11 |\n| T5 | 11 | 8 | 38 | 27 | 19 |\n| T6 | 15 | 7 | 45 | 30 | 23 |\n| T7 | 19 | 4 | 49 | 30 | 26 |\n| T8 | 23 | 5 | 54 | 31 | 26 |\n\nTurnaround = Completion - Arrival; Waiting = Turnaround - Burst\n\n**Step 4 - averages**\n\n- Average waiting time = (0 + 10 + 11 + 11 + 19 + 23 + 26 + 26) / 8 = **16.5**\n- Average turnaround time = (12 + 13 + 14 + 22 + 27 + 30 + 30 + 31) / 8 = **22.5**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 19,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 201,
+          "truncated": false,
+          "output": "**Policy: WORST-fit**\n\n- request 120: WORST fit -> hole 3 (free 227 -> 107)\n- request 180: WORST fit -> hole 2 (free 360 -> 180)\n- request 200: WORST fit -> hole 2 (free 180 -> 80)\n- request 100: WORST fit -> hole 0 (free 165 -> 65)\n- request 150: WORST fit -> hole 4 (free 356 -> 206)\n\n**Placement:** [3, 2, 2, 0, 4]\n**Remaining free space per hole:** [65, 222, 80, 107, 206]\n**Total external fragmentation = 680 KB**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 20,
+          "kind": "disk",
+          "final_correct": false,
+          "new_tokens": 333,
+          "truncated": false,
+          "output": "**Policy: CSCAN**\n\n- C-SCAN: service upward, jump to cylinder 0, resume upward (uniform wait times)\n- 40 -> 56 (+16, running total 16)\n- 56 -> 68 (+12, running total 28)\n- 68 -> 84 (+16, running total 44)\n- 84 -> 99 (+15, running total 59)\n- 99 -> 104 (+5, running total 64)\n- 104 -> 146 (+42, running total 106)\n- 146 -> 149 (+3, running total 109)\n- 149 -> 162 (+13, running total 122)\n- 162 -> 180 (+18, running total 140)\n- 180 -> 184 (+4, running total 144)\n- 184 -> 186 (+2, running total 146)\n- 186 -> 199 (+13, running total 159)\n\n**Service order:** 56 -> 68 -> 84 -> 99 -> 104 -> 146 -> 149 -> 162 -> 180 -> 184 -> 186 -> 199\n**Total head movement = 159 cylinders**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 21,
+          "kind": "banker_safety",
+          "final_correct": false,
+          "new_tokens": 790,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P  | Need A | Need B | Need C | Need D |\n|----|--------|--------|--------|--------|\n| P1 | 6       | 2       | 3       | 3       |\n| P2 | 2       | 2       | 5       | 0       |\n| P3 | 1       | 3       | 0       | 0       |\n| P4 | 4       | 4       | 4       | 0       |\n| P5 | 1       | 0       | 1       | 0       |\n| P6 | 0       | 0       | 3       | 4       |\n\n**Step 2 - run the safety algorithm**\n\n- P1: Need [6, 2, 3, 3] > Work [6, 6, 1, 0] -> cannot run yet\n- P2: Need [2, 2, 5, 0] <= Work [6, 6, 1, 0] -> run it. Work = [6, 6, 1, 0] + Allocation [0, 5, 0, 8] = [6, 11, 1, 8]\n- P1: Need [6, 2, 3, 3] <= Work [6, 11, 1, 8] -> run it. Work = [6, 11, 1, 8] + Allocation [0, 6, 1, 4] = [6, 17, 2, 12]\n- P3: Need [1, 3, 0, 0] <= Work [6, 17, 2, 12] -> run it. Work = [6, 17, 2, 12] + Allocation [4, 3, 5, 0] = [10, 20, 7, 12]\n- P4: Need [4, 4, 4, 0] <= Work [10, 20, 7, 12] -> run it. Work = [10, 20, 7, 12] + Allocation [3, 0, 4, 2] = [13, 20, 11, 14]\n- P5: Need [1, 0, 1, 0] <= Work [13, 20, 11, 14] -> run it. Work = [13, 20, 11, 14] + Allocation [2, 5, 1, 1] = [15, 25, 12, 15]\n- P6: Need [0, 0, 3, 4] <= Work [15, 25, 12, 15] -> run it. Work = [15, 25, 12, 15] + Allocation [6, 5, 5, 1] = [21, 30, 17, 16]\n\n**Step 3 - conclusion**\n\nAll 6 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< 2, 1, 3, 4, 5, 6 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 22,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 607,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [0, 0, 2, 0] <= Need [0, 0, 4, 2] -> OK\n- Test 2: Request [0, 0, 2, 0] <= Available [1, 1, 1, 1] -> OK\n- Test 3: pretend to grant. Available = [1, 1, 1, 1] - [0, 0, 2, 0] = [1, 1, -1, 1] -> OK\n- Now run the safety algorithm.\n- A: Need [0, 0, 0, 0] <= Work [1, 1, -1, 1] -> run it. Work = [1, 1, -1, 1] + Allocation [0, 0, 0, 0] = [1, 1, -1, 1]\n- B: Need [0, 0, 4, 2] <= Work [1, 1, -1, 1] -> OK\n- C: Need [0, 0, 0, 0] <= Work [1, 1, -1, 1] -> run it. Work = [1, 1, -1, 1] + Allocation [0, 0, 0, 0] = [1, 1, -1, 1]\n- D: Need [0, 0, 0, 0] <= Work [1, 1, -1, 1] -> run it. Work = [1, 1, -1, 1] + Allocation [0, 0, 0, 0] = [1, 1, -1, 1]\n- E: Need [0, 0, 0, 0] <= Work [1, 1, -1, 1] -> run it. Work = [1, 1, -1, 1] + Allocation [0, 0, 0, 0] = [1, 1, -1, 1]\n- F: Need [0, 0, 0, 0] <= Work [1, 1, -1, 1] -> run it. Work = [1, 1, -1, 1] + Allocation [0, 0, 0, 0] = [1, 1, -1, 1]\n- SAFE. Safe sequence: < A, B, C, D, E, F >\n- Resulting state is SAFE (sequence < A, B, C, D, E, F >) -> GRANT the request\n\n**Conclusion: the request is GRANTED.**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 23,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 809,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [3, 0, 0, 1] <= Need [5, 0, 0, 2] -> OK\n- Test 2: pretend to grant. Available = [10, 10, 10, 10] - [3, 0, 0, 1] = [7, 10, 10, 9]; Allocation[epsilon] = [6, 1, 0, 2]\n- Test 3: run the safety algorithm. Work = [7, 10, 10, 9]\n- alpha: Need [0, 1, 3, 0] <= Work [7, 10, 10, 9] -> run it. Work = [7, 10, 10, 9] + Allocation [7, 3, 1, 0] = [14, 13, 11, 9]\n- beta: Need [2, 6, 0, 3] <= Work [14, 13, 11, 9] -> run it. Work = [14, 13, 11, 9] + Allocation [4, 0, 1, 0] = [18, 13, 12, 9]\n- gamma: Need [0, 6, 1, 1] <= Work [18, 13, 12, 9] -> run it. Work = [18, 13, 12, 9] + Allocation [0, 2, 6, 4] = [18, 15, 18, 13]\n- delta: Need [1, 5, 0, 0] <= Work [18, 15, 18, 13] -> run it. Work = [18, 15, 18, 13] + Allocation [4, 2, 0, 5] = [22, 17, 18, 18]\n- epsilon: Need [2, 0, 0, 1] <= Work [22, 17, 18, 18] -> run it. Work = [22, 17, 18, 18] + Allocation [6, 1, 0, 2] = [28, 18, 18, 20]\n- zeta: Need [1, 0, 0, 6] <= Work [28, 18, 18, 20] -> run it. Work = [28, 18, 18, 20] + Allocation [5, 1, 0, 1] = [33, 19, 18, 21]\n- eta: Need [0, 0, 5, 8] <= Work [33, 19, 18, 21] -> run it. Work = [33, 19, 18, 21] + Allocation [1, 1, 1, 0] = [34, 20, 19, 21]\n- SAFE. Safe sequence: < alpha, beta, gamma, delta, epsilon, zeta, eta >\n- Resulting state is SAFE (sequence < alpha, beta, gamma, delta, epsilon, zeta, eta >) -> GRANT the request\n\n**Conclusion: the request is GRANTED.**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 24,
+          "kind": "disk",
+          "final_correct": false,
+          "new_tokens": 330,
+          "truncated": false,
+          "output": "**Policy: LOOK**\n\n- LOOK down: like SCAN but reverses at the LAST REQUEST, never travelling to the disk edge\n- 202 -> 183 (+19, running total 19)\n- 183 -> 138 (+45, running total 64)\n- 138 -> 99 (+39, running total 103)\n- 99 -> 64 (+35, running total 138)\n- 64 -> 61 (+3, running total 141)\n- 61 -> 48 (+13, running total 154)\n- 48 -> 3 (+45, running total 199)\n- 3 -> 12 (+9, running total 208)\n- 12 -> 240 (+228, running total 436)\n- 240 -> 267 (+27, running total 463)\n- 267 -> 231 (+36, running total 499)\n- 231 -> 208 (+23, running total 522)\n\n**Service order:** 183 -> 138 -> 99 -> 64 -> 61 -> 48 -> 3 -> 12 -> 240 -> 267 -> 231 -> 208\n**Total head movement = 522 cylinders**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 25,
+          "kind": "disk",
+          "final_correct": false,
+          "new_tokens": 289,
+          "truncated": false,
+          "output": "**Policy: LOOK**\n\n- LOOK down: like SCAN but reverses at the LAST REQUEST, never travelling to the disk edge\n- 74 -> 88 (+14, running total 14)\n- 88 -> 130 (+42, running total 56)\n- 130 -> 132 (+2, running total 58)\n- 132 -> 151 (+19, running total 77)\n- 151 -> 163 (+12, running total 89)\n- 163 -> 192 (+29, running total 118)\n- 192 -> 208 (+16, running total 134)\n- 208 -> 212 (+4, running total 138)\n- 212 -> 218 (+6, running total 144)\n- 218 -> 227 (+9, running total 153)\n\n**Service order:** 88 -> 130 -> 132 -> 151 -> 163 -> 192 -> 208 -> 212 -> 218 -> 227\n**Total head movement = 153 cylinders**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 26,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 197,
+          "truncated": false,
+          "output": "**Policy: WORST-fit**\n\n- request 120: WORST fit -> hole 2 (free 531 -> 411)\n- request 200: WORST fit -> hole 2 (free 411 -> 211)\n- request 100: WORST fit -> hole 3 (free 261 -> 161)\n- request 150: WORST fit -> hole 1 (free 416 -> 266)\n- request 250: WORST fit -> hole 1 (free 266 -> 16)\n\n**Placement:** [2, 2, 3, 1, 1]\n**Remaining free space per hole:** [134, 16, 211, 16]\n**Total external fragmentation = 377 KB**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 27,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 851,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [2, 0, 2, 0] <= Need [4, 3, 5, 1] -> OK\n- Test 2: pretend to grant. Available = [12, 12, 12, 12] - [2, 0, 2, 0] = [10, 12, 10, 10]; Allocation[J7] = [3, 4, 3, 5]\n- Test 3: run the safety algorithm\n- Need = Max - Allocation\n- Work = Available = [10, 12, 10, 10]\n- J1: Need [2, 1, 0, 1] <= Work [10, 12, 10, 10] -> run it. Work = [10, 12, 10, 10] + Allocation [4, 2, 8, 1] = [14, 14, 18, 11]\n- J2: Need [2, 3, 8, 4] <= Work [14, 14, 18, 11] -> run it. Work = [14, 14, 18, 11] + Allocation [5, 0, 0, 1] = [19, 14, 18, 12]\n- J3: Need [3, 4, 2, 2] <= Work [19, 14, 18, 12] -> run it. Work = [19, 14, 18, 12] + Allocation [3, 0, 3, 3] = [22, 14, 21, 15]\n- J4: Need [1, 0, 1, 3] <= Work [22, 14, 21, 15] -> run it. Work = [22, 14, 21, 15] + Allocation [4, 5, 5, 1] = [26, 19, 26, 16]\n- J5: Need [2, 0, 0, 0] <= Work [26, 19, 26, 16] -> run it. Work = [26, 19, 26, 16] + Allocation [2, 6, 0, 0] = [28, 25, 26, 16]\n- J6: Need [4, 1, 5, 3] <= Work [28, 25, 26, 16] -> run it. Work = [28, 25, 26, 16] + Allocation [2, 0, 2, 4] = [30, 25, 28, 20]\n- J7: Need [2, 3, 3, 1] <= Work [30, 25, 28, 20] -> run it. Work = [30, 25, 28, 20] + Allocation [3, 4, 3, 5] = [33, 29, 31, 25]\n- SAFE. Safe sequence: < J1, J2, J3, J4, J5, J6, J7 >\n- Resulting state is SAFE (sequence < J1, J2, J3, J4, J5, J6, J7 >) -> GRANT the request\n\n**Conclusion: the request is GRANTED.**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 28,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 651,
+          "truncated": false,
+          "output": "**Algorithm: Priority (non-preemptive)**\n\n**Step 1 - build the schedule**\n- t=0: CPU idle until t=1\n- t=1: run T6 (priority 1, highest ready)\n- t=4: run T9 (priority 1, highest ready)\n- t=7: run T7 (priority 5, highest ready)\n- t=16: run T2 (priority 2, highest ready)\n- t=21: run T3 (priority 2, highest ready)\n- t=29: run T1 (priority 3, highest ready)\n- t=36: run T5 (priority 4, highest ready)\n- t=37: run T4 (priority 5, highest ready)\n- t=41: run T8 (priority 5, highest ready)\n- t=52: run T10 (priority 3, highest ready)\n\n**Step 2 - Gantt chart**\n```\n| T6 | T9 | T7 | T2 | T3 | T1 | T5 | T4 | T8 | T10 |\n1 4 7 16 21 29 36 37 41 52\n```\n\n**Step 3 - per-process times**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|------------|---------|\n| T1 | 1 | 7 | 36 | 35 | 28 |\n| T2 | 2 | 5 | 21 | 19 | 14 |\n| T3 | 4 | 8 | 29 | 25 | 17 |\n| T4 | 4 | 4 | 41 | 37 | 33 |\n| T5 | 4 | 1 | 37 | 33 | 32 |\n| T6 | 1 | 3 | 4 | 3 | 0 |\n| T7 | 7 | 9 | 16 | 9 | 0 |\n| T8 | 9 | 11 | 52 | 43 | 32 |\n| T9 | 4 | 3 | 7 | 3 | 0 |\n| T10 | 11 | 6 | 52 | 41 | 35 |\n\nTurnaround = Completion - Arrival; Waiting = Turnaround - Burst\n\n**Step 4 - averages**\n\n- Average waiting time = (28 + 14 + 17 + 33 + 32 + 0 + 0 + 32 + 0 + 35) / 10 = **20.8**\n- Average turnaround time = (35 + 19 + 25 + 37 + 33 + 3 + 9 + 43 + 3 + 41) / 10 = **24.8**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 29,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 913,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P  | Need A | Need B | Need C | Need D |\n|----|--------|--------|--------|--------|\n| J1 | 4       | 5       | 6       | 2       |\n| J2 | 2       | 1       | 2       | 0       |\n| J3 | 3       | 3       | 4       | 3       |\n| J4 | 8       | 0       | 0       | 3       |\n| J5 | 4       | 0       | 0       | 0       |\n| J6 | 1       | 0       | 2       | 2       |\n| J7 | 1       | 7       | 0       | 3       |\n\n**Step 2 - run the safety algorithm**\n\n- J1: Need [4, 5, 6, 2] > Work [7, 7, 7, 7] -> cannot run yet\n- J2: Need [2, 1, 2, 0] <= Work [7, 7, 7, 7] -> run it. Work = [7, 7, 7, 7] + Allocation [1, 2, 5, 6] = [8, 9, 12, 13]\n- J1: Need [4, 5, 6, 2] <= Work [8, 9, 12, 13] -> run it. Work = [8, 9, 12, 13] + Allocation [2, 3, 1, 5] = [10, 12, 13, 18]\n- J3: Need [3, 3, 4, 3] <= Work [10, 12, 13, 18] -> run it. Work = [10, 12, 13, 18] + Allocation [4, 5, 2, 3] = [14, 17, 15, 21]\n- J4: Need [8, 0, 0, 3] <= Work [14, 17, 15, 21] -> run it. Work = [14, 17, 15, 21] + Allocation [0, 5, 0, 0] = [14, 22, 15, 21]\n- J5: Need [4, 0, 0, 0] <= Work [14, 22, 15, 21] -> run it. Work = [14, 22, 15, 21] + Allocation [0, 7, 1, 1] = [14, 29, 16, 22]\n- J6: Need [1, 0, 2, 2] <= Work [14, 29, 16, 22] -> run it. Work = [14, 29, 16, 22] + Allocation [0, 3, 3, 0] = [14, 32, 19, 22]\n- J7: Need [1, 7, 0, 3] <= Work [14, 32, 19, 22] -> run it. Work = [14, 32, 19, 22] + Allocation [1, 0, 4, 3] = [15, 32, 23, 25]\n\n**Step 3 - conclusion**\n\nAll 7 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< J2, J1, J3, J4, J5, J6, J7 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 30,
+          "kind": "banker_safety",
+          "final_correct": false,
+          "new_tokens": 940,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Need = Max - Allocation)**\n\n| P  | Need A | Need B | Need C | Need D |\n|----|--------|--------|--------|--------|\n| P1 | 0       | 0       | 4       | 1       |\n| P2 | 1       | 7       | 0       | 3       |\n| P3 | 4       | 1       | 1       | 1       |\n| P4 | 0       | 1       | 4       | 1       |\n| P5 | 1       | 2       | 2       | 3       |\n| P6 | 3       | 2       | 3       | 3       |\n| P7 | 5       | 1       | 0       | 1       |\n\n**Step 2 - run the safety algorithm**\n\n- P1: Need [0, 0, 4, 1] <= Work [1, 1, 2, 2] -> run it. Work = [1, 1, 2, 2] + Allocation [1, 0, 0, 2] = [2, 1, 2, 4]\n- P2: Need [1, 7, 0, 3] > Work [2, 1, 2, 4] -> cannot run yet\n- P3: Need [4, 1, 1, 1] > Work [2, 1, 2, 4] -> cannot run yet\n- P4: Need [0, 1, 4, 1] <= Work [2, 1, 2, 4] -> run it. Work = [2, 1, 2, 4] + Allocation [2, 4, 0, 1] = [4, 5, 2, 5]\n- P2: Need [1, 7, 0, 3] > Work [4, 5, 2, 5] -> cannot run yet\n- P3: Need [4, 1, 1, 1] <= Work [4, 5, 2, 5] -> run it. Work = [4, 5, 2, 5] + Allocation [0, 4, 2, 1] = [4, 9, 4, 6]\n- P2: Need [1, 7, 0, 3] <= Work [4, 9, 4, 6] -> run it. Work = [4, 9, 4, 6] + Allocation [0, 1, 1, 1] = [4, 10, 5, 7]\n- P5: Need [1, 2, 2, 3] <= Work [4, 10, 5, 7] -> run it. Work = [4, 10, 5, 7] + Allocation [7, 5, 2, 4] = [11, 15, 7, 11]\n- P6: Need [3, 2, 3, 3] <= Work [11, 15, 7, 11] -> run it. Work = [11, 15, 7, 11] + Allocation [3, 0, 0, 0] = [14, 15, 7, 11]\n- P7: Need [5, 1, 0, 1] <= Work [14, 15, 7, 11] -> run it. Work = [14, 15, 7, 11] + Allocation [1, 2, 5, 0] = [15, 17, 12, 11]\n\n**Step 3 - conclusion**\n\nAll 7 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< P1, P4, P3, P2, P5, P6, P7 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 31,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 871,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [1, 0, 0, 0] <= Need [2, 1, 0, 0] -> OK\n- Test 2: pretend to grant. Available = [13, 10, 10, 10] - [1, 0, 0, 0] = [12, 10, 10, 10]; Allocation[T1] = [5, 2, 0, 0]. Now run the safety algorithm.\n- Test 3: for each process compute Work = [12, 10, 10, 10] + Allocation - Closed. Need = Max - Allocation\n- T1: Need [2, 1, 0, 0] <= Work [12, 10, 10, 10] -> run it. Work = [12, 10, 10, 10] + Allocation [5, 2, 0, 0] - Closed = [17, 12, 10, 10]\n- T2: Need [0, 0, 0, 3] <= Work [17, 12, 10, 10] -> run it. Work = [17, 12, 10, 10] + Allocation [8, 2, 0, 2] - Closed = [25, 14, 10, 12]\n- T3: Need [6, 0, 2, 0] <= Work [25, 14, 10, 12] -> run it. Work = [25, 14, 10, 12] + Allocation [1, 1, 1, 1] - Closed = [26, 15, 11, 13]\n- T4: Need [1, 8, 6, 0] <= Work [26, 15, 11, 13] -> run it. Work = [26, 15, 11, 13] + Allocation [0, 0, 0, 2] - Closed = [26, 15, 11, 15]\n- T5: Need [2, 3, 0, 0] <= Work [26, 15, 11, 15] -> run it. Work = [26, 15, 11, 15] + Allocation [0, 3, 1, 0] - Closed = [26, 18, 12, 15]\n- T6: Need [0, 0, 4, 1] <= Work [26, 18, 12, 15] -> run it. Work = [26, 18, 12, 15] + Allocation [0, 4, 1, 0] - Closed = [26, 22, 13, 15]\n- T7: Need [4, 0, 3, 0] <= Work [26, 22, 13, 15] -> run it. Work = [26, 22, 13, 15] + Allocation [3, 8, 2, 5] - Closed = [29, 30, 15, 20]\n- SAFE. Safe sequence: < T1, T2, T3, T4, T5, T6, T7 >\n- Resulting state is SAFE (sequence < T1, T2, T3, T4, T5, T6, T7 >) -> GRANT the request\n\n**Conclusion: the request is GRANTED.**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 32,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 769,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [2, 0, 1, 1] <= Need [2, 0, 2, 3] -> OK\n- Test 2: Request [2, 0, 1, 1] <= Allocation [2, 1, 1, 3] -> OK\n- Test 3: pretend to grant. Available = [10, 12, 12, 12] - [2, 0, 1, 1] = [8, 12, 11, 11]; Allocation[gamma] = [4, 1, 2, 4]. Now run the safety algorithm.\n- Need = Max - Allocation\n- Work = Available = [8, 12, 11, 11]\n- alpha: Need [3, 0, 4, 0] <= Work [8, 12, 11, 11] -> run it. Work = [8, 12, 11, 11] + Allocation [3, 4, 1, 1] = [11, 16, 12, 12]\n- beta: Need [1, 4, 3, 2] <= Work [11, 16, 12, 12] -> run it. Work = [11, 16, 12, 12] + Allocation [7, 4, 5, 6] = [18, 20, 17, 18]\n- gamma: Need [0, 0, 1, 0] <= Work [18, 20, 17, 18] -> run it. Work = [18, 20, 17, 18] + Allocation [4, 1, 2, 4] = [22, 21, 19, 22]\n- delta: Need [0, 1, 8, 0] <= Work [22, 21, 19, 22] -> run it. Work = [22, 21, 19, 22] + Allocation [2, 5, 0, 1] = [24, 26, 19, 23]\n- epsilon: Need [1, 2, 0, 0] <= Work [24, 26, 19, 23] -> run it. Work = [24, 26, 19, 23] + Allocation [1, 2, 5, 0] = [25, 28, 24, 23]\n- zeta: Need [0, 4, 1, 1] <= Work [25, 28, 24, 23] -> run it. Work = [25, 28, 24, 23] + Allocation [3, 2, 3, 4] = [28, 30, 27, 27]\n- SAFE. Safe sequence: < alpha, beta, gamma, delta, epsilon, zeta >\n- Resulting state is SAFE (sequence < alpha, beta, gamma, delta, epsilon, zeta >) -> GRANT the request\n\n**Conclusion: the request is GRANTED.**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 33,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 140,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [0, 0, 2] <= Need [0, 0, 2] -> OK\n- Test 2: Request [0, 0, 2] <= Available [7, 1, 1] -> OK\n- Test 3: pretend to grant. Available = [7, 1, 1] - [0, 0, 2] = [7, 1, -1] -> OK\n- Resulting state is UNSAFE (not reachable from any previous state)\n\n**Conclusion: E's request is GRANTED.**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 34,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 1100,
+          "truncated": true,
+          "output": "**Algorithm: Round Robin (q=4)**\n\n**Step 1 - build the schedule**\n- t=0: 6358 runs 4 (quantum 4, remaining 3)\n- t=4: 6358 completes\n- t=4: 6376 runs 4 (quantum 4, remaining 4)\n- t=8: 6376 completes\n- t=8: 6384 runs 4 (quantum 4, remaining 9)\n- t=12: 6386 runs 4 (quantum 4, remaining 11)\n- t=16: 6384 runs 4 (quantum 4, remaining 5)\n- t=20: 6384 runs 4 (quantum 4, remaining 1)\n- t=24: 6384 completes\n- t=24: 6393 runs 4 (quantum 4, remaining 11)\n- t=28: 6393 runs 4 (quantum 4, remaining 7)\n- t=32: 6393 runs 4 (quantum 4, remaining 3)\n- t=36: 6393 completes\n- t=36: 6400 runs 4 (quantum 4, remaining 9)\n- t=40: 6400 runs 4 (quantum 4, remaining 5)\n- t=44: 6400 runs 4 (quantum 4, remaining 1)\n- t=48: 6400 completes\n- t=48: 6466 runs 4 (quantum 4, remaining 10)\n- t=52: 6466 runs 4 (quantum 4, remaining 6)\n- t=56: 6466 runs 4 (quantum 4, remaining 2)\n- t=60: 6466 completes\n- t=60: 6502 runs 4 (quantum 4, remaining 9)\n- t=64: 6502 runs 4 (quantum 4, remaining 5)\n- t=68: 6502 runs 4 (quantum 4, remaining 1)\n- t=72: 6502 completes\n- t=72: 6386 runs 4 (quantum 4, remaining 7)\n- t=76: 6386 runs 4 (quantum 4, remaining 3)\n- t=80: 6386 completes\n- t=80: 6590 runs 4 (quantum 4, remaining 8)\n- t=84: 6590 runs 4 (quantum 4, remaining 4)\n- t=88: 6590 completes\n\n**Step 2 - Gantt chart**\n```\n| 6358 | 6376 | 6384 | 6386 | 6384 | 6393 | 6393 | 6400 | 6466 | 6466 | 6502 | 6502 | 6386 | 6590 | 6590 |\n5 4 8 12 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88\n```\n\n**Step 3 - per-process times**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|------------|---------|\n| 6358 | 5 | 3 | 8 | 3 | 0 |\n| 6376 | 10 | 4 | 12 | 2 | 0 |\n| 6384 | 13 | 9 | 24 | 11 | 2 |\n| 6386 | 24 | 11 | 80 | 56 | 43 |\n| 6393 | 24 | 11 | 36 | 12 | 1 |\n| 6400 | 18 | 9 | 48 | 30 | 21 |\n| 6466 | 19 | 10 | 60 | 41 | 31 |\n| 6502 | 24 | 9 | 72 | 48 | 39 |\n| 6590 | 29 | 8 | 88 | 59 | 51 |\n\nTurnaround"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 35,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 176,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [0, 0, 3, 3] <= Need [0, 7, 5, 3] -> OK\n- Test 2: Request [0, 0, 3, 3] <= Available [1, 1, 1, 1] -> OK\n- Test 3: pretend to grant. Available = [1, 1, 1, 1] - [0, 0, 3, 3] = [1, 1, -2, -2] -> OK\n- Resulting state is UNSAFE (need 2 C and 2 D, none available)\n\n**Conclusion: DENY the request.** The process must wait, and the old state is restored."
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 36,
+          "kind": "banker_request",
+          "final_correct": false,
+          "new_tokens": 150,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [0, 1, 0] <= Need [3, 5, 0] -> OK\n- Test 2: Request [0, 1, 0] <= Available [1, 0, 0] -> OK\n- Test 3: pretend to grant. Available = [1, 0, 0] - [0, 1, 0] = [1, -1, 0] -> OK\n- Resulting state is UNSAFE (no safe sequence exists)\n\n**Conclusion: DENY the request.** The process must wait, and the system proceeds with the old state."
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 37,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 189,
+          "truncated": false,
+          "output": "**Policy: FIRST-fit**\n\n- request 300: FIRST fit -> hole 0 (free 341 -> 41)\n- request 200: FIRST fit -> hole 1 (free 355 -> 155)\n- request 100: FIRST fit -> hole 2 (free 274 -> 174)\n- request 400: FIRST fit -> hole 3 (free 587 -> 187)\n- request 200: FIRST fit -> hole 4 (free 284 -> 84)\n\n**Placement:** [0, 1, 2, 3, 4]\n**Remaining free space per hole:** [41, 155, 174, 187, 84]\n**Total external fragmentation = 601 KB**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 38,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 166,
+          "truncated": false,
+          "output": "**Policy: WORST-fit**\n\n- request 120: WORST fit -> hole 2 (free 150 -> 30)\n- request 180: WORST fit -> hole 3 (free 169 -> 189)\n- request 200: WORST fit -> hole 3 (free 189 -> 89)\n- request 100: WORST fit -> hole 1 (free 271 -> 171)\n\n**Placement:** [2, 3, 3, 1]\n**Remaining free space per hole:** [162, 171, 30, 89]\n**Total external fragmentation = 452 KB**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 39,
+          "kind": "translate",
+          "final_correct": false,
+          "new_tokens": 100,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(17842 / 4096) = 4\n- page offset = 17842 mod 4096 = 1250\n- page table[4] = frame 8\n- physical address = 8 x 4096 + 1250 = 34338\n\n**Physical address = 34338**"
+        }
+      ]
+    }
+  },
+  "generalisation_gap": 0.0
+}

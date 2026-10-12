@@ -1,0 +1,1206 @@
+[
+ {
+  "label": "v3",
+  "n": 57,
+  "correct": 34,
+  "accuracy": 0.5965,
+  "delegated": 0,
+  "truncated": 0,
+  "seconds": 680.3,
+  "by_kind": {
+   "scheduling": {
+    "correct": 4,
+    "n": 12
+   },
+   "paging": {
+    "correct": 3,
+    "n": 8
+   },
+   "banker_safety": {
+    "correct": 3,
+    "n": 4
+   },
+   "banker_request": {
+    "correct": 2,
+    "n": 2
+   },
+   "disk": {
+    "correct": 4,
+    "n": 7
+   },
+   "translate": {
+    "correct": 1,
+    "n": 3
+   },
+   "freespace": {
+    "correct": 0,
+    "n": 4
+   },
+   "eat_tlb": {
+    "correct": 2,
+    "n": 2
+   },
+   "eat_pagefault": {
+    "correct": 1,
+    "n": 1
+   },
+   "paging_bits": {
+    "correct": 1,
+    "n": 1
+   },
+   "multilevel_paging": {
+    "correct": 1,
+    "n": 1
+   },
+   "disk_access": {
+    "correct": 1,
+    "n": 1
+   },
+   "deadlock_min": {
+    "correct": 2,
+    "n": 2
+   },
+   "fork_count": {
+    "correct": 2,
+    "n": 2
+   },
+   "semaphore": {
+    "correct": 1,
+    "n": 1
+   },
+   "internal_frag": {
+    "correct": 1,
+    "n": 1
+   },
+   "cpu_util": {
+    "correct": 1,
+    "n": 1
+   },
+   "cache_eat": {
+    "correct": 1,
+    "n": 1
+   },
+   "clarify": {
+    "correct": 3,
+    "n": 3
+   }
+  },
+  "items": [
+   {
+    "index": 0,
+    "kind": "scheduling",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: SRTF (preemptive SJF)**\n\n**Step 1 - build the schedule**\n\n_Rule: at every arrival and completion, run the ready process with the SHORTEST REMAINING time; preempt the running process if a shorter one is ready._\n\n- t=0: P1 arrives; only P1 is ready -> run P1\n- t=1: P2 arrives; ready P2(4) < P1(7) -> PREEMPT P1, run P2\n- t=2: P3 arrives; ready P2(3) < P1(7) < P3(9) -> keep running P2\n- t=3: P4 arrives; ready P2(2) < P1(7) < P4(5) < P3(9) -> keep running P2\n- t=5: P2 completes; ready P1(7) < P4(5) < P3(9) -> run P1\n- t=12: P1 completes; ready P4(5) < P3(9) -> run P4\n- t=17: P4 completes; only P3 is ready -> run P3\n- t=26: P3 completes; all processes done\n\n**Step 2 - Gantt chart:** P1[0-1] P2[1-5] P1[5-12] P4[12-17] P3[17-26]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| P1 | 0 | 8 | 12 | 12 - 0 = 12 | 12 - 8 = 4 |\n| P2 | 1 | 4 | 5 | 5 - 1 = 4 | 4 - 4 = 0 |\n| P3 | 2 | 9 | 26 | 26 - 2 = 24 | 24 - 9 = 15 |\n| P4 | 3 | 5 | 17 | 17 - 3 = 14 | 14 - 5 = 9 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 4 + 0 = 4, 4 + 15 = 19, 19 + 9 = 28\n- Average waiting time = 28 / 4 = **7.0**\n- Sum of turnaround times: 12 + 4 = 16, 16 + 24 = 40, 40 + 14 = 54\n- Average turnaround time = 54 / 4 = **13.5**\n\n**Answer: average waiting time = 7.0**"
+   },
+   {
+    "index": 1,
+    "kind": "scheduling",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: Round Robin (q=4)**\n\n**Step 1 - build the schedule**\n\n_Rule: run the process at the head of the queue for up to q = 4 units; processes arriving during a slice join the tail of the queue._\n\n- t=0-4: run P1 (head of [P1, P2, P3]) for 4; 24 - 4 = 20 left; P1 back to tail -> queue [P2, P3, P1]\n- t=4-7: run P2 (head of [P2, P3, P1]) for 3; 3 - 3 = 0 left; P2 DONE at 7 -> queue [P3, P1]\n- t=7-11: run P3 (head of [P3, P1]) for 4; 3 - 4 = -1 < 0 P3 DONE at 11 -> queue [P1]\n- t=11-15: run P1 (head of [P1]) for 4; 20 - 4 = 16 left; P1 back to tail -> queue [P1]\n- t=15-19: run P1 (head of [P1]) for 4; 16 - 4 = 12 left; P1 back to tail -> queue [P1]\n- t=19-23: run P1 (head of [P1]) for 4; 12 - 4 = 8 left; P1 back to tail -> queue [P1]\n- t=23-27: run P1 (head of [P1]) for 4; 8 - 4 = 4 left; P1 back to tail -> queue [P1]\n- t=27-31: run P1 (head of [P1]) for 4; 4 - 4 = 0 left; P1 DONE at 31 -> queue []\n\n**Step 2 - Gantt chart:** P1[0-4] P2[4-7] P3[7-11] P1[11-15] P1[15-19] P1[19-23] P1[23-27] P1[27-31]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| P1 | 0 | 24 | 31 | 31 - 0 = 31 | 31 - 24 = 7 |\n| P2 | 0 | 3 | 7 | 7 - 0 = 7 | 7 - 3 = 4 |\n| P3 | 0 | 3 | 11 | 11 - 0 = 11 | 11 - 3 = 8 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 7 + 4 = 11, 11 + 8 = 19\n- Average waiting time = 19 / 3 = **6.33**\n- Sum of turnaround times: 31 + 7 = 38, 38 + 11 = 49\n- Average turnaround time = 49 / 3 = **16.33**\n\n**Answer: average waiting time = 6.33, average turnaround time = 16.33**"
+   },
+   {
+    "index": 2,
+    "kind": "scheduling",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: Priority (non-preemptive)**\n\n**Step 1 - build the schedule**\n\n_Rule: whenever a process is ready, run the highest-priority one (ties: earlier arrival, then name)._\n\n- t=0: ready P1(p3) > P2(p1) > P5(p2) > P4(p5) > P3(p4) -> run P2, done at 0 + 1 = 1\n- t=1: ready P5(p2) > P1(p3) > P3(p4) > P4(p5) -> run P5, done at 1 + 1 = 2\n- t=2: ready P1(p3) > P3(p4) > P4(p5) -> run P1, done at 2 + 10 = 12\n- t=12: ready P3(p4) > P4(p5) -> run P3, done at 12 + 2 = 14\n- t=14: only P4 is ready -> run P4, done at 14 + 1 = 15\n\n**Step 2 - Gantt chart:** P2[0-1] P5[1-2] P1[2-12] P3[12-14] P4[14-15]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| P1 | 0 | 10 | 12 | 12 - 0 = 12 | 12 - 10 = 2 |\n| P2 | 0 | 1 | 1 | 1 - 0 = 1 | 1 - 1 = 0 |\n| P3 | 0 | 2 | 14 | 14 - 0 = 14 | 14 - 2 = 12 |\n| P4 | 0 | 1 | 15 | 15 - 0 = 15 | 15 - 1 = 14 |\n| P5 | 0 | 1 | 2 | 2 - 0 = 2 | 2 - 1 = 1 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 2 + 0 = 2, 2 + 12 = 14, 14 + 14 = 28, 28 + 1 = 29\n- Average waiting time = 29 / 5 = **5.8**\n- Sum of turnaround times: 12 + 1 = 13, 13 + 14 = 27, 27 + 15 = 42, 42 + 2 = 44\n- Average turnaround time = 44 / 5 = **8.8**\n\n**Answer: average waiting time = 5.8**"
+   },
+   {
+    "index": 3,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: FCFS**\n\n**Step 1 - build the schedule**\n\n_Rule: run processes in order of arrival._\n\n- arrival: A t=2, B t=10, C t=11\n- order: A, B, C\n\n- t=0: CPU idle until t=2\n- t=2: A runs (arrived t=2, burst 3) finishes at 2 + 3 = 5\n- t=5: CPU idle until t=10\n- t=10: B runs (arrived t=10, burst 4) finishes at 10 + 4 = 14\n- t=14: C runs (arrived t=11, burst 2) finishes at 14 + 2 = 16\n\n**Step 2 - compute metrics**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|-------------|\n| A | 2 | 3 | 5 | 5 - 2 = 3 | 3 - 3 = 0 |\n| B | 10 | 4 | 14 | 14 - 10 = 4 | 4 - 4 = 0 |\n| C | 11 | 2 | 16 | 16 - 11 = 5 | 5 - 2 = 3 |\n\n- Sum of turnaround times: 3 + 4 = 7, 7 + 5 = 12\n- Average turnaround time = 12 / 3 = **4.0**\n- Sum of waiting times: 0 + 0 = 0, 0 + 3 = 3\n- Average waiting time = 3 / 3 = **1.0**\n\n**Answer: average turnaround time = 4.0**"
+   },
+   {
+    "index": 4,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: SJF (non-preemptive)**\n\n**Step 1 - build the schedule**\n\n_Rule: whenever the CPU is free, run the ready process with the shortest burst to completion (ties: earlier arrival, then name)._\n\n- t=0: only T1 is ready -> run T1, done at 0 + 7 = 7\n- t=7: ready T3(1) < T2(4) = T4(4) -> run T3, done at 7 + 1 = 8\n- t=8: ready T2(4) = T4(4) (tie -> earlier arrival, then name) -> run T2, done at 8 + 4 = 12\n- t=12: only T4 is ready -> run T4, done at 12 + 4 = 16\n\n**Step 2 - Gantt chart:** T1[0-7] T3[7-8] T2[8-12] T4[12-16]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| T1 | 0 | 7 | 7 | 7 - 0 = 7 | 7 - 7 = 0 |\n| T2 | 2 | 4 | 12 | 12 - 2 = 10 | 10 - 4 = 6 |\n| T3 | 4 | 1 | 8 | 8 - 4 = 4 | 4 - 1 = 3 |\n| T4 | 5 | 4 | 16 | 16 - 5 = 11 | 11 - 4 = 7 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 6 = 6, 6 + 3 = 9, 9 + 7 = 16\n- Average waiting time = 16 / 4 = **4.0**\n- Sum of turnaround times: 7 + 10 = 17, 17 + 4 = 21, 21 + 11 = 32\n- Average turnaround time = 32 / 4 = **8.0**\n\n**Answer: average waiting time = 4.0**"
+   },
+   {
+    "index": 5,
+    "kind": "scheduling",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: SRTF (preemptive SJF)**\n\n**Step 1 - build the schedule**\n\n_Rule: at every arrival and completion, run the ready process with the SHORTEST REMAINING time; preempt the running process if needed._\n\n- t=0: P0 arrives; only P0 is ready -> run P0\n- t=2: P1 arrives; ready P0(8) < P1(20) -> keep running P0\n- t=6: P2 arrives; ready P0(2) < P1(20) < P2(30) -> keep running P0\n- t=8: P0 completes; ready P1(20) < P2(30) -> run P1\n- t=28: P1 completes; only P2 is ready -> run P2\n- t=58: P2 completes; all processes done\n\n**Step 2 - Gantt chart**\nP0[0-8] P1[8-28] P2[28-58]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| P0 | 0 | 10 | 8 | 8 - 0 = 8 | 8 - 10 = -2 |\n| P1 | 2 | 20 | 28 | 28 - 2 = 26 | 26 - 20 = 6 |\n| P2 | 6 | 30 | 58 | 58 - 6 = 52 | 52 - 30 = 22 |\n\n**Step 4 - averages**\n- Sum of waiting times: 2 + 6 = 8, 8 + 22 = 30\n- Average waiting time = 30 / 3 = **10.0**\n- Sum of turnaround times: 8 + 26 = 34, 34 + 52 = 86\n- Average turnaround time = 86 / 3 = **28.67**\n\n**Answer: average waiting time = 10.0**"
+   },
+   {
+    "index": 6,
+    "kind": "scheduling",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: Round Robin (RR), time slice = 2**\n\n**Step 1 - build the schedule**\n\n_Rule: run the process at the head of the queue for `quantum = 2` time units, then put it at the tail of the queue; if the process has not completed, repeat. A process completes when its remaining time = 0._\n\n- t=0: A runs head of [A] for 2; 5 - 2 = 3 left; A back to tail -> queue [A]\n- t=2: A runs head of [A] for 2; 3 - 2 = 1 left; A back to tail -> queue [A]\n- t=4: A runs head of [A] for 1; 1 - 1 = 0 left; A completes -> queue []\n- t=5: B runs head of [B] for 2; 3 - 2 = 1 left; B back to tail -> queue [B]\n- t=7: B runs head of [B] for 1; 1 - 1 = 0 left; B completes -> queue []\n- t=8: C runs head of [C] for 2; 1 - 2 = -1 < 0 C completes -> queue []\n- t=9: D runs head of [D] for 2; 2 - 2 = 0 left; D completes -> queue []\n- t=11: E runs head of [E] for 2; 3 - 2 = 1 left; E back to tail -> queue [E]\n- t=13: E runs head of [E] for 1; 1 - 1 = 0 left; E completes -> queue []\n\n**Step 2 - Gantt chart:\n\nA[0-2] A[2-4] A[4-5] B[5-7] B[7-8] C[8-9] D[9-11] E[11-13] E[13-14]\n\n**Step 3 - per-process times**\n\n| Process | Burst | Wait | Turnaround |\n|---------|-------|------|------------|\n| A | 5 | 0 | 5 |\n| B | 3 | 5 | 8 |\n| C | 1 | 8 | 9 |\n| D | 2 | 9 | 11 |\n| E | 3 | 11 | 14 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 5 = 5, 5 + 8 = 13, 13 + 9 = 22, 22 + 11 = 33\n- Average waiting time = 33 / 5 = **6.6**\n- Sum of turnaround times: 5 + 8 = 13, 13 + 9 = 22, 22 + 11 = 33, 33 + 14 = 47\n- Average turnaround time = 47 / 5 = **9.4**\n\n**Answer: average waiting time = 6.6**"
+   },
+   {
+    "index": 7,
+    "kind": "scheduling",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: Priority (preemptive)**\n\n**Step 1 - build the schedule**\n\n_Rule: at every arrival and completion, run the ready process with the HIGHEST priority (LOWEST number); preempt the running process if a higher-priority one is ready (ties: earlier arrival, then name)._\n\n- t=0: P1 arrives; only P1 is ready -> run P1\n- t=1: P2 arrives; ready P2(p1) < P1(p3) -> PREEMPT P1, run P2\n- t=2: P3 arrives; ready P2(p1) < P1(p3) < P3(p4) -> keep running P2\n- t=3: P4 arrives; ready P2(p1) < P4(p2) < P1(p3) < P3(p4) -> keep running P2\n- t=4: P2 completes; ready P4(p2) < P1(p3) < P3(p4) -> run P4\n- t=6: P4 completes; ready P1(p3) < P3(p4) -> run P1\n- t=11: P1 completes; only P3 is ready -> run P3\n- t=19: P3 completes; all processes done\n\n**Step 2 - Gantt chart:** P1[0-1] P2[1-4] P4[4-6] P1[6-11] P3[11-19]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| P1 | 0 | 5 | 11 | 11 - 0 = 11 | 11 - 5 = 6 |\n| P2 | 1 | 3 | 4 | 4 - 1 = 3 | 3 - 3 = 0 |\n| P3 | 2 | 8 | 19 | 19 - 2 = 17 | 17 - 8 = 9 |\n| P4 | 3 | 2 | 6 | 6 - 3 = 3 | 3 - 2 = 1 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 6 + 0 = 6, 6 + 9 = 15, 15 + 1 = 16\n- Average waiting time = 16 / 4 = **4.0**\n- Sum of turnaround times: 11 + 3 = 14, 14 + 17 = 31, 31 + 3 = 34\n- Average turnaround time = 34 / 4 = **8.5**\n\n**Answer: average waiting time = 4.0, average turnaround time = 8.5**"
+   },
+   {
+    "index": 8,
+    "kind": "scheduling",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: HRRN (Highest Response Ratio Next)**\n\n**Step 1 - build the schedule**\n\n_Rule: whenever the CPU is free, compute each ready process's response ratio and run the HIGHEST ratio to completion._\n\n- t=0: only A is ready -> run A, done at 0 + 3 = 3\n- t=3: ratios: B waited 3 - 2 = 1, 1 / 6 = 0.17, remaining 6 - 3 = 3; C waited 3 - 4 = -1 (arrived t=4 > t=3), ratio 0; D waited 3 - 6 = -3 (arrived t=6 > t=3), ratio 0; E waited 3 - 8 = -5 (arrived t=8 > t=3), ratio 0; order B(0.17) > C(0) = D(0) = E(0) -> run B, done at 3 + 3 = 6\n- t=6: ratios: C waited 6 - 4 = 2, 2 / 4 = 0.5, remaining 4; D waited 6 - 6 = 0, 0 / 5 = 0, remaining 5; E waited 6 - 8 = -2 (arrived t=8 > t=6), ratio 0; order C(0.5) > D(0) = E(0) -> run C, done at 6 + 4 = 10\n- t=10: ratios: D waited 10 - 6 = 4, 4 / 5 = 0.8, remaining 5; E waited 10 - 8 = 2, 2 / 2 = 1, remaining 0; order E(1) > D(0.8) -> run E, done at 10 + 0 = 10\n- t=10: only D is ready -> run D, done at 10 + 5 = 15\n\n**Step 2 - Gantt chart:** A[0-3] B[3-6] C[6-10] E[10-10] D[10-15]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| A | 0 | 3 | 3 | 3 - 0 = 3 | 3 - 3 = 0 |\n| B | 2 | 6 | 6 | 6 - 2 = 4 | 4 - 6 = -2 |\n| C | 4 | 4 | 10 | 10 - 4 = 6 | 6 - 4 = 2 |\n| D | 6 | 5 | 15 | 15 - 6 = 9 | 9 - 5 = 4 |\n| E | 8 | 2 | 10 | 10 - 8 = 2 | 2 - 2 = 0 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + (-2) = -2, -2 + 2 = 0, 0 + 4 = 4, 4 + 0 = 4\n- Average waiting time = 4 / 5 = **0.8**\n- Sum of turnaround times: 3 + 4 = 7, 7 + 6 = 13, 13 + 9 = 22, 22 + 2 = 24\n- Average turnaround time = 24 / 5 = **4.8**\n\n**Answer: average waiting time = 0.8**"
+   },
+   {
+    "index": 9,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: SJF (non-preemptive)**\n\n**Step 1 - build the schedule**\n\n_Rule: whenever a process is ready, run the one with the shortest burst remaining (ties: earlier arrival, then name)._\n\n- t=0: ready P3(2) < P1(5) < P4(7) < P2(9) -> run P3, done at 0 + 2 = 2\n- t=2: ready P1(5) < P4(7) < P2(9) -> run P1, done at 2 + 5 = 7\n- t=7: ready P4(7) < P2(9) -> run P4, done at 7 + 7 = 14\n- t=14: only P2 is ready -> run P2, done at 14 + 9 = 23\n\n**Step 2 - Gantt chart:** P3[0-2] P1[2-7] P4[7-14] P2[14-23]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| P1 | 0 | 5 | 7 | 7 - 0 = 7 | 7 - 5 = 2 |\n| P2 | 0 | 9 | 23 | 23 - 0 = 23 | 23 - 9 = 14 |\n| P3 | 0 | 2 | 2 | 2 - 0 = 2 | 2 - 2 = 0 |\n| P4 | 0 | 7 | 14 | 14 - 0 = 14 | 14 - 7 = 7 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 2 + 14 = 16, 16 + 0 = 16, 16 + 7 = 23\n- Average waiting time = 23 / 4 = **5.75**\n- Sum of turnaround times: 7 + 23 = 30, 30 + 2 = 32, 32 + 14 = 46\n- Average turnaround time = 46 / 4 = **11.5**\n\n**Answer: average waiting time = 5.75**"
+   },
+   {
+    "index": 10,
+    "kind": "scheduling",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: Round Robin (q=3)**\n\n**Step 1 - build the schedule**\n\n_Rule: run the process at the head of the queue for q = 3 time units (or until completed); processes are added to the tail of the queue when they arrive or when they return from the CPU (if they are not done)._\n\n- t=0: P1 runs (arrived at 0) 0-3 P1<7-3 left 3-7\n- t=3: P1 runs (arrived at 0) 3-6 P1<7-4 left 6-7\n- t=6: P1 runs (arrived at 0) 6-9 P1<7-1 left 9-7 P2 arrives at 1 P2<4-0 left 9-4 P3 arrives at 3 P3<9-0 left 9-9 P4 arrives at 4 P4<2-0 left 9-2 P5 arrives at 6 P5<5-0 left 9-5 P6 arrives at 8 P6<3-0 left 9-3 P1 back to tail P2 runs (arrived at 1) 9-12 P2<4-1 left 12-4 P3 runs (arrived at 3) 12-15 P3<9-6 left 15-9 P4 runs (arrived at 4) 15-17 P4<2-0 left 17-0 P2 runs (arrived at 1) 17-18 P2<4-2 left 18-2 P3 runs (arrived at 3) 18-21 P3<9-3 left 21-3 P2 runs (arrived at 1) 21-23 P2<4-1 left 23-1 P3 runs (arrived at 3) 23-24 P3<3-0 left 24-0 P2 runs (arrived at 1) 24-25 P2<1-0 left 25-0 P5 runs (arrived at 6) 25-28 P5<5-0 left 28-0 P6 runs (arrived at 8) 28-31 P6<3-0 left 31-0 all processes completed\n\n**Step 2 - compute metrics**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| P1 | 0 | 7 | 31 | 31 - 0 = 31 | 31 - 7 = 24 |\n| P2 | 1 | 4 | 25 | 25 - 1 = 24 | 24 - 4 = 20 |\n| P3 | 3 | 9 | 24 | 24 - 3 = 21 | 21 - 9 = 12 |\n| P4 | 4 | 2 | 17 | 17 - 4 = 13 | 13 - 2 = 11 |\n| P5 | 6 | 5 | 28 | 28 - 6 = 22 | 22 - 5 = 17 |\n| P6 | 8 | 3 | 31 | 31 - 8 = 23 | 23 - 3 = 20 |\n\n- Sum of turnaround times: 31 + 24 = 55, 55 + 21 = 76, 76 + 13 = 89, 89 + 22 = 111, 111 + 23 = 134\n- Average turnaround time = 134 / 6 = **22.33**\n- Sum of waiting times: 24 + 20 = 44, 44 + 12 = 56, 56 + 11 = 67, 67 + 17 = 84, 84 + 20 = 104\n- Average waiting time = 104 / 6 = **17.33**\n\n**Answer: average turnaround time = 22.33**"
+   },
+   {
+    "index": 11,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: SRTF (Shortest Remaining Time First)**\n\n**Step 1 - build the schedule**\n\n_Rule: at every arrival and completion, run the ready process with the shortest remaining time; ties are broken by arrival order (oldest first)._\n\n- t=0: J1 arrives; only J1 is ready -> run J1\n- t=2: J1 completes; no process is ready -> CPU idle until t=5\n- t=5: J2 arrives; only J2 is ready -> run J2\n- t=6: J3 arrives; ready J3(1) < J2(3) -> run J3\n- t=7: J3 completes; only J2 is ready -> run J2\n- t=10: J2 completes; all processes done\n\n**Step 2 - Gantt chart:** J1[0-2] J2[5-6] J3[6-7] J2[7-10]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| J1 | 0 | 2 | 2 | 2 - 0 = 2 | 2 - 2 = 0 |\n| J2 | 5 | 4 | 10 | 10 - 5 = 5 | 5 - 4 = 1 |\n| J3 | 6 | 1 | 7 | 7 - 6 = 1 | 1 - 1 = 0 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 1 = 1, 1 + 0 = 1\n- Average waiting time = 1 / 3 = **0.333**\n- Sum of turnaround times: 2 + 5 = 7, 7 + 1 = 8\n- Average turnaround time = 8 / 3 = **2.667**\n\n**Answer: average waiting time = 0.333**"
+   },
+   {
+    "index": 12,
+    "kind": "paging",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Policy: FIFO, 3 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page loaded earliest._\n\n| # | Ref | Result | Evicted | Faults | Why |\n|---|-----|--------|---------|--------|-----|\n| 1 | 7 | miss | - | 1 | 1 frame used: 7 |\n| 2 | 0 | miss | 7 | 2 | 2 frames used: 7, 0 |\n| 3 | 1 | miss | 7 | 3 | 3 frames used: 7, 0, 1 |\n| 4 | 2 | miss | 7 | 4 | frames full; oldest (7) evicted |\n| 5 | 0 | hit | - | 4 | 0 already in frames |\n| 6 | 3 | miss | 0 | 5 | frames full; oldest (0) evicted |\n| 7 | 0 | miss | 1 | 6 | frames full; oldest (1) evicted |\n| 8 | 4 | miss | 2 | 7 | frames full; oldest (2) evicted |\n| 9 | 2 | miss | 3 | 8 | frames full; oldest (3) evicted |\n| 10 | 3 | miss | 4 | 9 | frames full; oldest (4) evicted |\n| 11 | 0 | miss | 2 | 10 | frames full; oldest (2) evicted |\n| 12 | 3 | miss | 0 | 11 | frames full; oldest (0) evicted |\n| 13 | 2 | miss | 3 | 12 | frames full; oldest (3) evicted |\n| 14 | 1 | miss | 2 | 13 | frames full; oldest (2) evicted |\n| 15 | 2 | miss | 1 | 14 | frames full; oldest (1) evicted |\n| 16 | 0 | miss | 2 | 15 | frames full; oldest (2) evicted |\n| 17 | 1 | miss | 0 | 16 | frames full; oldest (0) evicted |\n| 18 | 7 | miss | 1 | 17 | frames full; oldest (1) evicted |\n| 19 | 0 | miss | 7 | 18 | frames full; oldest (7) evicted |\n| 20 | 1 | miss | 0 | 19 | frames full; oldest (0) evicted |\n| 21 | 3 | miss | 1 | 20 | frames full; oldest (1) evicted |\n\n**Total page faults = 20** (hits = 21 - 20 = 1, hit ratio = 1 / 21 = 0.0476, fault ratio = 20 / 21 = 0.9524)\n\n**Answer: page faults = 20**"
+   },
+   {
+    "index": 13,
+    "kind": "paging",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Policy: LRU, 3 frames** (all empty at start)\n\n_Rule: on a fault with all frames full, evict the page used LEAST RECENTLY._\n\n| # | Ref | Result | Evicted | Why | Frames (least recently used first) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 7 | miss | - | free frame 0 | 7 | 1 |\n| 2 | 0 | miss | - | free frame 1 | 7 0 | 2 |\n| 3 | 1 | miss | - | free frame 2 | 7 0 1 | 3 |\n| 4 | 2 | miss | 7 | frames full; last used 7@#1 < 0@#2 < 1@#3 -> least recent = 7 | 0 1 2 | 4 |\n| 5 | 0 | hit | - | 0 already in frames | 1 2 0 | 4 |\n| 6 | 3 | miss | 1 | frames full; last used 1@#3 < 2@#4 < 0@#5 -> least recent = 1 | 2 0 3 | 5 |\n| 7 | 0 | hit | - | 0 already in frames | 2 3 0 | 5 |\n| 8 | 4 | miss | 2 | frames full; last used 2@#4 < 3@#6 < 0@#7 -> least recent = 2 | 3 0 4 | 6 |\n| 9 | 2 | miss | 3 | frames full; last used 3@#6 < 0@#7 < 4@#8 -> least recent = 3 | 0 4 2 | 7 |\n| 10 | 3 | miss | 0 | frames full; last used 0@#7 < 4@#8 < 2@#9 -> least recent = 0 | 4 2 3 | 8 |\n| 11 | 0 | miss | 4 | frames full; last used 4@#8 < 2@#9 < 3@#10 -> least recent = 4 | 2 3 0 | 9 |\n| 12 | 3 | hit | - | 3 already in frames | 2 0 3 | 9 |\n| 13 | 2 | hit | - | 2 already in frames | 0 3 2 | 9 |\n| 14 | 1 | miss | 0 | frames full; last used 0@#11 < 3@#12 < 2@#13 -> least recent = 0 | 3 2 1 | 10 |\n| 15 | 2 | hit | - | 2 already in frames | 3 1 2 | 10 |\n| 16 | 0 | miss | 3 | frames full; last used 3@#12 < 1@#14 < 2@#15 -> least recent = 3 | 1 2 0 | 11 |\n| 17 | 1 | hit | - | 1 already in frames | 2 0 1 | 11 |\n| 18 | 7 | miss | 2 | frames full; last used 2@#15 < 0@#16 < 1@#17 -> least recent = 2 | 0 1 7 | 12 |\n| 19 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 20 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n\n**Total page faults = 12**\n**Hit ratio = 12 / 20 = 0.6**\n**Fault ratio = 1 - 0.6 = 0.4**\n\n**Answer: page faults = 12**"
+   },
+   {
+    "index": 14,
+    "kind": "paging",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Policy: OPTIMAL, 3 frames** (all empty initially)\n\n_Rule: on a fault with all frames full, evict the page whose NEXT USE is FARTHEST in the future (never or farthest away = best)._\n\n| # | Ref | Result | Evicted | Why | Frames (reference string order) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 7 | miss | - | first page | 7 | 1 |\n| 2 | 0 | miss | - | first page | 7 0 | 2 |\n| 3 | 1 | miss | - | first page | 7 0 1 | 3 |\n| 4 | 2 | miss | - | first page | 7 0 1 2 | 4 |\n| 5 | 0 | hit | - | 0 already in frames | 7 0 1 2 | 4 |\n| 6 | 3 | miss | 7 | next use 7@18 > 0@10 > 1@14 > 2@9 | 3 0 1 | 5 |\n| 7 | 0 | hit | - | 0 already in frames | 3 0 1 | 5 |\n| 8 | 4 | miss | 1 | next use 1@14 > 0@10 > 3@11 | 3 0 4 | 6 |\n| 9 | 2 | miss | 0 | next use 0@10 > 3@11 > 4@12 | 3 2 4 | 7 |\n| 10 | 3 | hit | - | 3 already in frames | 3 2 4 | 7 |\n| 11 | 0 | miss | 2 | next use 2@13 > 4@12 > 3@15 | 3 0 4 | 8 |\n| 12 | 3 | hit | - | 3 already in frames | 3 0 4 | 8 |\n| 13 | 2 | miss | 4 | next use 4@never > 3@15 > 0@16 | 3 0 2 | 9 |\n| 14 | 1 | miss | 3 | next use 3@15 > 0@16 > 2@17 | 1 0 2 | 10 |\n| 15 | 2 | hit | - | 2 already in frames | 1 0 2 | 10 |\n| 16 | 0 | hit | - | 0 already in frames | 1 0 2 | 10 |\n| 17 | 1 | hit | - | 1 already in frames | 1 0 2 | 10 |\n| 18 | 7 | miss | 1 | next use 1@never > 0@never > 2@never | 7 0 2 | 11 |\n| 19 | 0 | hit | - | 0 already in frames | 7 0 2 | 11 |\n| 20 | 1 | miss | 7 | next use 7@never > 0@never > 2@never | 1 0 2 | 12 |\n\n**Total page faults = 12** (hits = 20 - 12 = 8, hit ratio = 8 / 20 = 0.4, fault ratio = 12 / 20 = 0.6)\n\n**Answer: page faults = 12**"
+   },
+   {
+    "index": 15,
+    "kind": "paging",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Policy: FIFO, 3 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page loaded earliest._\n\n| # | Ref | Result | Evicted | Why |\n|---|-----|--------|---------|-----|\n| 1 | 3 | miss | - | free frame 0 -> load 3 |\n| 2 | 2 | miss | - | free frame 1 -> load 2 |\n| 3 | 1 | miss | - | free frame 2 -> load 1 |\n| 4 | 0 | miss | 3 | frames full; load 0, evict oldest (3) |\n| 5 | 3 | miss | 2 | frames full; load 3, evict oldest (2) |\n| 6 | 2 | miss | 1 | frames full; load 2, evict oldest (1) |\n| 7 | 4 | miss | 3 | frames full; load 4, evict oldest (3) |\n| 8 | 3 | miss | 2 | frames full; load 3, evict oldest (2) |\n| 9 | 2 | miss | 4 | frames full; load 2, evict oldest (4) |\n| 10 | 1 | miss | 3 | frames full; load 1, evict oldest (3) |\n| 11 | 0 | miss | 1 | frames full; load 0, evict oldest (1) |\n| 12 | 4 | miss | 0 | frames full; load 4, evict oldest (0) |\n\n**Total page faults = 12**\n Hits = 12 - 12 = 0\n Faults = 12\n\n**Answer: faults = 12**"
+   },
+   {
+    "index": 16,
+    "kind": "paging",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Policy: FIFO, 4 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page loaded earliest._\n\n| # | Ref | Result | Evicted | Why | Frames (oldest first) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 3 | miss | - | free frame 0 | 3 | 1 |\n| 2 | 2 | miss | - | free frame 1 | 3 2 | 2 |\n| 3 | 1 | miss | - | free frame 2 | 3 2 1 | 3 |\n| 4 | 0 | miss | - | free frame 3 | 3 2 1 0 | 4 |\n| 5 | 3 | hit | - | 3 already in frames | 3 2 1 0 | 4 |\n| 6 | 2 | hit | - | 2 already in frames | 3 2 1 0 | 4 |\n| 7 | 4 | miss | 3 | frames full; load 4, evict oldest (3) | 2 1 0 4 | 5 |\n| 8 | 3 | miss | 2 | frames full; load 3, evict oldest (2) | 1 0 4 3 | 6 |\n| 9 | 2 | miss | 1 | frames full; load 2, evict oldest (1) | 0 4 3 2 | 7 |\n| 10 | 1 | miss | 0 | frames full; load 1, evict oldest (0) | 4 3 2 1 | 8 |\n| 11 | 0 | miss | 4 | frames full; load 0, evict oldest (4) | 3 2 1 0 | 9 |\n| 12 | 4 | miss | 3 | frames full; load 4, evict oldest (3) | 2 1 0 4 | 10 |\n\n**Total page faults = 10**\n**Hit ratio = 12 - 10 = 2 / 12 = 0.1667**\n**Fault ratio = 10 / 12 = 0.8333**\n\n**Answer: page faults = 10**"
+   },
+   {
+    "index": 17,
+    "kind": "paging",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Policy: LRU, 4 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page used earliest in the past._\n\n| # | Ref | Result | Evicted | Why | Frames (least recently used first) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 1 | miss | - | free frame (1/4 used) | 1 | 1 |\n| 2 | 2 | miss | - | free frame (2/4 used) | 1 2 | 2 |\n| 3 | 3 | miss | - | free frame (3/4 used) | 1 2 3 | 3 |\n| 4 | 4 | miss | - | free frame (4/4 used) | 1 2 3 4 | 4 |\n| 5 | 2 | hit | - | 2 already in frames | 1 3 4 2 | 4 |\n| 6 | 1 | hit | - | 1 already in frames | 3 4 2 1 | 4 |\n| 7 | 5 | miss | 3 | frames full; last used 3@#3 < 4@#4 < 2@#5 < 1@#6 -> oldest = 3 | 4 2 1 5 | 5 |\n| 8 | 6 | miss | 4 | frames full; last used 4@#4 < 2@#5 < 1@#6 < 5@#7 -> oldest = 4 | 2 1 5 6 | 6 |\n| 9 | 2 | hit | - | 2 already in frames | 1 5 6 2 | 6 |\n| 10 | 1 | hit | - | 1 already in frames | 5 6 2 1 | 6 |\n| 11 | 2 | hit | - | 2 already in frames | 5 6 1 2 | 6 |\n| 12 | 3 | miss | 5 | frames full; last used 5@#7 < 6@#8 < 1@#10 < 2@#11 -> oldest = 5 | 6 1 2 3 | 7 |\n| 13 | 7 | miss | 6 | frames full; last used 6@#8 < 1@#10 < 2@#11 < 3@#12 -> oldest = 6 | 1 2 3 7 | 8 |\n| 14 | 6 | miss | 1 | frames full; last used 1@#10 < 2@#11 < 3@#12 < 7@#13 -> oldest = 1 | 2 3 7 6 | 9 |\n| 15 | 3 | hit | - | 3 already in frames | 2 7 6 3 | 9 |\n| 16 | 2 | hit | - | 2 already in frames | 7 6 3 2 | 9 |\n| 17 | 1 | miss | 7 | frames full; last used 7@#13 < 6@#14 < 3@#15 < 2@#16 -> oldest = 7 | 6 3 2 1 | 10 |\n| 18 | 2 | hit | - | 2 already in frames | 6 3 1 2 | 10 |\n| 19 | 1 | hit | - | 1 already in frames | 6 3 2 1 | 10 |\n| 20 | 2 | hit | - | 2 already in frames | 6 3 1 2 | 10 |\n| 21 | 3 | hit | - | 3 already in frames | 6 1 2 3 | 10 |\n| 22 | 6 | hit | - | 6 already in frames | 1 2 3 6 | 10 |\n\n**Total page faults = 10** (hits = 22 - 10 = 12, hit ratio = 12 / 22 = 0.5455, fault ratio = 10 / 22 = 0.4545)\n\n**Answer: page faults = 10**"
+   },
+   {
+    "index": 18,
+    "kind": "paging",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Policy: CLOCK, 3 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, advance the hand: a page with bit 1 gets a second chance (bit cleared), the first page with bit 0 is evicted; a hit clears the bit._\n\n| # | Ref | Result | Evicted | Faults | Why |\n|---|-----|--------|---------|--------|-----|\n| 1 | 2 | miss | - | 1 | frame 1 empty frame 1: 2 |\n| 2 | 3 | miss | - | 2 | frame 2 empty frame 2: 3 |\n| 3 | 2 | miss | - | 3 | frame 3 empty frame 3: 2 |\n| 4 | 1 | miss | 2 | 4 | frames full hand 1 3 2 2 has bit 0 evict 2 |\n| 5 | 5 | miss | 3 | 5 | frames full hand 1 3 2 2 has bit 0 evict 3 |\n| 6 | 2 | hit | - | 5 | frame 2: 2 clear bit 2 |\n| 7 | 4 | miss | 1 | 6 | frames full hand 1 2 2 has bit 0 evict 1 |\n| 8 | 5 | miss | 2 | 7 | frames full hand 2 2 has bit 0 evict 2 |\n| 9 | 3 | miss | 2 | 8 | frames full hand 2 has bit 0 evict 2 |\n| 10 | 2 | miss | 2 | 9 | frames full hand 2 has bit 0 evict 2 |\n| 11 | 5 | miss | 2 | 10 | frames full hand 2 has bit 0 evict 2 |\n| 12 | 2 | miss | 2 | 11 | frames full hand 2 has bit 0 evict 2 |\n\n**Total page faults = 11** (hits = 12 - 11 = 1, hit ratio = 1 / 12 = 0.0833, fault ratio = 11 / 12 = 0.9167)\n\n**Answer: page faults = 11**"
+   },
+   {
+    "index": 19,
+    "kind": "paging",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Policy: OPT, 4 frames** *all empty at start*\n\n_Rule: on a fault with all frames full, evict page that will not be used for longest time in future (if any); otherwise, page will be used again soon enough to not need eviction._\n\n| # | Ref | Result | Evicted | Why |\n|---|-----|--------|---------|-----|\n| 1 | 3 | fault | - | no frame holds 3, allocate frame 1 |\n| 2 | 2 | fault | - | no frame holds 2, allocate frame 2 |\n| 3 | 1 | fault | - | no frame holds 1, allocate frame 3 |\n| 4 | 0 | fault | - | no frame holds 0, allocate frame 4 |\n| 5 | 3 | hit | - | 3 already in frame 1 |\n| 6 | 2 | hit | - | 2 already in frame 2 |\n| 7 | 4 | hit | - | 4 already in frame 4 |\n| 8 | 3 | hit | - | 3 already in frame 1 |\n| 9 | 2 | hit | - | 2 already in frame 2 |\n| 10 | 1 | hit | - | 1 already in frame 3 |\n| 11 | 0 | hit | - | 0 already in frame 4 |\n| 12 | 4 | hit | - | 4 already in frame 4 |\n\n**Total page faults = 4**\n\n**Answer: page faults = 4**"
+   },
+   {
+    "index": 20,
+    "kind": "banker_safety",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P0: [7, 5, 3] - [0, 1, 0] = [7, 4, 3]\n- P1: [3, 2, 2] - [2, 0, 0] = [1, 2, 2]\n- P2: [9, 0, 2] - [3, 0, 2] = [6, 0, 0]\n- P3: [2, 2, 2] - [2, 1, 1] = [0, 1, 1]\n- P4: [4, 3, 3] - [0, 0, 2] = [4, 3, 1]\n\n**Step 2 - run the safety algorithm** (scan the processes in order; run the first one whose Need fits in Work, then add its Allocation to Work and scan again)\n\n- Work = Available = [3, 3, 2]\n- P0: Need [7, 4, 3] vs Work [3, 3, 2]: 7>3, 4>3, 3<=2 -> cannot run yet\n- P1: Need [1, 2, 2] vs Work [3, 3, 2]: 1<=3, 2<=3, 2<=2 -> all fit, run it. Work = [3, 3, 2] + Allocation [2, 0, 0] = [5, 3, 2]\n- P0: Need [7, 4, 3] vs Work [5, 3, 2]: 7>5, 4>3, 3<=2 -> cannot run yet\n- P2: Need [6, 0, 0] vs Work [5, 3, 2]: 6>5, 0<=3, 0<=2 -> cannot run yet\n- P3: Need [0, 1, 1] vs Work [5, 3, 2]: 0<=5, 1<=3, 1<=2 -> all fit, run it. Work = [5, 3, 2] + Allocation [2, 1, 1] = [7, 4, 3]\n- P0: Need [7, 4, 3] vs Work [7, 4, 3]: 7<=7, 4<=4, 3<=3 -> all fit, run it. Work = [7, 4, 3] + Allocation [0, 1, 0] = [7, 5, 3]\n- P2: Need [6, 0, 0] vs Work [7, 5, 3]: 6<=7, 0<=5, 0<=3 -> all fit, run it. Work = [7, 5, 3] + Allocation [3, 0, 2] = [10, 5, 5]\n- P4: Need [4, 3, 1] vs Work [10, 5, 5]: 4<=10, 3<=5, 1<=5 -> all fit, run it. Work = [10, 5, 5] + Allocation [0, 0, 2] = [10, 5, 7]\n\n**Step 3 - conclusion**\n\nAll 5 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< P1, P3, P0, P2, P4 >**.\n\n_Safe sequence P1 P3 P0 P2 P4: Work = [3, 3, 2]; P1 Need [1, 2, 2] vs Work [3, 3, 2] 1<=3, 2<=3, 2<=2 all fit run it Work = [5, 3, 2] P3 Need [0, 1, 1] vs Work [5, 3, 2] 0<=5, 1<=3, 1<=2 all fit run it Work = [7, 4, 3] P0 Need [7, 4, 3] vs Work [7, 4, 3] 7<=7, 4<=4, 3<=3 all fit run it Work = [7, 5, 3] P2 Need [6, 0, 0] vs Work [7, 5, 3] 6<=7, 0<=5, 0<=3 all fit run it Work = [10, 5, 3] P4 Need [4, 3, 1] vs Work [10, 5, 3] 4<=10, 3<=5, 1<=3 all fit run it Work = [14, 8, 4]_\n\n**Answer: SAFE, safe sequence P1 P3 P0 P2 P4**"
+   },
+   {
+    "index": 21,
+    "kind": "banker_request",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P0: [7, 5, 3] - [0, 1, 0] = [7, 4, 3]\n- P1: [3, 2, 2] - [2, 0, 0] = [1, 2, 2]\n- P2: [9, 0, 2] - [3, 0, 2] = [6, 0, 0]\n- P3: [2, 2, 2] - [2, 1, 1] = [0, 1, 1]\n- P4: [4, 3, 3] - [0, 0, 2] = [4, 3, 1]\n\n**Step 2 - apply the three tests of the resource-request algorithm**\n\n- Test 1: Request [1, 0, 2] vs Need [1, 2, 2]: 1<=1, 0<=2, 2<=2 -> OK\n- Test 2: Request [1, 0, 2] vs Available [3, 3, 2]: 1<=3, 0<=3, 2<=2 -> OK\n- Test 3: pretend to grant. Available = [3, 3, 2] - [1, 0, 2] = [2, 3, 0]; Allocation[P1] = [3, 0, 2]. Now run the safety algorithm.\n- Work = Available = [2, 3, 0]\n- P0: Need [7, 4, 3] vs Work [2, 3, 0]: 7>2, 4>3, 3>0 -> cannot run yet\n- P1: Need [0, 2, 0] vs Work [2, 3, 0]: 0<=2, 2<=3, 0<=0 -> all fit, run it. Work = [2, 3, 0] + Allocation [3, 0, 2] = [5, 3, 2]\n- P0: Need [7, 4, 3] vs Work [5, 3, 2]: 7>5, 4>3, 3>2 -> cannot run yet\n- P2: Need [6, 0, 0] vs Work [5, 3, 2]: 6>5, 0<=3, 0<=2 -> cannot run yet\n- P3: Need [0, 1, 1] vs Work [5, 3, 2]: 0<=5, 1<=3, 1<=2 -> all fit, run it. Work = [5, 3, 2] + Allocation [2, 1, 1] = [7, 4, 3]\n- P0: Need [7, 4, 3] vs Work [7, 4, 3]: 7<=7, 4<=4, 3<=3 -> all fit, run it. Work = [7, 4, 3] + Allocation [0, 1, 0] = [7, 5, 3]\n- P2: Need [6, 0, 0] vs Work [7, 5, 3]: 6<=7, 0<=5, 0<=3 -> all fit, run it. Work = [7, 5, 3] + Allocation [3, 0, 2] = [10, 5, 5]\n- P4: Need [4, 3, 1] vs Work [10, 5, 5]: 4<=10, 3<=5, 1<=5 -> all fit, run it. Work = [10, 5, 5] + Allocation [0, 0, 2] = [10, 5, 7]\n- SAFE SAFE sequence: < P1, P3, P0, P2, P4 >\n- Resulting state is SAFE -> GRANT the request\n\n**Conclusion: the request is GRANTED.**\n\n**Answer: GRANTED**"
+   },
+   {
+    "index": 22,
+    "kind": "banker_request",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P0: [7, 5, 3] - [0, 1, 0] = [7, 4, 3]\n- P1: [3, 2, 2] - [2, 0, 0] = [1, 2, 2]\n- P2: [9, 0, 2] - [3, 0, 2] = [6, 0, 0]\n- P3: [2, 2, 2] - [2, 1, 1] = [0, 1, 1]\n- P4: [4, 3, 3] - [0, 0, 2] = [4, 3, 1]\n\n**Step 2 - apply the three tests of the resource-request algorithm**\n\n- Test 1: Request [0, 2, 0] vs Need [7, 4, 3]: 0<=7, 2<=4, 0<=3 -> OK\n- Test 2: Request [0, 2, 0] vs Available [3, 3, 2]: 0<=3, 2<=3, 0<=2 -> OK\n- Test 3: pretend to grant. Available = [3, 3, 2] - [0, 2, 0] = [3, 1, 2]; Allocation[P0] = [0, 3, 0]. Now run the safety algorithm.\n- Work = Available = [3, 1, 2]\n- P0: Need [7, 2, 3] vs Work [3, 1, 2]: 7>3, 2>1, 3>2 -> cannot run yet\n- P1: Need [1, 2, 2] vs Work [3, 1, 2]: 1<=3, 2>1, 2<=2 -> cannot run yet\n- P2: Need [6, 0, 0] vs Work [3, 1, 2]: 6>3, 0<=1, 0<=2 -> cannot run yet\n- P3: Need [0, 1, 1] vs Work [3, 1, 2]: 0<=3, 1<=1, 1<=2 -> all fit, run it. Work = [3, 1, 2] + Allocation [2, 1, 1] = [5, 2, 3]\n- P0: Need [7, 2, 3] vs Work [5, 2, 3]: 7>5, 2<=2, 3<=3 -> cannot run yet\n- P1: Need [1, 2, 2] vs Work [5, 2, 3]: 1<=5, 2<=2, 2<=3 -> all fit, run it. Work = [5, 2, 3] + Allocation [2, 0, 0] = [7, 2, 3]\n- P0: Need [7, 2, 3] vs Work [7, 2, 3]: 7<=7, 2<=2, 3<=3 -> all fit, run it. Work = [7, 2, 3] + Allocation [0, 3, 0] = [7, 5, 3]\n- P2: Need [6, 0, 0] vs Work [7, 5, 3]: 6<=7, 0<=5, 0<=3 -> all fit, run it. Work = [7, 5, 3] + Allocation [3, 0, 2] = [10, 5, 5]\n- P4: Need [4, 3, 1] vs Work [10, 5, 5]: 4<=10, 3<=5, 1<=5 -> all fit, run it. Work = [10, 5, 5] + Allocation [0, 0, 2] = [10, 5, 7]\n- SAFE SAFE sequence: P3 -> P1 -> P0 -> P2 -> P4\n\n**Conclusion:** the request is GRANTED.\n\n**Answer: GRANTED**"
+   },
+   {
+    "index": 23,
+    "kind": "banker_safety",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P0: [7, 5, 3] - [0, 1, 0] = [7, 4, 3]\n- P1: [3, 2, 2] - [2, 0, 0] = [1, 2, 2]\n- P2: [9, 0, 2] - [3, 0, 2] = [6, 0, 0]\n- P3: [2, 2, 2] - [2, 1, 1] = [0, 1, 1]\n- P4: [4, 3, 3] - [0, 0, 2] = [4, 3, 1]\n\n**Step 2 - run the safety algorithm** (scan the processes in order; run the first one whose Need fits in Work, then add its Allocation to Work and scan again)\n\n- Work = Available = [10, 5, 7]\n- P0: Need [7, 4, 3] vs Work [10, 5, 7]: 7<=10, 4<=5, 3<=7 -> all fit, run it. Work = [10, 5, 7] + Allocation [0, 1, 0] = [10, 6, 7]\n- P1: Need [1, 2, 2] vs Work [10, 6, 7]: 1<=10, 2<=6, 2<=7 -> all fit, run it. Work = [10, 6, 7] + Allocation [2, 0, 0] = [12, 6, 7]\n- P2: Need [6, 0, 0] vs Work [12, 6, 7]: 6<=12, 0<=6, 0<=7 -> all fit, run it. Work = [12, 6, 7] + Allocation [3, 0, 2] = [15, 6, 9]\n- P3: Need [0, 1, 1] vs Work [15, 6, 9]: 0<=15, 1<=6, 1<=9 -> all fit, run it. Work = [15, 6, 9] + Allocation [2, 1, 1] = [17, 7, 10]\n- P4: Need [4, 3, 1] vs Work [17, 7, 10]: 4<=17, 3<=7, 1<=10 -> all fit, run it. Work = [17, 7, 10] + Allocation [0, 0, 2] = [17, 7, 12]\n\n**Step 3 - conclusion**\n\nAll 5 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< P0, P1, P2, P3, P4 >**.\n\n_Safe state: SAFE_\n\n**Answer: SAFE**"
+   },
+   {
+    "index": 24,
+    "kind": "banker_safety",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Step 1 - compute Need = Max - Allocation, row by row**\n\n- A: [3, 2, 1] - [1, 1, 0] = [2, 1, 1]\n- B: [1, 3, 2] - [0, 1, 1] = [1, 2, 1]\n- C: [2, 1, 3] - [1, 0, 1] = [1, 1, 2]\n\n**Step 2 - run the safety algorithm** (scan the processes in order; run the first one whose Need fits in Work, then add its Allocation to Work and scan again)\n\n- Work = Available = [1, 0, 0]\n- A: Need [2, 1, 1] vs Work [1, 0, 0]: 2>1, 1>0, 1>0 -> cannot run yet\n- B: Need [1, 2, 1] vs Work [1, 0, 0]: 1<=1, 2>0, 1>0 -> cannot run yet\n- C: Need [1, 1, 2] vs Work [1, 0, 0]: 1<=1, 1>0, 2>0 -> cannot run yet\n- UNSAFE no safe sequence exists\n\n**Conclusion: UNSAFE**\n\n_A safe sequence does not exist. The system is in an unsafe state, and processes A, B, and C cannot all complete without causing a deadlock._\n\n**Answer: UNSAFE**"
+   },
+   {
+    "index": 25,
+    "kind": "banker_safety",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P1: [1, 2, 2] - [1, 0, 0] = [0, 2, 2]\n- P2: [0, 1, 1] - [2, 1, 1] = [2, 0, 0]\n- P3: [4, 3, 1] - [0, 0, 2] = [4, 3, -1]\n- P4: [1, 0, 0] - [1, 1, 0] = [0, -1, 0]\n\n**Step 2 - run the safety algorithm** (scan the processes in order; run the first one whose Need fits in Work, then add its Allocation to Work and scan again)\n\n- Work = Available = [1, 1, 1]\n- P1: Need [0, 2, 2] vs Work [1, 1, 1]: 0<=1, 2>1, 2>1 -> cannot run yet\n- P2: Need [2, 0, 0] vs Work [1, 1, 1]: 2>1, 0<=1, 0<=1 -> cannot run yet\n- P3: Need [4, 3, -1] vs Work [1, 1, 1]: 4>1, 3>1, -1<=1 -> cannot run yet\n- P4: Need [0, -1, 0] vs Work [1, 1, 1]: 0<=1, -1<=1, 0<=1 -> all fit, run it. Work = [1, 1, 1] + Allocation [1, 1, 0] = [2, 2, 1]\n- P1: Need [0, 2, 2] vs Work [2, 2, 1]: 0<=2, 2<=2, 2>1 -> cannot run yet\n- P2: Need [2, 0, 0] vs Work [2, 2, 1]: 2<=2, 0<=2, 0<=1 -> all fit, run it. Work = [2, 2, 1] + Allocation [2, 1, 1] = [4, 3, 2]\n- P1: Need [0, 2, 2] vs Work [4, 3, 2]: 0<=4, 2<=3, 2<=2 -> all fit, run it. Work = [4, 3, 2] + Allocation [1, 0, 0] = [5, 3, 2]\n- P3: Need [4, 3, -1] vs Work [5, 3, 2]: 4<=5, 3<=3, -1<=2 -> all fit, run it. Work = [5, 3, 2] + Allocation [0, 0, 2] = [5, 3, 4]\n\n**Step 3 - conclusion**\n\nAll 4 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< P4, P2, P1, P3 >**.\n\n_Safe, sequence < P4, P2, P1, P3 >_\n\n**Answer: SAFE, sequence < P4, P2, P1, P3 >**"
+   },
+   {
+    "index": 26,
+    "kind": "disk",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: SSTF**\n\n- at 53: nearest below 37 (53 - 37 = 16) vs above 65 (65 - 53 = 12); 12 < 16 -> 65\n- at 65: nearest below 37 (65 - 37 = 28) vs above 67 (67 - 65 = 2); 2 < 28 -> 67\n- at 67: nearest below 37 (67 - 37 = 30) vs above 98 (98 - 67 = 31); 30 < 31 -> 37\n- at 37: nearest below 14 (37 - 14 = 23) vs above 98 (98 - 37 = 61); 23 < 61 -> 14\n- at 14: nearest below 14 (14 - 14 = 0) vs above 98 (98 - 14 = 84); 0 < 84 -> 14\n- at 14: only requests above remain; nearest above 98 (98 - 14 = 84) -> 98\n- at 98: only requests above remain; nearest above 122 (122 - 98 = 24) -> 122\n- at 122: only requests above remain; nearest above 124 (124 - 122 = 2) -> 124\n- at 124: only requests above remain; nearest above 183 (183 - 124 = 59) -> 183\n- 53 -> 65: 65 - 53 = 12; running total 0 + 12 = 12\n- 65 -> 67: 67 - 65 = 2; running total 12 + 2 = 14\n- 67 -> 37: 67 - 37 = 30; running total 14 + 30 = 44\n- 37 -> 14: 37 - 14 = 23; running total 44 + 23 = 67\n- 14 -> 14: 14 - 14 = 0; running total 67 + 0 = 67\n- 14 -> 98: 98 - 14 = 84; running total 67 + 84 = 151\n- 98 -> 122: 122 - 98 = 24; running total 151 + 24 = 175\n- 122 -> 124: 124 - 122 = 2; running total 175 + 2 = 177\n- 124 -> 183: 183 - 124 = 59; running total 177 + 59 = 236\n\n**Service order:** 65 -> 67 -> 37 -> 14 -> 14 -> 98 -> 122 -> 124 -> 183\n**Total head movement = 236 cylinders**\n- Average seek length = 236 / 9 = 26.22\n\n**Answer: total head movement = 236 cylinders**"
+   },
+   {
+    "index": 27,
+    "kind": "disk",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Policy: SCAN**\n\n- direction: toward cylinder 0 (so service cylinders with higher numbers first)\n- sorted queue: [14, 37, 65, 67, 98, 122, 124, 183]; below head 53: [14, 37]; at/above head: [65, 67, 98, 122, 124, 183]\n- SCAN, head moving DOWN, so service [65, 67, 98, 122, 124, 183], continue to the disk edge 0, then service [37, 14]\n- 53 -> 65: 65 - 53 = 12; running total 0 + 12 = 12\n- 65 -> 67: 67 - 65 = 2; running total 12 + 2 = 14\n- 67 -> 98: 98 - 67 = 31; running total 14 + 31 = 45\n- 98 -> 122: 122 - 98 = 24; running total 45 + 24 = 69\n- 122 -> 124: 124 - 122 = 2; running total 69 + 2 = 71\n- 124 -> 183: 183 - 124 = 59; running total 71 + 59 = 130\n- 183 -> 0: 183 - 0 = 183; running total 130 + 183 = 313\n- 0 -> 37: 37 - 0 = 37; running total 313 + 37 = 350\n- 37 -> 14: 37 - 14 = 23; running total 350 + 23 = 373\n\n**Service order:** 65 -> 67 -> 98 -> 122 -> 124 -> 183 -> 0 -> 37 -> 14\n**Total head movement = 373 cylinders**\n- Average seek length = 373 / 8 = 46.62\n\n**Answer: total head movement = 373 cylinders**"
+   },
+   {
+    "index": 28,
+    "kind": "disk",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: CSCAN**\n\n- direction: up, head 53\n- sorted requests: [14, 37, 65, 67, 98, 122, 124, 183]; below head 53: [14, 37]; at/above head: [65, 67, 98, 122, 124, 183]\n- service [65, 67, 98, 122, 124, 183], move from 53 to 183 = 183 - 53 = 130; 183 - 183 = 0\n- return to 0, move from 183 to 0 = 183 - 0 = 183; 183 - 0 = 183\n- service [14, 37], move from 0 to 37 = 37 - 0 = 37; 37 - 37 = 0\n- 0 - 14 = -14 < 0, so not serviced; 0 - 37 = -37 < 0, so not serviced\n- total head movement = 130 + 183 + 37 = 350 cylinders\n\n**Service order:** 65 -> 67 -> 98 -> 122 -> 124 -> 183 -> 0 -> 14 -> 37\n**Total head movement = 350 cylinders**\n\n**Answer: total head movement = 350 cylinders**"
+   },
+   {
+    "index": 29,
+    "kind": "disk",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Policy: LOOK**\n\n- direction: not given in the question -> assume the head moves UP, towards higher cylinders (the usual convention when not specified)\n- sorted requests: [130, 86, 1022, 913, 948, 1509, 1750, 1774, 1470]\n- head 143 moving UP through [130, 86, 1022, 913, 948, 1509, 1750, 1774, 1470]\n- 130 < 143 -> skip\n- 86 < 143 -> skip\n- 1022 >= 143 -> service 1022, 1022 - 143 = 879\n- 913 >= 143 -> service 913, 913 - 1022 = 109\n- 948 >= 913 -> service 948, 948 - 913 = 35\n- 1509 >= 948 -> service 1509, 1509 - 948 = 561\n- 1750 >= 1509 -> service 1750, 1750 - 1509 = 241\n- 1774 >= 1750 -> service 1774, 1774 - 1750 = 24\n- 1470 < 1774 -> reverse direction, now moving DOWN through [1470, 1509, 1750, 1774]\n- 1470 >= 143 -> service 1470, 1470 - 143 = 1327\n- 1509 >= 1470 -> service 1509, 1509 - 1470 = 39\n- 1750 >= 1509 -> service 1750, 1750 - 1509 = 241\n- 1774 >= 1750 -> service 1774, 1774 - 1750 = 24\n- 143 < 1774 -> no more requests; head moves to 143, 1774 - 143 = 1631\n- 143 < 130 -> no more requests; head moves to 130, 143 - 130 = 13\n- total head movement = 879 + 109 = 988, 988 + 35 = 1023, 1023 + 561 = 1584, 1584 + 241 = 1825, 1825 + 24 = 1849, 1849 + 1327 = 3176, 3176 + 39 = 3215, 3215 + 241 = 3456, 3456 + 24 = 3480, 3480 + 1631 = 5111, 5111 + 13 = 5124\n\n**Service order:** 1022 -> 913 -> 948 -> 1509 -> 1750 -> 1774 -> 1470 -> 1509 -> 1750 -> 1774 -> 143 -> 130\n**Total head movement = 5124 cylinders**\n- Average seek length = 5124 / 9 = 569.33\n\n**Answer: total head movement = 5124 cylinders**"
+   },
+   {
+    "index": 30,
+    "kind": "disk",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: FCFS**\n\n- 143 -> 86: 143 - 86 = 57; running total 0 + 57 = 57\n- 86 -> 1470: 1470 - 86 = 1384; running total 57 + 1384 = 1441\n- 1470 -> 913: 1470 - 913 = 557; running total 1441 + 557 = 1998\n- 913 -> 1774: 1774 - 913 = 861; running total 1998 + 861 = 2859\n- 1774 -> 948: 1774 - 948 = 826; running total 2859 + 826 = 3685\n- 948 -> 1509: 1509 - 948 = 561; running total 3685 + 561 = 4246\n- 1509 -> 1022: 1509 - 1022 = 487; running total 4246 + 487 = 4733\n- 1022 -> 1750: 1750 - 1022 = 728; running total 4733 + 728 = 5461\n- 1750 -> 130: 1750 - 130 = 1620; running total 5461 + 1620 = 7081\n\n**Service order:** 86 -> 1470 -> 913 -> 1774 -> 948 -> 1509 -> 1022 -> 1750 -> 130\n**Total head movement = 7081 cylinders**\n- Average seek length = 7081 / 9 = 786.78\n\n**Answer: total head movement = 7081 cylinders**"
+   },
+   {
+    "index": 31,
+    "kind": "disk",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: C-LOOK**\n\n- direction: DOWN, so serve requests below head 50, then jump to the highest pending request and continue down through it\n- sorted requests: [16, 24, 43, 82, 140, 170, 190]; below head 50: [16, 24, 43]; at/above head: [82, 140, 170, 190]\n- C-LOOK, head moving DOWN, towards lower cylinders: service [43, 24, 16], jump to 190, then service [170, 140, 82]\n- 50 -> 43: 50 - 43 = 7; running total 0 + 7 = 7\n- 43 -> 24: 43 - 24 = 19; running total 7 + 19 = 26\n- 24 -> 16: 24 - 16 = 8; running total 26 + 8 = 34\n- 16 -> 190: 190 - 16 = 174; running total 34 + 174 = 208\n- 190 -> 170: 190 - 170 = 20; running total 208 + 20 = 228\n- 170 -> 140: 170 - 140 = 30; running total 228 + 30 = 258\n- 140 -> 82: 140 - 82 = 58; running total 258 + 58 = 316\n\n**Service order:** 43 -> 24 -> 16 -> 190 -> 170 -> 140 -> 82\n**Total head movement = 316 cylinders**\n- Average seek length = 316 / 7 = 45.14\n\n**Answer: total head movement = 316 cylinders**"
+   },
+   {
+    "index": 32,
+    "kind": "disk",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: SSTF**\n\n- at 50: nearest below 43 (50 - 43 = 7) vs above 82 (82 - 50 = 32) -> 43; 50 -> 43, 50 - 43 = 7\n- at 43: nearest below 24 (43 - 24 = 19) vs above 82 (82 - 43 = 39) -> 24; 43 -> 24, 43 - 24 = 19\n- at 24: nearest below 16 (24 - 16 = 8) vs above 82 (82 - 24 = 58) -> 16; 24 -> 16, 24 - 16 = 8\n- at 16: nearest below 140 (140 - 16 = 124) vs above 82 (82 - 16 = 66) -> 82; 16 -> 82, 16 - 82 = -66\n- at 82: nearest below 140 (140 - 82 = 58) vs above 170 (170 - 82 = 88) -> 140; 82 -> 140, 82 - 140 = -58\n- at 140: nearest below 170 (170 - 140 = 30) vs above 190 (190 - 140 = 50) -> 170; 140 -> 170, 140 - 170 = -30\n- at 170: nearest below 190 (190 - 170 = 20) vs above 190 (190 - 170 = 20) -> tie, service 190 (arbitrary); 170 -> 190, 170 - 190 = -20\n- 50 -> 43: 50 - 43 = 7; running total 0 + 7 = 7\n- 43 -> 24: 43 - 24 = 19; running total 7 + 19 = 26\n- 24 -> 16: 24 - 16 = 8; running total 26 + 8 = 34\n- 16 -> 82: 82 - 16 = 66; running total 34 + 66 = 100\n- 82 -> 140: 140 - 82 = 58; running total 100 + 58 = 158\n- 140 -> 170: 170 - 140 = 30; running total 158 + 30 = 188\n- 170 -> 190: 190 - 170 = 20; running total 188 + 20 = 208\n\n**Service order:** 43 -> 24 -> 16 -> 82 -> 140 -> 170 -> 190\n**Total head movement = 208 cylinders**\n- Average seek length = 208 / 7 = 29.71\n\n**Answer: total head movement = 208 cylinders**"
+   },
+   {
+    "index": 33,
+    "kind": "translate",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Step-by-step translation**\n\n- page number = floor(9000 / 4096) = 2 (check: 2 x 4096 = 8192 <= 9000 < 12288)\n- page offset = 9000 - 8192 = 808\n- page table[2] = frame 1\n- frame base = 1 x 4096 = 4096\n- physical address = 4096 + 808 = 4904\n\n**Physical address = 4904**\n\n**Answer: physical address = 4904**"
+   },
+   {
+    "index": 34,
+    "kind": "translate",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Step-by-step translation**\n\n- convert 0x0A2C to decimal: 0 x 4096 = 0; 10 x 256 = 2560; 2 x 16 = 32; 12 x 1 = 12\n- sum: 0 + 2560 = 2560, 2560 + 32 = 2592, 2592 + 12 = 2604 -> 0x0A2C = 2604\n- page number = floor(2604 / 1024) = 2 (check: 2 x 1024 = 2048 <= 2604 < 3072)\n- page offset = 2604 - 2048 = 556\n- page table[2] = frame 7\n- frame base = 7 x 1024 = 7168\n- physical address = 7168 + 556 = 7724\n\n**Physical address = 7724**\n- in hexadecimal: 7724 = 0x1E2C\n\n**Answer: physical address = 0x1E2C**"
+   },
+   {
+    "index": 35,
+    "kind": "translate",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Step-by-step translation**\n\n- page number = floor(10000 / 2048) = 4 (check: 4 x 2048 = 8192 <= 10000 < 10240)\n- page offset = 10000 - 8192 = 1808\n- page table[4] = 11\n- frame number = 11 x 2048 = 22528\n- frame base = 22528\n- physical address = frame base + offset = 22528 + 1808 = 24336\n\n**Physical address = 24336**\n\n**Answer: physical address = 24336**"
+   },
+   {
+    "index": 36,
+    "kind": "freespace",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Policy: BEST-fit**\n\n_Rule: take the SMALLEST hole that is large enough._\n\n- holes: 100, 500, 200, 300, 600 KB free; sum = 1700\n- process 212: hole 100 too small; hole 500 >= 212 fits; hole 200 too small; hole 300 >= 212 fits; hole 600 >= 212 fits -> smallest fitting 300 < 500 < 600 -> hole 300 KB\n- process 417: hole 100 too small; hole 500 >= 417 fits; hole 200 too small; hole 300 too small; hole 600 >= 417 fits -> smallest fitting 500 < 600 -> hole 500 KB\n- process 112: hole 100 too small; hole 500 too small; hole 200 >= 112 fits; hole 300 too small; hole 600 >= 112 fits -> smallest fitting 200 < 600 -> hole 200 KB\n- process 426: hole 100 too small; hole 500 too small; hole 200 too small; hole 300 too small; hole 600 >= 426 fits -> smallest fitting 600 -> hole 600 KB\n\n**Placement:** 212 KB -> 300 KB; 417 KB -> 500 KB; 112 KB -> 200 KB; 426 KB -> 600 KB\n**Remaining free space per hole:** [100, 0, 0, 0, 0]\n- Sum of free space: 100\n**Total external fragmentation = 100 KB**\n\n**Answer: 212 KB -> 300 KB; 417 KB -> 500 KB; 112 KB -> 200 KB; 426 KB -> 600 KB**"
+   },
+   {
+    "index": 37,
+    "kind": "freespace",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Policy: WORST-fit**\n\n_Rule: take the largest hole that is large enough._\n\n- holes: 100K, 500K, 200K, 300K, 600K; sorted: [100K, 200K, 300K, 500K, 600K]\n- request 212K: hole 100K too small; hole 200K too small; hole 300K >= 212K largest = 300K 300K - 212K = 88K\n- request 417K: hole 100K too small; hole 200K too small; hole 300K too small; hole 500K >= 417K largest = 500K 500K - 417K = 83K\n- request 112K: hole 100K too small; hole 200K >= 112K largest = 200K 200K - 112K = 88K\n- request 426K: hole 100K too small; hole 200K too small; hole 300K too small; hole 500K too small; hole 600K >= 426K largest = 600K 600K - 426K = 174K\n\n**Placement:** 212K -> 300K; 417K -> 500K; 112K -> 200K; 426K -> 600K\n**Remaining holes:** 100K, 88K, 83K, 88K, 174K\n- Sum of free memory: 100K + 88K = 188K, 188K + 83K = 271K, 271K + 88K = 359K, 359K + 174K = 533K\n\n**Answer: 212K -> 300K; 417K -> 500K; 112K -> 200K; 426K -> 600K**"
+   },
+   {
+    "index": 38,
+    "kind": "freespace",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Algorithm: FIRST-fit**\n\n_Rule: scan the free blocks in order and take the FIRST one that is large enough._\n\n- free blocks: [100, 500, 200, 300, 600] KB\n- request 212: first block >= 212 is 500 500 >= 212 fits -> assign to 500 remaining: [100, 200, 300, 600] 500 - 212 = 288\n- request 417: first block >= 417 is 600 600 >= 417 fits -> assign to 600 remaining: [100, 200, 300, 288] 600 - 417 = 183\n- request 112: first block >= 112 is 200 200 >= 112 fits -> assign to 200 remaining: [100, 300, 288, 183] 200 - 112 = 88\n- request 426: first block >= 426 is 300 300 < 426 no 288 < 426 no 183 < 426 no 100 < 426 no no fit -> cannot satisfy request\n\n**Cannot satisfy:** 426 KB\n**Remaining free space:** [100, 300, 288, 183] sum = 871\n**Used space:** 212 + 417 = 629, 629 + 112 = 741, 741 + 426 = 1167 > 871 error: used space exceeds remaining free space 1167 > 871\n\n**Conclusion: cannot allocate 426 KB**"
+   },
+   {
+    "index": 39,
+    "kind": "freespace",
+    "final_correct": false,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Policy: BEST-fit**\n\n_Rule: take the hole whose size is MINIMUM but still large enough to satisfy the request._\n\n- holes: 40, 25, 90, 30, 60 KB; requests: 28, 55, 35, 20\n- 28 KB: holes >= 28: 40, 90, 30, 60; smallest = 30 -> hole 30\n- 55 KB: holes >= 55: 90, 60; smallest = 60 -> hole 60\n- 35 KB: holes >= 35: 40, 90, 60; smallest = 40 -> hole 40\n- 20 KB: holes >= 20: 40, 90, 30, 60; smallest = 30 -> hole 30\n\n**Placement:** 28 KB -> 30; 55 KB -> 60; 35 KB -> 40; 20 KB -> 30\n**Remaining holes:** 40, 90, 30, 60 -> 40, 90, 30, 60\n**Remaining free space:** 40, 90, 30, 60\n**Total free space:** 40 + 90 = 130, 130 + 30 = 160, 160 + 60 = 220\n**Total external fragmentation:** 220 KB\n\n**Answer: 28 KB -> 30; 55 KB -> 60; 35 KB -> 40; 20 KB -> 30**"
+   },
+   {
+    "index": 40,
+    "kind": "eat_tlb",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Formula:** EAT = h x (t + m) + (1 - h) x (t + (n + 1) x m)\n\n**Working**\n\n- TLB hit: TLB lookup + memory access = 20 + 100 = 120 ns\n- TLB miss: 1 page-table access = 1 x 100 = 100 ns\n- miss time = TLB lookup + page-table access + memory access = 20 + 100 = 120, 120 + 100 = 220 ns\n- EAT = 0.8 x 120 = 96, 0.2 x 220 = 44, 96 + 44 = 140 ns\n\n**Answer: EAT (ns) = 140**"
+   },
+   {
+    "index": 41,
+    "kind": "eat_tlb",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Formula:** EAT = h x (t + m) + (1 - h) x (t + t + m)\n\n**Working**\n\n- TLB hit: TLB + one memory access = 10 + 120 = 130 ns\n- TLB miss: 1 memory access for page table level 1 + 1 for page table level 2 + 1 for data = 120 + 120 = 240, 240 + 120 = 360 ns\n- h x (t + m) = 0.98 x 130 = 127.4\n- 1 - h = 1 - 0.98 = 0.02\n- (1 - h) x (t + t + m) = 0.02 x 360 = 7.2\n- EAT = 127.4 + 7.2 = 134.6 ns\n\n**Answer: EAT (ns) = 134.6**"
+   },
+   {
+    "index": 42,
+    "kind": "eat_pagefault",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Formula:** EAT = (1 - p) x ma + p x (page-fault-service-time)\n\n**Working**\n\n- page-fault service time = 8 ms = 8 x 1,000,000 = 8,000,000 ns\n- 1 - p = 1 - 0.001 = 0.999\n- (1 - p) x 200 = 199.8\n- p x 8,000,000 = 8000\n- EAT = 199.8 + 8000 = 8199.8 ns\n\n**Answer: EAT (ns) = 8199.8**"
+   },
+   {
+    "index": 43,
+    "kind": "paging_bits",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Formula:** offset = log2(page size); pages = 2^(logical bits - offset); frames = 2^(physical bits - frame bits); page table = pages x PTE size\n\n**Working**\n\n- logical address = 32 bits\n- physical address = log2(1 GB) = log2(1,073,741,824) = 30 bits\n- offset = log2(page size) = log2(4096) = 12 bits\n- page-number bits = 32 - 12 = 20\n- number of pages = 2^20 = 1,048,576\n- frame bits = 30 - 12 = 18\n- number of frames = 2^18 = 262,144\n- page table size = pages x PTE size = 1,048,576 x 4 = 4,194,304 bytes = 4 MB\n\n**Answer: entries = 1048576, page table size bytes = 4194304, offset bits = 12, frame bits = 18**"
+   },
+   {
+    "index": 44,
+    "kind": "multilevel_paging",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Formula:** levels = ceil((VA bits - offset bits) / log2(page size / PTE size))\n\n**Working**\n\n- offset bits = log2(4096) = 12\n- bits for page table hierarchy = 39 - 12 = 27\n- each PTE holds 8 bytes, so pages can hold log2(4096 / 8) = 10 entries\n- levels = ceil(27 / 10) = ceil(2.7) = 3\n\n**Answer: levels = 3**"
+   },
+   {
+    "index": 45,
+    "kind": "disk_access",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Formula:** access time = seek + rotational latency + transfer\n\n**Working**\n\n- one full rotation = 60,000 ms / 7200 = 8.3333 ms\n- average rotational latency = 8.3333 / 2 = 4.1667 ms\n- block size = 4 KB / 1024 = 0.003906 MB\n- transfer time = 0.003906 / 100 x 1000 = 0.0391 ms\n- total = seek + latency + transfer = 9 + 4.1667 + 0.0391 = 13.2058 ms\n\n**Answer: access time (ms) = 13.2058**"
+   },
+   {
+    "index": 46,
+    "kind": "deadlock_min",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Formula:** minimum = n x (k - 1) + 1\n\n**Working**\n\n- worst case: every process holds 3 - 1 = 2 drives\n- total held in worst case = 6 x 2 = 12\n- one extra drive ensures a deadlock-free state: 12 + 1 = 13\n\n**Answer: minimum drives = 13**"
+   },
+   {
+    "index": 47,
+    "kind": "deadlock_min",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Formula:** minimum = sum of (max_i - 1) + 1\n\n**Working**\n\n- sum of (max_i - 1) = (3 - 1) + (4 - 1) + (5 - 1) = 2 + 3 + 4 = 9\n- minimum = 9 + 1 = 10\n\n**Answer: minimum = 10 printers**"
+   },
+   {
+    "index": 48,
+    "kind": "fork_count",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**This program does not specify an input.**\n\nThe number of times \"hi\" is printed depends on the number of processes created by the `fork()` calls, which in turn depends on the initial number of processes and how they interact.\n\nHowever, the `fork()` system call creates a new process that is a copy of the current process. Each `fork()` doubles the number of processes (assuming no other process creation or termination occurs).\n\nIn this code:\n- The `main()` function starts with one process.\n- Each `fork()` creates a new process, so after `n` `fork()` calls, there are `2^n` processes.\n\nBut the `printf(\"hi\\n\");` statement is executed in **every process** that reaches it. So, if all processes execute the `printf`, the total number of \"hi\" prints will be equal to the total number of processes at the end.\n\nLet's compute that:\n\n- After 1 `fork()`: 2 processes\n- After 2 `fork()`: 4 processes\n- After 3 `fork()`: 8 processes\n- After 4 `fork()`: 16 processes\n- After 5 `fork()`: 32 processes\n\nSo, **32 processes** will each execute `printf(\"hi\\n\");`, meaning \"hi\" will be printed **32 times**.\n\n**Answer: 32 times.**"
+   },
+   {
+    "index": 49,
+    "kind": "fork_count",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Formula:** children = 2^n - 1\n\n**Working**\n\n- each fork() doubles the number of processes: 1 -> 2 -> 4 -> 8 -> 16\n- after 4 calls: 2^4 = 16 processes\n- children = 16 - 1 = 15\n\n**Answer: child processes = 15**"
+   },
+   {
+    "index": 50,
+    "kind": "semaphore",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Formula:** final value = initial value - (number of P) + (number of V)\n\n**Working**\n\n- each P subtracts 1: 7 - 20 = -13\n- each V adds 1: -13 + 15 = 2\n\n**Answer: final value = 2**"
+   },
+   {
+    "index": 51,
+    "kind": "internal_frag",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Formula:**\n\nPages = ceil(Process size / Page size)\nInternal fragmentation = Pages x Page size - Process size\n\n**Working**\n\nPages = ceil(72,766 / 2048) = ceil(35.54) = 36\nInternal fragmentation = 36 x 2048 - 72,766 = 73,728 - 72,766 = 961 bytes\n\n**Answer: pages = 36, internal fragmentation (bytes) = 961**"
+   },
+   {
+    "index": 52,
+    "kind": "cpu_util",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Formula:** Utilisation = 1 - p^n\n\n**Working**\n\n- p = 0.8\n- n = 4\n- 0.8^4 = 0.4096\n- 1 - 0.4096 = 0.5904 = 59.04%\n\n**Answer: utilisation = 59.04%**"
+   },
+   {
+    "index": 53,
+    "kind": "cache_eat",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**Formula:** T = h x c + (1 - h) x (c + m)\n\n**Working**\n\n- hit cost = 5 ns; miss cost = 5 + 60 = 65 ns\n- h x hit = 0.95 x 5 = 4.75\n- 1 - h = 0.05\n- (1 - h) x miss = 0.05 x 65 = 3.25\n- average access time = 4.75 + 3.25 = 8 ns\n\n**Answer: access time (ns) = 8**"
+   },
+   {
+    "index": 54,
+    "kind": "clarify",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**This question is missing an input.**\n\nI can't tell where each process ends up because **the sizes of the processes** (or the list of processes to be allocated) are not given.\n\n**What I need to know:**\nPlease provide the sizes (in KB) of the processes that need to be allocated to the memory holes.\n\nOnce I have that, I will:\n1. Sort the memory holes by size (smallest to largest).\n2. For each process, find the smallest hole that can fit it (best fit).\n3. Allocate the process to that hole and update the remaining hole size.\n4. Show the final allocation.\n\nLet me know the process sizes, and I'll solve it step by step!"
+   },
+   {
+    "index": 55,
+    "kind": "clarify",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**This question is missing an input.**\n\nThe average waiting time under Round Robin scheduling depends on the **time quantum** (the time slice allocated to each process before it is preempted).\n\nWhile the arrival times and burst times are given (all processes arrive at time 0 with bursts 5, 3, and 8), the **time quantum** is not specified.\n\n **Missing input: time quantum (e.g., q = 2, q = 1, etc.)**\n\nWithout knowing the time quantum, we cannot compute the exact waiting times or the average waiting time.\n\n **Please provide the time quantum (q) to proceed.**"
+   },
+   {
+    "index": 56,
+    "kind": "clarify",
+    "final_correct": true,
+    "delegated": false,
+    "reason": null,
+    "finish": "stop",
+    "output": "**This question is missing an input.**\n\nWhat is the number of page frames?\n\n(A page fault occurs when a page is accessed that is not currently in memory. The number of page faults depends on how many page frames are available \u2014 that is, how many pages can be stored in memory at once.)\n\nPlease specify the number of page frames (e.g., 3 frames, 4 frames, etc.), and I will solve the problem step by step using the LRU (Least Recently Used) algorithm."
+   }
+  ]
+ },
+ {
+  "label": "v3+solver",
+  "n": 57,
+  "correct": 57,
+  "accuracy": 1.0,
+  "delegated": 38,
+  "truncated": 0,
+  "seconds": 1628.8,
+  "by_kind": {
+   "scheduling": {
+    "correct": 12,
+    "n": 12
+   },
+   "paging": {
+    "correct": 8,
+    "n": 8
+   },
+   "banker_safety": {
+    "correct": 4,
+    "n": 4
+   },
+   "banker_request": {
+    "correct": 2,
+    "n": 2
+   },
+   "disk": {
+    "correct": 7,
+    "n": 7
+   },
+   "translate": {
+    "correct": 3,
+    "n": 3
+   },
+   "freespace": {
+    "correct": 4,
+    "n": 4
+   },
+   "eat_tlb": {
+    "correct": 2,
+    "n": 2
+   },
+   "eat_pagefault": {
+    "correct": 1,
+    "n": 1
+   },
+   "paging_bits": {
+    "correct": 1,
+    "n": 1
+   },
+   "multilevel_paging": {
+    "correct": 1,
+    "n": 1
+   },
+   "disk_access": {
+    "correct": 1,
+    "n": 1
+   },
+   "deadlock_min": {
+    "correct": 2,
+    "n": 2
+   },
+   "fork_count": {
+    "correct": 2,
+    "n": 2
+   },
+   "semaphore": {
+    "correct": 1,
+    "n": 1
+   },
+   "internal_frag": {
+    "correct": 1,
+    "n": 1
+   },
+   "cpu_util": {
+    "correct": 1,
+    "n": 1
+   },
+   "cache_eat": {
+    "correct": 1,
+    "n": 1
+   },
+   "clarify": {
+    "correct": 3,
+    "n": 3
+   }
+  },
+  "items": [
+   {
+    "index": 0,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Algorithm: SRTF (preemptive SJF)**\n\n**Step 1 - build the schedule**\n\n_Rule: at every arrival and completion, run the ready process with the SHORTEST REMAINING time; preempt the running process if a shorter one is ready (ties: earlier arrival, then name)._\n\n- t=0: P1 arrives; only P1 is ready -> run P1\n- t=1: P2 arrives; ready P2(4) < P1(7) -> PREEMPT P1, run P2\n- t=2: P3 arrives; ready P2(3) < P1(7) < P3(9) -> keep running P2\n- t=3: P4 arrives; ready P2(2) < P4(5) < P1(7) < P3(9) -> keep running P2\n- t=5: P2 completes; ready P4(5) < P1(7) < P3(9) -> run P4\n- t=10: P4 completes; ready P1(7) < P3(9) -> run P1\n- t=17: P1 completes; only P3 is ready -> run P3\n- t=26: P3 completes; all processes done\n\n**Step 2 - Gantt chart:** P1[0-1] P2[1-5] P4[5-10] P1[10-17] P3[17-26]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround  | Waiting     |\n|---------|---------|-------|------------|-------------|-------------|\n| P1      | 0       | 8     | 17         | 17 - 0 = 17 | 17 - 8 = 9  |\n| P2      | 1       | 4     | 5          | 5 - 1 = 4   | 4 - 4 = 0   |\n| P3      | 2       | 9     | 26         | 26 - 2 = 24 | 24 - 9 = 15 |\n| P4      | 3       | 5     | 10         | 10 - 3 = 7  | 7 - 5 = 2   |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 9 + 0 = 9, 9 + 15 = 24, 24 + 2 = 26\n- Average waiting time = 26 / 4 = **6.5**\n- Sum of turnaround times: 17 + 4 = 21, 21 + 24 = 45, 45 + 7 = 52\n- Average turnaround time = 52 / 4 = **13.0**\n\n**Answer: average waiting time = 6.5, average turnaround time = 13.0**"
+   },
+   {
+    "index": 1,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Algorithm: Round Robin (q=4)**\n\n**Step 1 - build the schedule**\n\n_Rule: run the process at the HEAD of the queue for up to q = 4 units; processes arriving during a slice join the tail BEFORE the preempted process goes back to the tail._\n\n- t=0-4: run P1 (head of [P1, P2, P3]) for 4; 24 - 4 = 20 left; P1 back to tail -> queue [P2, P3, P1]\n- t=4-7: run P2 (head of [P2, P3, P1]) for 3; 3 - 3 = 0 left; P2 DONE at 7 -> queue [P3, P1]\n- t=7-10: run P3 (head of [P3, P1]) for 3; 3 - 3 = 0 left; P3 DONE at 10 -> queue [P1]\n- t=10-14: run P1 (head of [P1]) for 4; 20 - 4 = 16 left; P1 back to tail -> queue [P1]\n- t=14-18: run P1 (head of [P1]) for 4; 16 - 4 = 12 left; P1 back to tail -> queue [P1]\n- t=18-22: run P1 (head of [P1]) for 4; 12 - 4 = 8 left; P1 back to tail -> queue [P1]\n- t=22-26: run P1 (head of [P1]) for 4; 8 - 4 = 4 left; P1 back to tail -> queue [P1]\n- t=26-30: run P1 (head of [P1]) for 4; 4 - 4 = 0 left; P1 DONE at 30 -> queue []\n\n**Step 2 - Gantt chart:** P1[0-4] P2[4-7] P3[7-10] P1[10-30]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround  | Waiting     |\n|---------|---------|-------|------------|-------------|-------------|\n| P1      | 0       | 24    | 30         | 30 - 0 = 30 | 30 - 24 = 6 |\n| P2      | 0       | 3     | 7          | 7 - 0 = 7   | 7 - 3 = 4   |\n| P3      | 0       | 3     | 10         | 10 - 0 = 10 | 10 - 3 = 7  |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 6 + 4 = 10, 10 + 7 = 17\n- Average waiting time = 17 / 3 = **5.67**\n- Sum of turnaround times: 30 + 7 = 37, 37 + 10 = 47\n- Average turnaround time = 47 / 3 = **15.67**\n\n**Answer: average waiting time = 5.67, average turnaround time = 15.67**"
+   },
+   {
+    "index": 2,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Algorithm: Priority (non-preemptive)**\n\n**Step 1 - build the schedule**\n\n_Rule: whenever the CPU is free, run the ready process with the HIGHEST priority (LOWEST number) to completion (ties: earlier arrival, then name)._\n\n- t=0: ready P2(p1) < P5(p2) < P1(p3) < P3(p4) < P4(p5) -> run P2, done at 0 + 1 = 1\n- t=1: ready P5(p2) < P1(p3) < P3(p4) < P4(p5) -> run P5, done at 1 + 5 = 6\n- t=6: ready P1(p3) < P3(p4) < P4(p5) -> run P1, done at 6 + 10 = 16\n- t=16: ready P3(p4) < P4(p5) -> run P3, done at 16 + 2 = 18\n- t=18: only P4 is ready -> run P4, done at 18 + 1 = 19\n\n**Step 2 - Gantt chart:** P2[0-1] P5[1-6] P1[6-16] P3[16-18] P4[18-19]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround  | Waiting     |\n|---------|---------|-------|------------|-------------|-------------|\n| P1      | 0       | 10    | 16         | 16 - 0 = 16 | 16 - 10 = 6 |\n| P2      | 0       | 1     | 1          | 1 - 0 = 1   | 1 - 1 = 0   |\n| P3      | 0       | 2     | 18         | 18 - 0 = 18 | 18 - 2 = 16 |\n| P4      | 0       | 1     | 19         | 19 - 0 = 19 | 19 - 1 = 18 |\n| P5      | 0       | 5     | 6          | 6 - 0 = 6   | 6 - 5 = 1   |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 6 + 0 = 6, 6 + 16 = 22, 22 + 18 = 40, 40 + 1 = 41\n- Average waiting time = 41 / 5 = **8.2**\n- Sum of turnaround times: 16 + 1 = 17, 17 + 18 = 35, 35 + 19 = 54, 54 + 6 = 60\n- Average turnaround time = 60 / 5 = **12.0**\n\n**Answer: average waiting time = 8.2, average turnaround time = 12.0**"
+   },
+   {
+    "index": 3,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "extraction could not be grounded in the question",
+    "finish": "stop",
+    "output": "**Algorithm: FCFS**\n\n**Step 1 - build the schedule**\n\n_Rule: run processes in order of arrival._\n\n- arrival: A t=2, B t=10, C t=11\n- order: A, B, C\n\n- t=0: CPU idle until t=2\n- t=2: A runs (arrived t=2, burst 3) finishes at 2 + 3 = 5\n- t=5: CPU idle until t=10\n- t=10: B runs (arrived t=10, burst 4) finishes at 10 + 4 = 14\n- t=14: C runs (arrived t=11, burst 2) finishes at 14 + 2 = 16\n\n**Step 2 - compute metrics**\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|-------------|\n| A | 2 | 3 | 5 | 5 - 2 = 3 | 3 - 3 = 0 |\n| B | 10 | 4 | 14 | 14 - 10 = 4 | 4 - 4 = 0 |\n| C | 11 | 2 | 16 | 16 - 11 = 5 | 5 - 2 = 3 |\n\n- Sum of turnaround times: 3 + 4 = 7, 7 + 5 = 12\n- Average turnaround time = 12 / 3 = **4.0**\n- Sum of waiting times: 0 + 0 = 0, 0 + 3 = 3\n- Average waiting time = 3 / 3 = **1.0**\n\n**Answer: average turnaround time = 4.0**"
+   },
+   {
+    "index": 4,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Algorithm: SJF (non-preemptive)**\n\n**Step 1 - build the schedule**\n\n_Rule: whenever the CPU is free, run the ready process with the SHORTEST BURST to completion (ties: earlier arrival, then name)._\n\n- t=0: only T1 is ready -> run T1, done at 0 + 7 = 7\n- t=7: ready T3(1) < T2(4) = T4(4) -> run T3, done at 7 + 1 = 8\n- t=8: ready T2(4) = T4(4) (tie -> earlier arrival, then name) -> run T2, done at 8 + 4 = 12\n- t=12: only T4 is ready -> run T4, done at 12 + 4 = 16\n\n**Step 2 - Gantt chart:** T1[0-7] T3[7-8] T2[8-12] T4[12-16]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround  | Waiting    |\n|---------|---------|-------|------------|-------------|------------|\n| T1      | 0       | 7     | 7          | 7 - 0 = 7   | 7 - 7 = 0  |\n| T2      | 2       | 4     | 12         | 12 - 2 = 10 | 10 - 4 = 6 |\n| T3      | 4       | 1     | 8          | 8 - 4 = 4   | 4 - 1 = 3  |\n| T4      | 5       | 4     | 16         | 16 - 5 = 11 | 11 - 4 = 7 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 6 = 6, 6 + 3 = 9, 9 + 7 = 16\n- Average waiting time = 16 / 4 = **4.0**\n- Sum of turnaround times: 7 + 10 = 17, 17 + 4 = 21, 21 + 11 = 32\n- Average turnaround time = 32 / 4 = **8.0**\n\n**Answer: average waiting time = 4.0, average turnaround time = 8.0**"
+   },
+   {
+    "index": 5,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Algorithm: SRTF (preemptive SJF)**\n\n**Step 1 - build the schedule**\n\n_Rule: at every arrival and completion, run the ready process with the SHORTEST REMAINING time; preempt the running process if a shorter one is ready (ties: earlier arrival, then name)._\n\n- t=0: P0 arrives; only P0 is ready -> run P0\n- t=2: P1 arrives; ready P0(8) < P1(20) -> keep running P0\n- t=6: P2 arrives; ready P0(4) < P1(20) < P2(30) -> keep running P0\n- t=10: P0 completes; ready P1(20) < P2(30) -> run P1\n- t=30: P1 completes; only P2 is ready -> run P2\n- t=60: P2 completes; all processes done\n\n**Step 2 - Gantt chart:** P0[0-10] P1[10-30] P2[30-60]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround  | Waiting      |\n|---------|---------|-------|------------|-------------|--------------|\n| P0      | 0       | 10    | 10         | 10 - 0 = 10 | 10 - 10 = 0  |\n| P1      | 2       | 20    | 30         | 30 - 2 = 28 | 28 - 20 = 8  |\n| P2      | 6       | 30    | 60         | 60 - 6 = 54 | 54 - 30 = 24 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 8 = 8, 8 + 24 = 32\n- Average waiting time = 32 / 3 = **10.67**\n- Sum of turnaround times: 10 + 28 = 38, 38 + 54 = 92\n- Average turnaround time = 92 / 3 = **30.67**\n\n**Answer: average waiting time = 10.67, average turnaround time = 30.67**"
+   },
+   {
+    "index": 6,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Algorithm: Round Robin (q=2)**\n\n**Step 1 - build the schedule**\n\n_Rule: run the process at the HEAD of the queue for up to q = 2 units; processes arriving during a slice join the tail BEFORE the preempted process goes back to the tail._\n\n- t=0-2: run A (head of [A]) for 2; 5 - 2 = 3 left; arrived B(t=1), C(t=2) -> tail; A back to tail -> queue [B, C, A]\n- t=2-4: run B (head of [B, C, A]) for 2; 3 - 2 = 1 left; arrived D(t=3), E(t=4) -> tail; B back to tail -> queue [C, A, D, E, B]\n- t=4-5: run C (head of [C, A, D, E, B]) for 1; 1 - 1 = 0 left; C DONE at 5 -> queue [A, D, E, B]\n- t=5-7: run A (head of [A, D, E, B]) for 2; 3 - 2 = 1 left; A back to tail -> queue [D, E, B, A]\n- t=7-9: run D (head of [D, E, B, A]) for 2; 2 - 2 = 0 left; D DONE at 9 -> queue [E, B, A]\n- t=9-11: run E (head of [E, B, A]) for 2; 3 - 2 = 1 left; E back to tail -> queue [B, A, E]\n- t=11-12: run B (head of [B, A, E]) for 1; 1 - 1 = 0 left; B DONE at 12 -> queue [A, E]\n- t=12-13: run A (head of [A, E]) for 1; 1 - 1 = 0 left; A DONE at 13 -> queue [E]\n- t=13-14: run E (head of [E]) for 1; 1 - 1 = 0 left; E DONE at 14 -> queue []\n\n**Step 2 - Gantt chart:** A[0-2] B[2-4] C[4-5] A[5-7] D[7-9] E[9-11] B[11-12] A[12-13] E[13-14]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround  | Waiting    |\n|---------|---------|-------|------------|-------------|------------|\n| A       | 0       | 5     | 13         | 13 - 0 = 13 | 13 - 5 = 8 |\n| B       | 1       | 3     | 12         | 12 - 1 = 11 | 11 - 3 = 8 |\n| C       | 2       | 1     | 5          | 5 - 2 = 3   | 3 - 1 = 2  |\n| D       | 3       | 2     | 9          | 9 - 3 = 6   | 6 - 2 = 4  |\n| E       | 4       | 3     | 14         | 14 - 4 = 10 | 10 - 3 = 7 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 8 + 8 = 16, 16 + 2 = 18, 18 + 4 = 22, 22 + 7 = 29\n- Average waiting time = 29 / 5 = **5.8**\n- Sum of turnaround times: 13 + 11 = 24, 24 + 3 = 27, 27 + 6 = 33, 33 + 10 = 43\n- Average turnaround time = 43 / 5 = **8.6**\n\n**Answer: average waiting time = 5.8, average turnaround time = 8.6**"
+   },
+   {
+    "index": 7,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Algorithm: Priority (preemptive)**\n\n**Step 1 - build the schedule**\n\n_Rule: at every arrival and completion, run the ready process with the HIGHEST priority (LOWEST number); preempt the running process if a higher-priority one is ready (ties: earlier arrival, then name)._\n\n- t=0: P1 arrives; only P1 is ready -> run P1\n- t=1: P2 arrives; ready P2(p1) < P1(p3) -> PREEMPT P1, run P2\n- t=2: P3 arrives; ready P2(p1) < P1(p3) < P3(p4) -> keep running P2\n- t=3: P4 arrives; ready P2(p1) < P4(p2) < P1(p3) < P3(p4) -> keep running P2\n- t=4: P2 completes; ready P4(p2) < P1(p3) < P3(p4) -> run P4\n- t=6: P4 completes; ready P1(p3) < P3(p4) -> run P1\n- t=10: P1 completes; only P3 is ready -> run P3\n- t=18: P3 completes; all processes done\n\n**Step 2 - Gantt chart:** P1[0-1] P2[1-4] P4[4-6] P1[6-10] P3[10-18]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround  | Waiting    |\n|---------|---------|-------|------------|-------------|------------|\n| P1      | 0       | 5     | 10         | 10 - 0 = 10 | 10 - 5 = 5 |\n| P2      | 1       | 3     | 4          | 4 - 1 = 3   | 3 - 3 = 0  |\n| P3      | 2       | 8     | 18         | 18 - 2 = 16 | 16 - 8 = 8 |\n| P4      | 3       | 2     | 6          | 6 - 3 = 3   | 3 - 2 = 1  |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 5 + 0 = 5, 5 + 8 = 13, 13 + 1 = 14\n- Average waiting time = 14 / 4 = **3.5**\n- Sum of turnaround times: 10 + 3 = 13, 13 + 16 = 29, 29 + 3 = 32\n- Average turnaround time = 32 / 4 = **8.0**\n\n**Answer: average waiting time = 3.5, average turnaround time = 8.0**"
+   },
+   {
+    "index": 8,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Algorithm: HRRN (highest response ratio next)**\n\n**Step 1 - build the schedule**\n\n_Rule: whenever the CPU is free, compute each ready process's response ratio = (waiting + burst) / burst and run the HIGHEST ratio to completion (ties: earlier arrival, then name)._\n\n- t=0: only A is ready -> run A, done at 0 + 3 = 3\n- t=3: only B is ready -> run B, done at 3 + 6 = 9\n- t=9: ratios: C waited 9 - 4 = 5, (5 + 4) / 4 = 2.25, D waited 9 - 6 = 3, (3 + 5) / 5 = 1.60, E waited 9 - 8 = 1, (1 + 2) / 2 = 1.50; order C(2.25) > D(1.60) > E(1.50) -> run C, done at 9 + 4 = 13\n- t=13: ratios: D waited 13 - 6 = 7, (7 + 5) / 5 = 2.40, E waited 13 - 8 = 5, (5 + 2) / 2 = 3.50; order E(3.50) > D(2.40) -> run E, done at 13 + 2 = 15\n- t=15: only D is ready -> run D, done at 15 + 5 = 20\n\n**Step 2 - Gantt chart:** A[0-3] B[3-9] C[9-13] E[13-15] D[15-20]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround  | Waiting    |\n|---------|---------|-------|------------|-------------|------------|\n| A       | 0       | 3     | 3          | 3 - 0 = 3   | 3 - 3 = 0  |\n| B       | 2       | 6     | 9          | 9 - 2 = 7   | 7 - 6 = 1  |\n| C       | 4       | 4     | 13         | 13 - 4 = 9  | 9 - 4 = 5  |\n| D       | 6       | 5     | 20         | 20 - 6 = 14 | 14 - 5 = 9 |\n| E       | 8       | 2     | 15         | 15 - 8 = 7  | 7 - 2 = 5  |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 1 = 1, 1 + 5 = 6, 6 + 9 = 15, 15 + 5 = 20\n- Average waiting time = 20 / 5 = **4.0**\n- Sum of turnaround times: 3 + 7 = 10, 10 + 9 = 19, 19 + 14 = 33, 33 + 7 = 40\n- Average turnaround time = 40 / 5 = **8.0**\n\n**Answer: average waiting time = 4.0, average turnaround time = 8.0**"
+   },
+   {
+    "index": 9,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Algorithm: SJF (non-preemptive)**\n\n**Step 1 - build the schedule**\n\n_Rule: whenever the CPU is free, run the ready process with the SHORTEST BURST to completion (ties: earlier arrival, then name)._\n\n- t=0: ready P3(2) < P1(5) < P4(7) < P2(9) -> run P3, done at 0 + 2 = 2\n- t=2: ready P1(5) < P4(7) < P2(9) -> run P1, done at 2 + 5 = 7\n- t=7: ready P4(7) < P2(9) -> run P4, done at 7 + 7 = 14\n- t=14: only P2 is ready -> run P2, done at 14 + 9 = 23\n\n**Step 2 - Gantt chart:** P3[0-2] P1[2-7] P4[7-14] P2[14-23]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround  | Waiting     |\n|---------|---------|-------|------------|-------------|-------------|\n| P1      | 0       | 5     | 7          | 7 - 0 = 7   | 7 - 5 = 2   |\n| P2      | 0       | 9     | 23         | 23 - 0 = 23 | 23 - 9 = 14 |\n| P3      | 0       | 2     | 2          | 2 - 0 = 2   | 2 - 2 = 0   |\n| P4      | 0       | 7     | 14         | 14 - 0 = 14 | 14 - 7 = 7  |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 2 + 14 = 16, 16 + 0 = 16, 16 + 7 = 23\n- Average waiting time = 23 / 4 = **5.75**\n- Sum of turnaround times: 7 + 23 = 30, 30 + 2 = 32, 32 + 14 = 46\n- Average turnaround time = 46 / 4 = **11.5**\n\n**Answer: average waiting time = 5.75, average turnaround time = 11.5**"
+   },
+   {
+    "index": 10,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Algorithm: Round Robin (q=3)**\n\n**Step 1 - build the schedule**\n\n_Rule: run the process at the HEAD of the queue for up to q = 3 units; processes arriving during a slice join the tail BEFORE the preempted process goes back to the tail._\n\n- t=0-3: run P1 (head of [P1]) for 3; 7 - 3 = 4 left; arrived P2(t=1), P3(t=3) -> tail; P1 back to tail -> queue [P2, P3, P1]\n- t=3-6: run P2 (head of [P2, P3, P1]) for 3; 4 - 3 = 1 left; arrived P4(t=4), P5(t=6) -> tail; P2 back to tail -> queue [P3, P1, P4, P5, P2]\n- t=6-9: run P3 (head of [P3, P1, P4, P5, P2]) for 3; 9 - 3 = 6 left; arrived P6(t=8) -> tail; P3 back to tail -> queue [P1, P4, P5, P2, P6, P3]\n- t=9-12: run P1 (head of [P1, P4, P5, P2, P6, P3]) for 3; 4 - 3 = 1 left; P1 back to tail -> queue [P4, P5, P2, P6, P3, P1]\n- t=12-14: run P4 (head of [P4, P5, P2, P6, P3, P1]) for 2; 2 - 2 = 0 left; P4 DONE at 14 -> queue [P5, P2, P6, P3, P1]\n- t=14-17: run P5 (head of [P5, P2, P6, P3, P1]) for 3; 5 - 3 = 2 left; P5 back to tail -> queue [P2, P6, P3, P1, P5]\n- t=17-18: run P2 (head of [P2, P6, P3, P1, P5]) for 1; 1 - 1 = 0 left; P2 DONE at 18 -> queue [P6, P3, P1, P5]\n- t=18-21: run P6 (head of [P6, P3, P1, P5]) for 3; 3 - 3 = 0 left; P6 DONE at 21 -> queue [P3, P1, P5]\n- t=21-24: run P3 (head of [P3, P1, P5]) for 3; 6 - 3 = 3 left; P3 back to tail -> queue [P1, P5, P3]\n- t=24-25: run P1 (head of [P1, P5, P3]) for 1; 1 - 1 = 0 left; P1 DONE at 25 -> queue [P5, P3]\n- t=25-27: run P5 (head of [P5, P3]) for 2; 2 - 2 = 0 left; P5 DONE at 27 -> queue [P3]\n- t=27-30: run P3 (head of [P3]) for 3; 3 - 3 = 0 left; P3 DONE at 30 -> queue []\n\n**Step 2 - Gantt chart:** P1[0-3] P2[3-6] P3[6-9] P1[9-12] P4[12-14] P5[14-17] P2[17-18] P6[18-21] P3[21-24] P1[24-25] P5[25-27] P3[27-30]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround  | Waiting     |\n|---------|---------|-------|------------|-------------|-------------|\n| P1      | 0       | 7     | 25         | 25 - 0 = 25 | 25 - 7 = 18 |\n| P2      | 1       | 4     | 18         | 18 - 1 = 17 | 17 - 4 = 13 |\n| P3      | 3       | 9     | 30         | 30 - 3 = 27 | 27 - 9 = 18 |\n| P4      | 4       | 2     | 14         | 14 - 4 = 10 | 10 - 2 = 8  |\n| P5      | 6       | 5     | 27         | 27 - 6 = 21 | 21 - 5 = 16 |\n| P6      | 8       | 3     | 21         | 21 - 8 = 13 | 13 - 3 = 10 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 18 + 13 = 31, 31 + 18 = 49, 49 + 8 = 57, 57 + 16 = 73, 73 + 10 = 83\n- Average waiting time = 83 / 6 = **13.83**\n- Sum of turnaround times: 25 + 17 = 42, 42 + 27 = 69, 69 + 10 = 79, 79 + 21 = 100, 100 + 13 = 113\n- Average turnaround time = 113 / 6 = **18.83**\n\n**Answer: average waiting time = 13.83, average turnaround time = 18.83**"
+   },
+   {
+    "index": 11,
+    "kind": "scheduling",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Algorithm: SRTF (preemptive SJF)**\n\n**Step 1 - build the schedule**\n\n_Rule: at every arrival and completion, run the ready process with the SHORTEST REMAINING time; preempt the running process if a shorter one is ready (ties: earlier arrival, then name)._\n\n- t=0: J1 arrives; only J1 is ready -> run J1\n- t=2: J1 completes; no process ready -> CPU idle until t=5\n- t=5: J2 arrives; only J2 is ready -> run J2\n- t=6: J3 arrives; ready J3(1) < J2(3) -> PREEMPT J2, run J3\n- t=7: J3 completes; only J2 is ready -> run J2\n- t=10: J2 completes; all processes done\n\n**Step 2 - Gantt chart:** J1[0-2] J2[5-6] J3[6-7] J2[7-10]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting   |\n|---------|---------|-------|------------|------------|-----------|\n| J1      | 0       | 2     | 2          | 2 - 0 = 2  | 2 - 2 = 0 |\n| J2      | 5       | 4     | 10         | 10 - 5 = 5 | 5 - 4 = 1 |\n| J3      | 6       | 1     | 7          | 7 - 6 = 1  | 1 - 1 = 0 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 1 = 1, 1 + 0 = 1\n- Average waiting time = 1 / 3 = **0.33**\n- Sum of turnaround times: 2 + 5 = 7, 7 + 1 = 8\n- Average turnaround time = 8 / 3 = **2.67**\n\n**Answer: average waiting time = 0.33, average turnaround time = 2.67**"
+   },
+   {
+    "index": 12,
+    "kind": "paging",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: FIFO, 3 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page loaded EARLIEST._\n\n| # | Ref | Result | Evicted | Why | Frames (oldest first) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 7 | miss | - | free frame (1/3 used) | 7 | 1 |\n| 2 | 0 | miss | - | free frame (2/3 used) | 7 0 | 2 |\n| 3 | 1 | miss | - | free frame (3/3 used) | 7 0 1 | 3 |\n| 4 | 2 | miss | 7 | frames full; load order 7 0 1 -> oldest = 7 | 0 1 2 | 4 |\n| 5 | 0 | hit | - | 0 already in frames | 0 1 2 | 4 |\n| 6 | 3 | miss | 0 | frames full; load order 0 1 2 -> oldest = 0 | 1 2 3 | 5 |\n| 7 | 0 | miss | 1 | frames full; load order 1 2 3 -> oldest = 1 | 2 3 0 | 6 |\n| 8 | 4 | miss | 2 | frames full; load order 2 3 0 -> oldest = 2 | 3 0 4 | 7 |\n| 9 | 2 | miss | 3 | frames full; load order 3 0 4 -> oldest = 3 | 0 4 2 | 8 |\n| 10 | 3 | miss | 0 | frames full; load order 0 4 2 -> oldest = 0 | 4 2 3 | 9 |\n| 11 | 0 | miss | 4 | frames full; load order 4 2 3 -> oldest = 4 | 2 3 0 | 10 |\n| 12 | 3 | hit | - | 3 already in frames | 2 3 0 | 10 |\n| 13 | 2 | hit | - | 2 already in frames | 2 3 0 | 10 |\n| 14 | 1 | miss | 2 | frames full; load order 2 3 0 -> oldest = 2 | 3 0 1 | 11 |\n| 15 | 2 | miss | 3 | frames full; load order 3 0 1 -> oldest = 3 | 0 1 2 | 12 |\n| 16 | 0 | hit | - | 0 already in frames | 0 1 2 | 12 |\n| 17 | 1 | hit | - | 1 already in frames | 0 1 2 | 12 |\n| 18 | 7 | miss | 0 | frames full; load order 0 1 2 -> oldest = 0 | 1 2 7 | 13 |\n| 19 | 0 | miss | 1 | frames full; load order 1 2 7 -> oldest = 1 | 2 7 0 | 14 |\n| 20 | 1 | miss | 2 | frames full; load order 2 7 0 -> oldest = 2 | 7 0 1 | 15 |\n\n**Total page faults = 15** (hits = 20 - 15 = 5, hit ratio = 5 / 20 = 0.25, fault ratio = 15 / 20 = 0.75)\n\n**Answer: page faults = 15**"
+   },
+   {
+    "index": 13,
+    "kind": "paging",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "incomplete",
+    "finish": "stop",
+    "output": "**Policy: LRU, 3 frames** (all empty at start)\n\n_Rule: on a fault with all frames full, evict the page used LEAST RECENTLY._\n\n| # | Ref | Result | Evicted | Why | Frames (least recently used first) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 7 | miss | - | free frame 0 | 7 | 1 |\n| 2 | 0 | miss | - | free frame 1 | 7 0 | 2 |\n| 3 | 1 | miss | - | free frame 2 | 7 0 1 | 3 |\n| 4 | 2 | miss | 7 | frames full; last used 7@#1 < 0@#2 < 1@#3 -> least recent = 7 | 0 1 2 | 4 |\n| 5 | 0 | hit | - | 0 already in frames | 1 2 0 | 4 |\n| 6 | 3 | miss | 1 | frames full; last used 1@#3 < 2@#4 < 0@#5 -> least recent = 1 | 2 0 3 | 5 |\n| 7 | 0 | hit | - | 0 already in frames | 2 3 0 | 5 |\n| 8 | 4 | miss | 2 | frames full; last used 2@#4 < 3@#6 < 0@#7 -> least recent = 2 | 3 0 4 | 6 |\n| 9 | 2 | miss | 3 | frames full; last used 3@#6 < 0@#7 < 4@#8 -> least recent = 3 | 0 4 2 | 7 |\n| 10 | 3 | miss | 0 | frames full; last used 0@#7 < 4@#8 < 2@#9 -> least recent = 0 | 4 2 3 | 8 |\n| 11 | 0 | miss | 4 | frames full; last used 4@#8 < 2@#9 < 3@#10 -> least recent = 4 | 2 3 0 | 9 |\n| 12 | 3 | hit | - | 3 already in frames | 2 0 3 | 9 |\n| 13 | 2 | hit | - | 2 already in frames | 0 3 2 | 9 |\n| 14 | 1 | miss | 0 | frames full; last used 0@#11 < 3@#12 < 2@#13 -> least recent = 0 | 3 2 1 | 10 |\n| 15 | 2 | hit | - | 2 already in frames | 3 1 2 | 10 |\n| 16 | 0 | miss | 3 | frames full; last used 3@#12 < 1@#14 < 2@#15 -> least recent = 3 | 1 2 0 | 11 |\n| 17 | 1 | hit | - | 1 already in frames | 2 0 1 | 11 |\n| 18 | 7 | miss | 2 | frames full; last used 2@#15 < 0@#16 < 1@#17 -> least recent = 2 | 0 1 7 | 12 |\n| 19 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 20 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n\n**Total page faults = 12**\n**Hit ratio = 12 / 20 = 0.6**\n**Fault ratio = 1 - 0.6 = 0.4**\n\n**Answer: page faults = 12**"
+   },
+   {
+    "index": 14,
+    "kind": "paging",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: OPT, 3 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page whose NEXT USE is FARTHEST in the future (never used again = farthest)._\n\n| # | Ref | Result | Evicted | Why | Frames (frame order) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 7 | miss | - | free frame (1/3 used) | 7 | 1 |\n| 2 | 0 | miss | - | free frame (2/3 used) | 7 0 | 2 |\n| 3 | 1 | miss | - | free frame (3/3 used) | 7 0 1 | 3 |\n| 4 | 2 | miss | 7 | frames full; next use 7@#18 > 1@#14 > 0@#5 -> farthest = 7 | 2 0 1 | 4 |\n| 5 | 0 | hit | - | 0 already in frames | 2 0 1 | 4 |\n| 6 | 3 | miss | 1 | frames full; next use 1@#14 > 2@#9 > 0@#7 -> farthest = 1 | 2 0 3 | 5 |\n| 7 | 0 | hit | - | 0 already in frames | 2 0 3 | 5 |\n| 8 | 4 | miss | 0 | frames full; next use 0@#11 > 3@#10 > 2@#9 -> farthest = 0 | 2 4 3 | 6 |\n| 9 | 2 | hit | - | 2 already in frames | 2 4 3 | 6 |\n| 10 | 3 | hit | - | 3 already in frames | 2 4 3 | 6 |\n| 11 | 0 | miss | 4 | frames full; next use 4@never > 2@#13 > 3@#12 -> farthest = 4 | 2 0 3 | 7 |\n| 12 | 3 | hit | - | 3 already in frames | 2 0 3 | 7 |\n| 13 | 2 | hit | - | 2 already in frames | 2 0 3 | 7 |\n| 14 | 1 | miss | 3 | frames full; next use 3@never > 0@#16 > 2@#15 -> farthest = 3 | 2 0 1 | 8 |\n| 15 | 2 | hit | - | 2 already in frames | 2 0 1 | 8 |\n| 16 | 0 | hit | - | 0 already in frames | 2 0 1 | 8 |\n| 17 | 1 | hit | - | 1 already in frames | 2 0 1 | 8 |\n| 18 | 7 | miss | 2 | frames full; next use 2@never > 1@#20 > 0@#19 -> farthest = 2 | 7 0 1 | 9 |\n| 19 | 0 | hit | - | 0 already in frames | 7 0 1 | 9 |\n| 20 | 1 | hit | - | 1 already in frames | 7 0 1 | 9 |\n\n**Total page faults = 9** (hits = 20 - 9 = 11, hit ratio = 11 / 20 = 0.55, fault ratio = 9 / 20 = 0.45)\n\n**Answer: page faults = 9**"
+   },
+   {
+    "index": 15,
+    "kind": "paging",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: FIFO, 3 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page loaded EARLIEST._\n\n| # | Ref | Result | Evicted | Why | Frames (oldest first) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 3 | miss | - | free frame (1/3 used) | 3 | 1 |\n| 2 | 2 | miss | - | free frame (2/3 used) | 3 2 | 2 |\n| 3 | 1 | miss | - | free frame (3/3 used) | 3 2 1 | 3 |\n| 4 | 0 | miss | 3 | frames full; load order 3 2 1 -> oldest = 3 | 2 1 0 | 4 |\n| 5 | 3 | miss | 2 | frames full; load order 2 1 0 -> oldest = 2 | 1 0 3 | 5 |\n| 6 | 2 | miss | 1 | frames full; load order 1 0 3 -> oldest = 1 | 0 3 2 | 6 |\n| 7 | 4 | miss | 0 | frames full; load order 0 3 2 -> oldest = 0 | 3 2 4 | 7 |\n| 8 | 3 | hit | - | 3 already in frames | 3 2 4 | 7 |\n| 9 | 2 | hit | - | 2 already in frames | 3 2 4 | 7 |\n| 10 | 1 | miss | 3 | frames full; load order 3 2 4 -> oldest = 3 | 2 4 1 | 8 |\n| 11 | 0 | miss | 2 | frames full; load order 2 4 1 -> oldest = 2 | 4 1 0 | 9 |\n| 12 | 4 | hit | - | 4 already in frames | 4 1 0 | 9 |\n\n**Total page faults = 9** (hits = 12 - 9 = 3, hit ratio = 3 / 12 = 0.25, fault ratio = 9 / 12 = 0.75)\n\n**Answer: page faults = 9**"
+   },
+   {
+    "index": 16,
+    "kind": "paging",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: FIFO, 4 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page loaded EARLIEST._\n\n| # | Ref | Result | Evicted | Why | Frames (oldest first) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 3 | miss | - | free frame (1/4 used) | 3 | 1 |\n| 2 | 2 | miss | - | free frame (2/4 used) | 3 2 | 2 |\n| 3 | 1 | miss | - | free frame (3/4 used) | 3 2 1 | 3 |\n| 4 | 0 | miss | - | free frame (4/4 used) | 3 2 1 0 | 4 |\n| 5 | 3 | hit | - | 3 already in frames | 3 2 1 0 | 4 |\n| 6 | 2 | hit | - | 2 already in frames | 3 2 1 0 | 4 |\n| 7 | 4 | miss | 3 | frames full; load order 3 2 1 0 -> oldest = 3 | 2 1 0 4 | 5 |\n| 8 | 3 | miss | 2 | frames full; load order 2 1 0 4 -> oldest = 2 | 1 0 4 3 | 6 |\n| 9 | 2 | miss | 1 | frames full; load order 1 0 4 3 -> oldest = 1 | 0 4 3 2 | 7 |\n| 10 | 1 | miss | 0 | frames full; load order 0 4 3 2 -> oldest = 0 | 4 3 2 1 | 8 |\n| 11 | 0 | miss | 4 | frames full; load order 4 3 2 1 -> oldest = 4 | 3 2 1 0 | 9 |\n| 12 | 4 | miss | 3 | frames full; load order 3 2 1 0 -> oldest = 3 | 2 1 0 4 | 10 |\n\n**Total page faults = 10** (hits = 12 - 10 = 2, hit ratio = 2 / 12 = 0.1667, fault ratio = 10 / 12 = 0.8333)\n\n**Answer: page faults = 10**"
+   },
+   {
+    "index": 17,
+    "kind": "paging",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: LRU, 4 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page used LEAST RECENTLY._\n\n| # | Ref | Result | Evicted | Why | Frames (least recently used first) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 1 | miss | - | free frame (1/4 used) | 1 | 1 |\n| 2 | 2 | miss | - | free frame (2/4 used) | 1 2 | 2 |\n| 3 | 3 | miss | - | free frame (3/4 used) | 1 2 3 | 3 |\n| 4 | 4 | miss | - | free frame (4/4 used) | 1 2 3 4 | 4 |\n| 5 | 2 | hit | - | 2 already in frames | 1 3 4 2 | 4 |\n| 6 | 1 | hit | - | 1 already in frames | 3 4 2 1 | 4 |\n| 7 | 5 | miss | 3 | frames full; last used 3@#3 < 4@#4 < 2@#5 < 1@#6 -> least recent = 3 | 4 2 1 5 | 5 |\n| 8 | 6 | miss | 4 | frames full; last used 4@#4 < 2@#5 < 1@#6 < 5@#7 -> least recent = 4 | 2 1 5 6 | 6 |\n| 9 | 2 | hit | - | 2 already in frames | 1 5 6 2 | 6 |\n| 10 | 1 | hit | - | 1 already in frames | 5 6 2 1 | 6 |\n| 11 | 2 | hit | - | 2 already in frames | 5 6 1 2 | 6 |\n| 12 | 3 | miss | 5 | frames full; last used 5@#7 < 6@#8 < 1@#10 < 2@#11 -> least recent = 5 | 6 1 2 3 | 7 |\n| 13 | 7 | miss | 6 | frames full; last used 6@#8 < 1@#10 < 2@#11 < 3@#12 -> least recent = 6 | 1 2 3 7 | 8 |\n| 14 | 6 | miss | 1 | frames full; last used 1@#10 < 2@#11 < 3@#12 < 7@#13 -> least recent = 1 | 2 3 7 6 | 9 |\n| 15 | 3 | hit | - | 3 already in frames | 2 7 6 3 | 9 |\n| 16 | 2 | hit | - | 2 already in frames | 7 6 3 2 | 9 |\n| 17 | 1 | miss | 7 | frames full; last used 7@#13 < 6@#14 < 3@#15 < 2@#16 -> least recent = 7 | 6 3 2 1 | 10 |\n| 18 | 2 | hit | - | 2 already in frames | 6 3 1 2 | 10 |\n| 19 | 3 | hit | - | 3 already in frames | 6 1 2 3 | 10 |\n| 20 | 6 | hit | - | 6 already in frames | 1 2 3 6 | 10 |\n\n**Total page faults = 10** (hits = 20 - 10 = 10, hit ratio = 10 / 20 = 0.5, fault ratio = 10 / 20 = 0.5)\n\n**Answer: page faults = 10**"
+   },
+   {
+    "index": 18,
+    "kind": "paging",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: CLOCK, 3 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, advance the hand: a page with bit 1 gets a second chance (bit cleared), the first page with bit 0 is evicted; a hit sets the bit to 1._\n\n| # | Ref | Result | Evicted | Why | Frames (reference bit in brackets) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 2 | miss | - | free frame (1/3 used) | 2(1) | 1 |\n| 2 | 3 | miss | - | free frame (2/3 used) | 2(1) 3(1) | 2 |\n| 3 | 2 | hit | - | hit, set bit of 2 to 1 | 2(1) 3(1) | 2 |\n| 4 | 1 | miss | - | free frame (3/3 used) | 2(1) 3(1) 1(1), hand 2 | 3 |\n| 5 | 5 | miss | 2 | frames full; hand 2(1) clear, 3(1) clear, 1(1) clear, 2(0) evict | 5(1) 3(0) 1(0), hand 3 | 4 |\n| 6 | 2 | miss | 3 | frames full; hand 3(0) evict | 5(1) 2(1) 1(0), hand 1 | 5 |\n| 7 | 4 | miss | 1 | frames full; hand 1(0) evict | 5(1) 2(1) 4(1), hand 5 | 6 |\n| 8 | 5 | hit | - | hit, set bit of 5 to 1 | 5(1) 2(1) 4(1), hand 5 | 6 |\n| 9 | 3 | miss | 5 | frames full; hand 5(1) clear, 2(1) clear, 4(1) clear, 5(0) evict | 3(1) 2(0) 4(0), hand 2 | 7 |\n| 10 | 2 | hit | - | hit, set bit of 2 to 1 | 3(1) 2(1) 4(0), hand 2 | 7 |\n| 11 | 5 | miss | 4 | frames full; hand 2(1) clear, 4(0) evict | 3(1) 2(0) 5(1), hand 3 | 8 |\n| 12 | 2 | hit | - | hit, set bit of 2 to 1 | 3(1) 2(1) 5(1), hand 3 | 8 |\n\n**Total page faults = 8** (hits = 12 - 8 = 4, hit ratio = 4 / 12 = 0.3333, fault ratio = 8 / 12 = 0.6667)\n\n**Answer: page faults = 8**"
+   },
+   {
+    "index": 19,
+    "kind": "paging",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: OPT, 4 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page whose NEXT USE is FARTHEST in the future (never used again = farthest)._\n\n| # | Ref | Result | Evicted | Why | Frames (frame order) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 3 | miss | - | free frame (1/4 used) | 3 | 1 |\n| 2 | 2 | miss | - | free frame (2/4 used) | 3 2 | 2 |\n| 3 | 1 | miss | - | free frame (3/4 used) | 3 2 1 | 3 |\n| 4 | 0 | miss | - | free frame (4/4 used) | 3 2 1 0 | 4 |\n| 5 | 3 | hit | - | 3 already in frames | 3 2 1 0 | 4 |\n| 6 | 2 | hit | - | 2 already in frames | 3 2 1 0 | 4 |\n| 7 | 4 | miss | 0 | frames full; next use 0@#11 > 1@#10 > 2@#9 > 3@#8 -> farthest = 0 | 3 2 1 4 | 5 |\n| 8 | 3 | hit | - | 3 already in frames | 3 2 1 4 | 5 |\n| 9 | 2 | hit | - | 2 already in frames | 3 2 1 4 | 5 |\n| 10 | 1 | hit | - | 1 already in frames | 3 2 1 4 | 5 |\n| 11 | 0 | miss | 3 | frames full; next use 3@never > 2@never > 1@never > 4@#12 -> farthest = 3 | 0 2 1 4 | 6 |\n| 12 | 4 | hit | - | 4 already in frames | 0 2 1 4 | 6 |\n\n**Total page faults = 6** (hits = 12 - 6 = 6, hit ratio = 6 / 12 = 0.5, fault ratio = 6 / 12 = 0.5)\n\n**Answer: page faults = 6**"
+   },
+   {
+    "index": 20,
+    "kind": "banker_safety",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P0: [7, 5, 3] - [0, 1, 0] = [7, 4, 3]\n- P1: [3, 2, 2] - [2, 0, 0] = [1, 2, 2]\n- P2: [9, 0, 2] - [3, 0, 2] = [6, 0, 0]\n- P3: [2, 2, 2] - [2, 1, 1] = [0, 1, 1]\n- P4: [4, 3, 3] - [0, 0, 2] = [4, 3, 1]\n\n**Step 2 - run the safety algorithm** (scan the processes in order; run the first one whose Need fits in Work, then add its Allocation to Work and scan again)\n\n- Work = Available = [3, 3, 2]\n- P0: Need [7, 4, 3] vs Work [3, 3, 2]: 7>3, 4>3, 3>2 -> cannot run yet\n- P1: Need [1, 2, 2] vs Work [3, 3, 2]: 1<=3, 2<=3, 2<=2 -> all fit, run it. Work = [3, 3, 2] + Allocation [2, 0, 0] = [5, 3, 2]\n- P0: Need [7, 4, 3] vs Work [5, 3, 2]: 7>5, 4>3, 3>2 -> cannot run yet\n- P2: Need [6, 0, 0] vs Work [5, 3, 2]: 6>5, 0<=3, 0<=2 -> cannot run yet\n- P3: Need [0, 1, 1] vs Work [5, 3, 2]: 0<=5, 1<=3, 1<=2 -> all fit, run it. Work = [5, 3, 2] + Allocation [2, 1, 1] = [7, 4, 3]\n- P0: Need [7, 4, 3] vs Work [7, 4, 3]: 7<=7, 4<=4, 3<=3 -> all fit, run it. Work = [7, 4, 3] + Allocation [0, 1, 0] = [7, 5, 3]\n- P2: Need [6, 0, 0] vs Work [7, 5, 3]: 6<=7, 0<=5, 0<=3 -> all fit, run it. Work = [7, 5, 3] + Allocation [3, 0, 2] = [10, 5, 5]\n- P4: Need [4, 3, 1] vs Work [10, 5, 5]: 4<=10, 3<=5, 1<=5 -> all fit, run it. Work = [10, 5, 5] + Allocation [0, 0, 2] = [10, 5, 7]\n\n**Step 3 - conclusion**\n\nAll 5 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< P1, P3, P0, P2, P4 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._\n\n**Answer: SAFE, safe sequence < P1, P3, P0, P2, P4 >**"
+   },
+   {
+    "index": 21,
+    "kind": "banker_request",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P0: [7, 5, 3] - [0, 1, 0] = [7, 4, 3]\n- P1: [3, 2, 2] - [2, 0, 0] = [1, 2, 2]\n- P2: [9, 0, 2] - [3, 0, 2] = [6, 0, 0]\n- P3: [2, 2, 2] - [2, 1, 1] = [0, 1, 1]\n- P4: [4, 3, 3] - [0, 0, 2] = [4, 3, 1]\n\n**Step 2 - apply the three tests of the resource-request algorithm**\n\n- Test 1: Request [1, 0, 2] vs Need [1, 2, 2]: 1<=1, 0<=2, 2<=2 -> OK\n- Test 2: Request [1, 0, 2] vs Available [3, 3, 2]: 1<=3, 0<=3, 2<=2 -> OK\n- Test 3: pretend to grant. Available = [3, 3, 2] - [1, 0, 2] = [2, 3, 0]; Allocation[P1] = [3, 0, 2]. Now run the safety algorithm.\n- Work = Available = [2, 3, 0]\n- P0: Need [7, 4, 3] vs Work [2, 3, 0]: 7>2, 4>3, 3>0 -> cannot run yet\n- P1: Need [0, 2, 0] vs Work [2, 3, 0]: 0<=2, 2<=3, 0<=0 -> all fit, run it. Work = [2, 3, 0] + Allocation [3, 0, 2] = [5, 3, 2]\n- P0: Need [7, 4, 3] vs Work [5, 3, 2]: 7>5, 4>3, 3>2 -> cannot run yet\n- P2: Need [6, 0, 0] vs Work [5, 3, 2]: 6>5, 0<=3, 0<=2 -> cannot run yet\n- P3: Need [0, 1, 1] vs Work [5, 3, 2]: 0<=5, 1<=3, 1<=2 -> all fit, run it. Work = [5, 3, 2] + Allocation [2, 1, 1] = [7, 4, 3]\n- P0: Need [7, 4, 3] vs Work [7, 4, 3]: 7<=7, 4<=4, 3<=3 -> all fit, run it. Work = [7, 4, 3] + Allocation [0, 1, 0] = [7, 5, 3]\n- P2: Need [6, 0, 0] vs Work [7, 5, 3]: 6<=7, 0<=5, 0<=3 -> all fit, run it. Work = [7, 5, 3] + Allocation [3, 0, 2] = [10, 5, 5]\n- P4: Need [4, 3, 1] vs Work [10, 5, 5]: 4<=10, 3<=5, 1<=5 -> all fit, run it. Work = [10, 5, 5] + Allocation [0, 0, 2] = [10, 5, 7]\n- SAFE. Safe sequence: < P1, P3, P0, P2, P4 >\n- Resulting state is SAFE (sequence < P1, P3, P0, P2, P4 >) -> GRANT the request\n\n**Conclusion: the request is GRANTED.**\n\n**Answer: GRANTED**"
+   },
+   {
+    "index": 22,
+    "kind": "banker_request",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 2)",
+    "finish": "stop",
+    "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P0: [7, 5, 3] - [0, 1, 0] = [7, 4, 3]\n- P1: [3, 2, 2] - [2, 0, 0] = [1, 2, 2]\n- P2: [9, 0, 2] - [3, 0, 2] = [6, 0, 0]\n- P3: [2, 2, 2] - [2, 1, 1] = [0, 1, 1]\n- P4: [4, 3, 3] - [0, 0, 2] = [4, 3, 1]\n\n**Step 2 - apply the three tests of the resource-request algorithm**\n\n- Test 1: Request [0, 2, 0] vs Need [7, 4, 3]: 0<=7, 2<=4, 0<=3 -> OK\n- Test 2: Request [0, 2, 0] vs Available [3, 3, 2]: 0<=3, 2<=3, 0<=2 -> OK\n- Test 3: pretend to grant. Available = [3, 3, 2] - [0, 2, 0] = [3, 1, 2]; Allocation[P0] = [0, 3, 0]. Now run the safety algorithm.\n- Work = Available = [3, 1, 2]\n- P0: Need [7, 2, 3] vs Work [3, 1, 2]: 7>3, 2>1, 3>2 -> cannot run yet\n- P1: Need [1, 2, 2] vs Work [3, 1, 2]: 1<=3, 2>1, 2<=2 -> cannot run yet\n- P2: Need [6, 0, 0] vs Work [3, 1, 2]: 6>3, 0<=1, 0<=2 -> cannot run yet\n- P3: Need [0, 1, 1] vs Work [3, 1, 2]: 0<=3, 1<=1, 1<=2 -> all fit, run it. Work = [3, 1, 2] + Allocation [2, 1, 1] = [5, 2, 3]\n- P0: Need [7, 2, 3] vs Work [5, 2, 3]: 7>5, 2<=2, 3<=3 -> cannot run yet\n- P1: Need [1, 2, 2] vs Work [5, 2, 3]: 1<=5, 2<=2, 2<=3 -> all fit, run it. Work = [5, 2, 3] + Allocation [2, 0, 0] = [7, 2, 3]\n- P0: Need [7, 2, 3] vs Work [7, 2, 3]: 7<=7, 2<=2, 3<=3 -> all fit, run it. Work = [7, 2, 3] + Allocation [0, 3, 0] = [7, 5, 3]\n- P2: Need [6, 0, 0] vs Work [7, 5, 3]: 6<=7, 0<=5, 0<=3 -> all fit, run it. Work = [7, 5, 3] + Allocation [3, 0, 2] = [10, 5, 5]\n- P4: Need [4, 3, 1] vs Work [10, 5, 5]: 4<=10, 3<=5, 1<=5 -> all fit, run it. Work = [10, 5, 5] + Allocation [0, 0, 2] = [10, 5, 7]\n- SAFE. Safe sequence: < P3, P1, P0, P2, P4 >\n- Resulting state is SAFE (sequence < P3, P1, P0, P2, P4 >) -> GRANT the request\n\n**Conclusion: the request is GRANTED.**\n\n**Answer: GRANTED**"
+   },
+   {
+    "index": 23,
+    "kind": "banker_safety",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Step 0 - Available = Total - (sum of each Allocation column)**\n\n- A: allocated 0 + 2 = 2, 2 + 3 = 5, 5 + 2 = 7, 7 + 0 = 7; available 10 - 7 = 3\n- B: allocated 1 + 0 = 1, 1 + 0 = 1, 1 + 1 = 2, 2 + 0 = 2; available 5 - 2 = 3\n- C: allocated 0 + 0 = 0, 0 + 2 = 2, 2 + 1 = 3, 3 + 2 = 5; available 7 - 5 = 2\n- Available = [3, 3, 2]\n\n**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P0: [7, 5, 3] - [0, 1, 0] = [7, 4, 3]\n- P1: [3, 2, 2] - [2, 0, 0] = [1, 2, 2]\n- P2: [9, 0, 2] - [3, 0, 2] = [6, 0, 0]\n- P3: [2, 2, 2] - [2, 1, 1] = [0, 1, 1]\n- P4: [4, 3, 3] - [0, 0, 2] = [4, 3, 1]\n\n**Step 2 - run the safety algorithm** (scan the processes in order; run the first one whose Need fits in Work, then add its Allocation to Work and scan again)\n\n- Work = Available = [3, 3, 2]\n- P0: Need [7, 4, 3] vs Work [3, 3, 2]: 7>3, 4>3, 3>2 -> cannot run yet\n- P1: Need [1, 2, 2] vs Work [3, 3, 2]: 1<=3, 2<=3, 2<=2 -> all fit, run it. Work = [3, 3, 2] + Allocation [2, 0, 0] = [5, 3, 2]\n- P0: Need [7, 4, 3] vs Work [5, 3, 2]: 7>5, 4>3, 3>2 -> cannot run yet\n- P2: Need [6, 0, 0] vs Work [5, 3, 2]: 6>5, 0<=3, 0<=2 -> cannot run yet\n- P3: Need [0, 1, 1] vs Work [5, 3, 2]: 0<=5, 1<=3, 1<=2 -> all fit, run it. Work = [5, 3, 2] + Allocation [2, 1, 1] = [7, 4, 3]\n- P0: Need [7, 4, 3] vs Work [7, 4, 3]: 7<=7, 4<=4, 3<=3 -> all fit, run it. Work = [7, 4, 3] + Allocation [0, 1, 0] = [7, 5, 3]\n- P2: Need [6, 0, 0] vs Work [7, 5, 3]: 6<=7, 0<=5, 0<=3 -> all fit, run it. Work = [7, 5, 3] + Allocation [3, 0, 2] = [10, 5, 5]\n- P4: Need [4, 3, 1] vs Work [10, 5, 5]: 4<=10, 3<=5, 1<=5 -> all fit, run it. Work = [10, 5, 5] + Allocation [0, 0, 2] = [10, 5, 7]\n\n**Step 3 - conclusion**\n\nAll 5 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< P1, P3, P0, P2, P4 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._\n\n**Answer: SAFE, safe sequence < P1, P3, P0, P2, P4 >**"
+   },
+   {
+    "index": 24,
+    "kind": "banker_safety",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- A: [3, 2, 1] - [1, 1, 0] = [2, 1, 1]\n- B: [1, 3, 2] - [0, 1, 1] = [1, 2, 1]\n- C: [2, 1, 3] - [1, 0, 1] = [1, 1, 2]\n\n**Step 2 - run the safety algorithm** (scan the processes in order; run the first one whose Need fits in Work, then add its Allocation to Work and scan again)\n\n- Work = Available = [1, 0, 0]\n- A: Need [2, 1, 1] vs Work [1, 0, 0]: 2>1, 1>0, 1>0 -> cannot run yet\n- B: Need [1, 2, 1] vs Work [1, 0, 0]: 1<=1, 2>0, 1>0 -> cannot run yet\n- C: Need [1, 1, 2] vs Work [1, 0, 0]: 1<=1, 1>0, 2>0 -> cannot run yet\n\n**Step 3 - conclusion**\n\nNo remaining process (A, B, C) has a Need that fits in Work [1, 0, 0], so they can never all finish: the system is **NOT in a safe state (UNSAFE)**.\n\n_Unsafe does not mean deadlocked yet: it means a deadlock is possible if the processes request their maximum._\n\n**Answer: UNSAFE, no safe sequence exists**"
+   },
+   {
+    "index": 25,
+    "kind": "banker_safety",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P1: [1, 2, 2] - [1, 0, 0] = [0, 2, 2]\n- P2: [0, 1, 1] - [2, 1, 1] = [-2, 0, 0]\n- P3: [4, 3, 1] - [0, 0, 2] = [4, 3, -1]\n- P4: [1, 0, 0] - [1, 1, 0] = [0, -1, 0]\n\n**Step 2 - run the safety algorithm** (scan the processes in order; run the first one whose Need fits in Work, then add its Allocation to Work and scan again)\n\n- Work = Available = [1, 1, 1]\n- P1: Need [0, 2, 2] vs Work [1, 1, 1]: 0<=1, 2>1, 2>1 -> cannot run yet\n- P2: Need [-2, 0, 0] vs Work [1, 1, 1]: -2<=1, 0<=1, 0<=1 -> all fit, run it. Work = [1, 1, 1] + Allocation [2, 1, 1] = [3, 2, 2]\n- P1: Need [0, 2, 2] vs Work [3, 2, 2]: 0<=3, 2<=2, 2<=2 -> all fit, run it. Work = [3, 2, 2] + Allocation [1, 0, 0] = [4, 2, 2]\n- P3: Need [4, 3, -1] vs Work [4, 2, 2]: 4<=4, 3>2, -1<=2 -> cannot run yet\n- P4: Need [0, -1, 0] vs Work [4, 2, 2]: 0<=4, -1<=2, 0<=2 -> all fit, run it. Work = [4, 2, 2] + Allocation [1, 1, 0] = [5, 3, 2]\n- P3: Need [4, 3, -1] vs Work [5, 3, 2]: 4<=5, 3<=3, -1<=2 -> all fit, run it. Work = [5, 3, 2] + Allocation [0, 0, 2] = [5, 3, 4]\n\n**Step 3 - conclusion**\n\nAll 4 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< P2, P1, P4, P3 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._\n\n**Answer: SAFE, safe sequence < P2, P1, P4, P3 >**"
+   },
+   {
+    "index": 26,
+    "kind": "disk",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: SSTF**\n\n- direction: not given in the question -> assume the head moves UP, towards higher cylinder numbers (the usual textbook convention)\n- at 53: nearest below 37 (53 - 37 = 16) vs above 65 (65 - 53 = 12); 12 < 16 -> 65\n- at 65: nearest below 37 (65 - 37 = 28) vs above 67 (67 - 65 = 2); 2 < 28 -> 67\n- at 67: nearest below 37 (67 - 37 = 30) vs above 98 (98 - 67 = 31); 30 < 31 -> 37\n- at 37: nearest below 14 (37 - 14 = 23) vs above 98 (98 - 37 = 61); 23 < 61 -> 14\n- at 14: only requests above remain; nearest above 98 (98 - 14 = 84) -> 98\n- at 98: only requests above remain; nearest above 122 (122 - 98 = 24) -> 122\n- at 122: only requests above remain; nearest above 124 (124 - 122 = 2) -> 124\n- at 124: only requests above remain; nearest above 183 (183 - 124 = 59) -> 183\n- 53 -> 65: 65 - 53 = 12; running total 0 + 12 = 12\n- 65 -> 67: 67 - 65 = 2; running total 12 + 2 = 14\n- 67 -> 37: 67 - 37 = 30; running total 14 + 30 = 44\n- 37 -> 14: 37 - 14 = 23; running total 44 + 23 = 67\n- 14 -> 98: 98 - 14 = 84; running total 67 + 84 = 151\n- 98 -> 122: 122 - 98 = 24; running total 151 + 24 = 175\n- 122 -> 124: 124 - 122 = 2; running total 175 + 2 = 177\n- 124 -> 183: 183 - 124 = 59; running total 177 + 59 = 236\n\n**Service order:** 65 -> 67 -> 37 -> 14 -> 98 -> 122 -> 124 -> 183\n**Total head movement = 236 cylinders**\n- Average seek length = 236 / 8 = 29.5\n- _If the head were moving DOWN instead: order 65 -> 67 -> 37 -> 14 -> 98 -> 122 -> 124 -> 183, total 236 cylinders._\n\n**Answer: total head movement = 236 cylinders**"
+   },
+   {
+    "index": 27,
+    "kind": "disk",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: SCAN**\n\n- sorted requests: [14, 37, 65, 67, 98, 122, 124, 183]; below head 53: [14, 37]; at/above head: [65, 67, 98, 122, 124, 183]\n- SCAN, head moving DOWN, towards cylinder 0: service [37, 14], continue to the disk edge 0, reverse, then service [65, 67, 98, 122, 124, 183]\n- 53 -> 37: 53 - 37 = 16; running total 0 + 16 = 16\n- 37 -> 14: 37 - 14 = 23; running total 16 + 23 = 39\n- 14 -> 0: 14 - 0 = 14; running total 39 + 14 = 53\n- 0 -> 65: 65 - 0 = 65; running total 53 + 65 = 118\n- 65 -> 67: 67 - 65 = 2; running total 118 + 2 = 120\n- 67 -> 98: 98 - 67 = 31; running total 120 + 31 = 151\n- 98 -> 122: 122 - 98 = 24; running total 151 + 24 = 175\n- 122 -> 124: 124 - 122 = 2; running total 175 + 2 = 177\n- 124 -> 183: 183 - 124 = 59; running total 177 + 59 = 236\n\n**Service order:** 37 -> 14 -> 0 -> 65 -> 67 -> 98 -> 122 -> 124 -> 183\n**Total head movement = 236 cylinders**\n- Average seek length = 236 / 8 = 29.5\n\n**Answer: total head movement = 236 cylinders**"
+   },
+   {
+    "index": 28,
+    "kind": "disk",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: CSCAN**\n\n- sorted requests: [14, 37, 65, 67, 98, 122, 124, 183]; below head 53: [14, 37]; at/above head: [65, 67, 98, 122, 124, 183]\n- C-SCAN, head moving UP, towards higher cylinders: service [65, 67, 98, 122, 124, 183], go to the edge 199, jump to 0, continue up through [14, 37]\n- 53 -> 65: 65 - 53 = 12; running total 0 + 12 = 12\n- 65 -> 67: 67 - 65 = 2; running total 12 + 2 = 14\n- 67 -> 98: 98 - 67 = 31; running total 14 + 31 = 45\n- 98 -> 122: 122 - 98 = 24; running total 45 + 24 = 69\n- 122 -> 124: 124 - 122 = 2; running total 69 + 2 = 71\n- 124 -> 183: 183 - 124 = 59; running total 71 + 59 = 130\n- 183 -> 199: 199 - 183 = 16; running total 130 + 16 = 146\n- 199 -> 0: 199 - 0 = 199; running total 146 + 199 = 345\n- 0 -> 14: 14 - 0 = 14; running total 345 + 14 = 359\n- 14 -> 37: 37 - 14 = 23; running total 359 + 23 = 382\n\n**Service order:** 65 -> 67 -> 98 -> 122 -> 124 -> 183 -> 199 -> 0 -> 14 -> 37\n**Total head movement = 382 cylinders**\n- Average seek length = 382 / 8 = 47.75\n- _Convention: this total counts the return jump of 199 cylinders. If your course excludes the jump, the total is 382 - 199 = 183._\n\n**Answer: total head movement = 382 cylinders**"
+   },
+   {
+    "index": 29,
+    "kind": "disk",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: LOOK**\n\n- direction: previous request 125 < head 143, so the head is moving UP\n- sorted requests: [86, 130, 913, 948, 1022, 1470, 1509, 1750, 1774]; below head 143: [86, 130]; at/above head: [913, 948, 1022, 1470, 1509, 1750, 1774]\n- LOOK, head moving UP, towards higher cylinders: service [913, 948, 1022, 1470, 1509, 1750, 1774], reverse at the last request (not the edge), then service [130, 86]\n- 143 -> 913: 913 - 143 = 770; running total 0 + 770 = 770\n- 913 -> 948: 948 - 913 = 35; running total 770 + 35 = 805\n- 948 -> 1022: 1022 - 948 = 74; running total 805 + 74 = 879\n- 1022 -> 1470: 1470 - 1022 = 448; running total 879 + 448 = 1327\n- 1470 -> 1509: 1509 - 1470 = 39; running total 1327 + 39 = 1366\n- 1509 -> 1750: 1750 - 1509 = 241; running total 1366 + 241 = 1607\n- 1750 -> 1774: 1774 - 1750 = 24; running total 1607 + 24 = 1631\n- 1774 -> 130: 1774 - 130 = 1644; running total 1631 + 1644 = 3275\n- 130 -> 86: 130 - 86 = 44; running total 3275 + 44 = 3319\n\n**Service order:** 913 -> 948 -> 1022 -> 1470 -> 1509 -> 1750 -> 1774 -> 130 -> 86\n**Total head movement = 3319 cylinders**\n- Average seek length = 3319 / 9 = 368.78\n\n**Answer: total head movement = 3319 cylinders**"
+   },
+   {
+    "index": 30,
+    "kind": "disk",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: FCFS**\n\n- direction: not given in the question -> assume the head moves UP, towards higher cylinder numbers (the usual textbook convention)\n- 143 -> 86: 143 - 86 = 57; running total 0 + 57 = 57\n- 86 -> 1470: 1470 - 86 = 1384; running total 57 + 1384 = 1441\n- 1470 -> 913: 1470 - 913 = 557; running total 1441 + 557 = 1998\n- 913 -> 1774: 1774 - 913 = 861; running total 1998 + 861 = 2859\n- 1774 -> 948: 1774 - 948 = 826; running total 2859 + 826 = 3685\n- 948 -> 1509: 1509 - 948 = 561; running total 3685 + 561 = 4246\n- 1509 -> 1022: 1509 - 1022 = 487; running total 4246 + 487 = 4733\n- 1022 -> 1750: 1750 - 1022 = 728; running total 4733 + 728 = 5461\n- 1750 -> 130: 1750 - 130 = 1620; running total 5461 + 1620 = 7081\n\n**Service order:** 86 -> 1470 -> 913 -> 1774 -> 948 -> 1509 -> 1022 -> 1750 -> 130\n**Total head movement = 7081 cylinders**\n- Average seek length = 7081 / 9 = 786.78\n- _If the head were moving DOWN instead: order 86 -> 1470 -> 913 -> 1774 -> 948 -> 1509 -> 1022 -> 1750 -> 130, total 7081 cylinders._\n\n**Answer: total head movement = 7081 cylinders**"
+   },
+   {
+    "index": 31,
+    "kind": "disk",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: CLOOK**\n\n- sorted requests: [16, 24, 43, 82, 140, 170, 190]; below head 50: [16, 24, 43]; at/above head: [82, 140, 170, 190]\n- C-LOOK, head moving DOWN, towards cylinder 0: service [43, 24, 16], jump to the farthest pending request, continue down through [190, 170, 140, 82]\n- 50 -> 43: 50 - 43 = 7; running total 0 + 7 = 7\n- 43 -> 24: 43 - 24 = 19; running total 7 + 19 = 26\n- 24 -> 16: 24 - 16 = 8; running total 26 + 8 = 34\n- 16 -> 190: 190 - 16 = 174; running total 34 + 174 = 208\n- 190 -> 170: 190 - 170 = 20; running total 208 + 20 = 228\n- 170 -> 140: 170 - 140 = 30; running total 228 + 30 = 258\n- 140 -> 82: 140 - 82 = 58; running total 258 + 58 = 316\n\n**Service order:** 43 -> 24 -> 16 -> 190 -> 170 -> 140 -> 82\n**Total head movement = 316 cylinders**\n- Average seek length = 316 / 7 = 45.14\n- _Convention: this total counts the return jump of 174 cylinders. If your course excludes the jump, the total is 316 - 174 = 142._\n\n**Answer: total head movement = 316 cylinders**"
+   },
+   {
+    "index": 32,
+    "kind": "disk",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: SSTF**\n\n- direction: not given in the question -> assume the head moves UP, towards higher cylinder numbers (the usual textbook convention)\n- at 50: nearest below 43 (50 - 43 = 7) vs above 82 (82 - 50 = 32); 7 < 32 -> 43\n- at 43: nearest below 24 (43 - 24 = 19) vs above 82 (82 - 43 = 39); 19 < 39 -> 24\n- at 24: nearest below 16 (24 - 16 = 8) vs above 82 (82 - 24 = 58); 8 < 58 -> 16\n- at 16: only requests above remain; nearest above 82 (82 - 16 = 66) -> 82\n- at 82: only requests above remain; nearest above 140 (140 - 82 = 58) -> 140\n- at 140: only requests above remain; nearest above 170 (170 - 140 = 30) -> 170\n- at 170: only requests above remain; nearest above 190 (190 - 170 = 20) -> 190\n- 50 -> 43: 50 - 43 = 7; running total 0 + 7 = 7\n- 43 -> 24: 43 - 24 = 19; running total 7 + 19 = 26\n- 24 -> 16: 24 - 16 = 8; running total 26 + 8 = 34\n- 16 -> 82: 82 - 16 = 66; running total 34 + 66 = 100\n- 82 -> 140: 140 - 82 = 58; running total 100 + 58 = 158\n- 140 -> 170: 170 - 140 = 30; running total 158 + 30 = 188\n- 170 -> 190: 190 - 170 = 20; running total 188 + 20 = 208\n\n**Service order:** 43 -> 24 -> 16 -> 82 -> 140 -> 170 -> 190\n**Total head movement = 208 cylinders**\n- Average seek length = 208 / 7 = 29.71\n- _If the head were moving DOWN instead: order 43 -> 24 -> 16 -> 82 -> 140 -> 170 -> 190, total 208 cylinders._\n\n**Answer: total head movement = 208 cylinders**"
+   },
+   {
+    "index": 33,
+    "kind": "translate",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Step-by-step translation**\n\n- page number = floor(9000 / 4096) = 2  (check: 2 x 4096 = 8192 <= 9000 < 12288)\n- page offset = 9000 - 8192 = 808\n- page table[2] = frame 1\n- frame base = 1 x 4096 = 4096\n- physical address = 4096 + 808 = 4904\n\n**Physical address = 4904**\n\n**Answer: physical address = 4904**"
+   },
+   {
+    "index": 34,
+    "kind": "translate",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Step-by-step translation**\n\n- convert 0xa2c to decimal: 10 x 256 = 2560; 2 x 16 = 32; 12 x 1 = 12\n- sum: 2560 + 32 = 2592, 2592 + 12 = 2604 -> 0xa2c = 2604\n- page number = floor(2604 / 1024) = 2  (check: 2 x 1024 = 2048 <= 2604 < 3072)\n- page offset = 2604 - 2048 = 556\n- page table[2] = frame 2\n- frame base = 2 x 1024 = 2048\n- physical address = 2048 + 556 = 2604\n\n**Physical address = 2604**\n- in hexadecimal: 2604 = 0xa2c\n\n**Answer: physical address = 2604 (0xa2c)**"
+   },
+   {
+    "index": 35,
+    "kind": "translate",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Step-by-step translation**\n\n- page number = floor(10000 / 2048) = 4  (check: 4 x 2048 = 8192 <= 10000 < 10240)\n- page offset = 10000 - 8192 = 1808\n- page table[4] = frame 6\n- frame base = 6 x 2048 = 12288\n- physical address = 12288 + 1808 = 14096\n\n**Physical address = 14096**\n\n**Answer: physical address = 14096**"
+   },
+   {
+    "index": 36,
+    "kind": "freespace",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: BEST-fit**\n\n_Rule: take the SMALLEST hole that is large enough; the leftover stays as a smaller hole. A request that fits nowhere must wait._\n\n- holes (free KB, numbered in order): hole 1=100, hole 2=500, hole 3=200, hole 4=300, hole 5=600\n- request 212: hole 1=100 < 212 no; hole 2=500 >= 212 fits; hole 3=200 < 212 no; hole 4=300 >= 212 fits; hole 5=600 >= 212 fits -> smallest fitting: 300 < 500 < 600 -> hole 4; 300 - 212 = 88\n- request 417: hole 1=100 < 417 no; hole 2=500 >= 417 fits; hole 3=200 < 417 no; hole 4=88 < 417 no; hole 5=600 >= 417 fits -> smallest fitting: 500 < 600 -> hole 2; 500 - 417 = 83\n- request 112: hole 1=100 < 112 no; hole 2=83 < 112 no; hole 3=200 >= 112 fits; hole 4=88 < 112 no; hole 5=600 >= 112 fits -> smallest fitting: 200 < 600 -> hole 3; 200 - 112 = 88\n- request 426: hole 1=100 < 426 no; hole 2=83 < 426 no; hole 3=88 < 426 no; hole 4=88 < 426 no; hole 5=600 >= 426 fits -> smallest fitting: 600 -> hole 5; 600 - 426 = 174\n\n**Placement:** 212 KB -> hole 4; 417 KB -> hole 2; 112 KB -> hole 3; 426 KB -> hole 5\n**Remaining free space per hole:** [100, 83, 88, 88, 174]\n- Sum of free space: 100 + 83 = 183, 183 + 88 = 271, 271 + 88 = 359, 359 + 174 = 533\n**Total external fragmentation = 533 KB**\n\n**Answer: 212 KB -> hole 4; 417 KB -> hole 2; 112 KB -> hole 3; 426 KB -> hole 5**"
+   },
+   {
+    "index": 37,
+    "kind": "freespace",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: WORST-fit**\n\n_Rule: take the LARGEST hole that is large enough; the leftover stays as a smaller hole. A request that fits nowhere must wait._\n\n- holes (free KB, numbered in order): hole 1=100, hole 2=500, hole 3=200, hole 4=300, hole 5=600\n- request 212: hole 1=100 < 212 no; hole 2=500 >= 212 fits; hole 3=200 < 212 no; hole 4=300 >= 212 fits; hole 5=600 >= 212 fits -> largest fitting: 600 > 500 > 300 -> hole 5; 600 - 212 = 388\n- request 417: hole 1=100 < 417 no; hole 2=500 >= 417 fits; hole 3=200 < 417 no; hole 4=300 < 417 no; hole 5=388 < 417 no -> largest fitting: 500 -> hole 2; 500 - 417 = 83\n- request 112: hole 1=100 < 112 no; hole 2=83 < 112 no; hole 3=200 >= 112 fits; hole 4=300 >= 112 fits; hole 5=388 >= 112 fits -> largest fitting: 388 > 300 > 200 -> hole 5; 388 - 112 = 276\n- request 426: hole 1=100 < 426 no; hole 2=83 < 426 no; hole 3=200 < 426 no; hole 4=300 < 426 no; hole 5=276 < 426 no -> no hole fits -> must WAIT\n\n**Placement:** 212 KB -> hole 5; 417 KB -> hole 2; 112 KB -> hole 5; 426 KB -> WAIT\n**Remaining free space per hole:** [100, 83, 200, 300, 276]\n- Sum of free space: 100 + 83 = 183, 183 + 200 = 383, 383 + 300 = 683, 683 + 276 = 959\n**Total external fragmentation = 959 KB**\n\n**Answer: 212 KB -> hole 5; 417 KB -> hole 2; 112 KB -> hole 5; 426 KB -> WAIT**"
+   },
+   {
+    "index": 38,
+    "kind": "freespace",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: FIRST-fit**\n\n_Rule: scan holes in order and take the FIRST that is large enough; the leftover stays as a smaller hole. A request that fits nowhere must wait._\n\n- holes (free KB, numbered in order): hole 1=100, hole 2=500, hole 3=200, hole 4=300, hole 5=600\n- request 212: hole 1=100 < 212 no; hole 2=500 >= 212 fits -> first fitting hole = hole 2; 500 - 212 = 288\n- request 417: hole 1=100 < 417 no; hole 2=288 < 417 no; hole 3=200 < 417 no; hole 4=300 < 417 no; hole 5=600 >= 417 fits -> first fitting hole = hole 5; 600 - 417 = 183\n- request 112: hole 1=100 < 112 no; hole 2=288 >= 112 fits -> first fitting hole = hole 2; 288 - 112 = 176\n- request 426: hole 1=100 < 426 no; hole 2=176 < 426 no; hole 3=200 < 426 no; hole 4=300 < 426 no; hole 5=183 < 426 no -> no hole fits -> must WAIT\n\n**Placement:** 212 KB -> hole 2; 417 KB -> hole 5; 112 KB -> hole 2; 426 KB -> WAIT\n**Remaining free space per hole:** [100, 176, 200, 300, 183]\n- Sum of free space: 100 + 176 = 276, 276 + 200 = 476, 476 + 300 = 776, 776 + 183 = 959\n**Total external fragmentation = 959 KB**\n\n**Answer: 212 KB -> hole 2; 417 KB -> hole 5; 112 KB -> hole 2; 426 KB -> WAIT**"
+   },
+   {
+    "index": 39,
+    "kind": "freespace",
+    "final_correct": true,
+    "delegated": true,
+    "reason": "ok (attempt 1)",
+    "finish": "stop",
+    "output": "**Policy: BEST-fit**\n\n_Rule: take the SMALLEST hole that is large enough; the leftover stays as a smaller hole. A request that fits nowhere must wait._\n\n- holes (free KB, numbered in order): hole 1=40, hole 2=25, hole 3=90, hole 4=30, hole 5=60\n- request 28: hole 1=40 >= 28 fits; hole 2=25 < 28 no; hole 3=90 >= 28 fits; hole 4=30 >= 28 fits; hole 5=60 >= 28 fits -> smallest fitting: 30 < 40 < 60 < 90 -> hole 4; 30 - 28 = 2\n- request 55: hole 1=40 < 55 no; hole 2=25 < 55 no; hole 3=90 >= 55 fits; hole 4=2 < 55 no; hole 5=60 >= 55 fits -> smallest fitting: 60 < 90 -> hole 5; 60 - 55 = 5\n- request 35: hole 1=40 >= 35 fits; hole 2=25 < 35 no; hole 3=90 >= 35 fits; hole 4=2 < 35 no; hole 5=5 < 35 no -> smallest fitting: 40 < 90 -> hole 1; 40 - 35 = 5\n- request 20: hole 1=5 < 20 no; hole 2=25 >= 20 fits; hole 3=90 >= 20 fits; hole 4=2 < 20 no; hole 5=5 < 20 no -> smallest fitting: 25 < 90 -> hole 2; 25 - 20 = 5\n\n**Placement:** 28 KB -> hole 4; 55 KB -> hole 5; 35 KB -> hole 1; 20 KB -> hole 2\n**Remaining free space per hole:** [5, 5, 90, 2, 5]\n- Sum of free space: 5 + 5 = 10, 10 + 90 = 100, 100 + 2 = 102, 102 + 5 = 107\n**Total external fragmentation = 107 KB**\n\n**Answer: 28 KB -> hole 4; 55 KB -> hole 5; 35 KB -> hole 1; 20 KB -> hole 2**"
+   },
+   {
+    "index": 40,
+    "kind": "eat_tlb",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "formula",
+    "finish": "stop",
+    "output": "**Formula:** EAT = h x (t + m) + (1 - h) x (t + (n + 1) x m)\n\n**Working**\n\n- TLB hit: TLB lookup + memory access = 20 + 100 = 120 ns\n- TLB miss: 1 page-table access = 1 x 100 = 100 ns\n- miss time = TLB lookup + page-table access + memory access = 20 + 100 = 120, 120 + 100 = 220 ns\n- h x hit = 0.8 x 120 = 96\n- 1 - h = 1 - 0.8 = 0.2\n- (1 - h) x miss = 0.2 x 220 = 44\n- EAT = 96 + 44 = 140 ns\n\n**Answer: EAT (ns) = 140**"
+   },
+   {
+    "index": 41,
+    "kind": "eat_tlb",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "formula",
+    "finish": "stop",
+    "output": "**Formula:** EAT = h x (t + m) + (1 - h) x (t + t + m)\n\n**Working**\n\n- TLB hit: TLB + one memory access = 10 + 120 = 130 ns\n- TLB miss: 1 memory access for page table level 1 + 1 memory access for page table level 2 + 1 memory access for the page frame = 120 + 120 + 120 = 360 ns\n- h x (t + m) = 0.98 x 130 = 127.4\n- 1 - h = 1 - 0.98 = 0.02\n- (1 - h) x (t + t + m) = 0.02 x 360 = 7.2\n- EAT = 127.4 + 7.2 = 134.6 ns\n\n**Answer: EAT (ns) = 134.6**"
+   },
+   {
+    "index": 42,
+    "kind": "eat_pagefault",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "formula",
+    "finish": "stop",
+    "output": "**Formula:** EAT = (1 - p) x ma + p x (page-fault-service-time + ma)\n\n**Working**\n\n- page-fault service time = 8 ms = 8 x 1,000,000 = 8,000,000 ns\n- 1 - p = 1 - 0.001 = 0.999\n- (1 - p) x 200 = 199.8\n- p x 8,000,000 = 8000\n- 8000 + 199.8 = 8199.8\n\n**Answer: EAT (ns) = 8199.8**"
+   },
+   {
+    "index": 43,
+    "kind": "paging_bits",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "formula",
+    "finish": "stop",
+    "output": "**Formula:** offset = log2(page size); pages = 2^(logical bits - offset); frames = 2^(physical bits - frame bits); table = pages x PTE size\n\n**Working**\n\n- logical address = 32 bits\n- physical address = log2(1 GB) = log2(1,073,741,824) = 30 bits\n- offset = log2(page size) = log2(4096) = 12 bits\n- page-number bits = 32 - 12 = 20\n- number of pages = 2^20 = 1,048,576\n- frame bits = 30 - 12 = 18\n- number of frames = 2^18 = 262,144\n- PTE size = 4 bytes\n- page table size = pages x PTE size = 1,048,576 x 4 = 4,194,304 bytes = 4 MB\n\n**Answer: entries = 1048576, page table size bytes = 4194304, offset bits = 12, frame bits = 18**"
+   },
+   {
+    "index": 44,
+    "kind": "multilevel_paging",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "formula",
+    "finish": "stop",
+    "output": "**Formula:** levels = ceil((VA bits - offset bits) / log2(page size / PTE size))\n\n**Working**\n\n- offset bits = log2(4096) = 12\n- bits for page table indices = 39 - 12 = 27\n- each PTE index = log2(8) = 3\n- number of indices per table = 2^3 = 8\n- levels = ceil(27 / 3) = 9\n\n**Answer: levels = 9**"
+   },
+   {
+    "index": 45,
+    "kind": "disk_access",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "formula",
+    "finish": "stop",
+    "output": "**Formula:** access time = seek + rotational latency + transfer\n\n**Working**\n\n- one full rotation = 60,000 ms / 7200 = 8.3333 ms\n- average rotational latency = 8.3333 / 2 = 4.1667 ms\n- block size = 4 KB / 1024 = 0.003906 MB\n- transfer time = 0.003906 / 100 x 1000 = 0.0391 ms\n- total = seek + latency + transfer = 9 + 4.1667 + 0.0391 = 13.2058 ms\n\n**Answer: access time (ms) = 13.2058**"
+   },
+   {
+    "index": 46,
+    "kind": "deadlock_min",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "formula",
+    "finish": "stop",
+    "output": "**Formula:** minimum = n x (k - 1) + 1\n\n**Working**\n\n- worst case: every process holds 3 - 1 = 2 drives\n- total held in worst case = 6 x 2 = 12\n- one extra drive ensures a safe state: 12 + 1 = 13\n\n**Answer: minimum drives = 13**"
+   },
+   {
+    "index": 47,
+    "kind": "deadlock_min",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "formula",
+    "finish": "stop",
+    "output": "**Formula:** minimum = sum of (max_i - 1) + 1\n\n**Working**\n\n- each process can be denied one more resource: 3 - 1 = 2, 4 - 1 = 3, 5 - 1 = 4\n- sum of (max_i - 1) = 2 + 3 + 4 = 9\n- minimum = 9 + 1 = 10\n\n**Answer: minimum = 10 printers**"
+   },
+   {
+    "index": 48,
+    "kind": "fork_count",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "formula",
+    "finish": "stop",
+    "output": "**This program does not specify an input.**\n\nThe number of times \"hi\" is printed depends on the number of processes created by the `fork()` calls, which in turn depends on the initial number of processes and how they interact.\n\nHowever, the `fork()` system call creates a new process that is a copy of the current process. Each `fork()` doubles the number of processes (assuming no other process creation or termination occurs).\n\nIn this code:\n- The `main()` function starts with one process.\n- Each `fork()` creates a new process, so after `n` `fork()` calls, there are `2^n` processes.\n\nBut the `printf(\"hi\\n\");` statement is executed in **every process** that reaches it. So, if all processes execute the `printf`, the total number of \"hi\" prints will be equal to the total number of processes at the end.\n\nLet's compute that:\n\n- After 1 `fork()`: 2 processes\n- After 2 `fork()`: 4 processes\n- After 3 `fork()`: 8 processes\n- After 4 `fork()`: 16 processes\n- After 5 `fork()`: 32 processes\n\nSo, **32 processes** will each execute `printf(\"hi\\n\");`, meaning \"hi\" will be printed **32 times**.\n\n**Answer: 32 times.**"
+   },
+   {
+    "index": 49,
+    "kind": "fork_count",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "formula",
+    "finish": "stop",
+    "output": "**Formula:** children = 2^n - 1\n\n**Working**\n\n- each fork() doubles the number of processes: 1 -> 2 -> 4 -> 8 -> 16\n- after 4 fork(): 2^4 = 16 processes\n- children = 16 - 1 = 15\n\n**Answer: child processes = 15**"
+   },
+   {
+    "index": 50,
+    "kind": "semaphore",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "formula",
+    "finish": "stop",
+    "output": "**Formula:** final value = initial value - (number of P) + (number of V)\n\n**Working**\n\n- each P subtracts 1: 7 - 20 = -13\n- each V adds 1: -13 + 15 = 2\n\n**Answer: final value = 2**"
+   },
+   {
+    "index": 51,
+    "kind": "internal_frag",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "formula",
+    "finish": "stop",
+    "output": "**Formula:**\n\nPages = ceil(Process size / Page size)\nInternal fragmentation = Pages x Page size - Process size\n\n**Working**\n\nPages = ceil(72,766 / 2048) = ceil(35.54) = 36\nInternal fragmentation = 36 x 2048 - 72,766 = 73,728 - 72,766 = 961 bytes\n\n**Answer: pages = 36, internal fragmentation (bytes) = 961**"
+   },
+   {
+    "index": 52,
+    "kind": "cpu_util",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "formula",
+    "finish": "stop",
+    "output": "**Formula:** Utilisation = 1 - p^n\n\n**Working**\n\n- p = 0.8\n- n = 4\n- 0.8^4 = 0.4096\n- 1 - 0.4096 = 0.5904 = 59.04%\n\n**Answer: utilisation = 59.04%**"
+   },
+   {
+    "index": 53,
+    "kind": "cache_eat",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "formula",
+    "finish": "stop",
+    "output": "**Formula:** T = h x c + (1 - h) x (c + m)\n\n**Working**\n\n- hit cost = 5 ns; miss cost = 5 + 60 = 65 ns\n- h x hit = 0.95 x 5 = 4.75\n- 1 - h = 0.05\n- (1 - h) x miss = 0.05 x 65 = 3.25\n- average access time = 4.75 + 3.25 = 8 ns\n\n**Answer: access time (ns) = 8**"
+   },
+   {
+    "index": 54,
+    "kind": "clarify",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "extraction could not be grounded in the question",
+    "finish": "stop",
+    "output": "**This question is missing an input.**\n\nI can't tell where each process ends up because **the sizes of the processes** (or the list of processes to be allocated) are not given.\n\n**What I need to know:**\nPlease provide the sizes (in KB) of the processes that need to be allocated to the memory holes.\n\nOnce I have that, I will:\n1. Sort the memory holes by size (smallest to largest).\n2. For each process, find the smallest hole that can fit it (best fit).\n3. Allocate the process to that hole and update the remaining hole size.\n4. Show the final allocation.\n\nLet me know the process sizes, and I'll solve it step by step!"
+   },
+   {
+    "index": 55,
+    "kind": "clarify",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "incomplete",
+    "finish": "stop",
+    "output": "**This question is missing an input.**\n\nThe average waiting time under Round Robin scheduling depends on the **time quantum** (the time slice allocated to each process before it is preempted).\n\nIn the given problem:\n- Arrival times: all processes arrive at time 0.\n- Burst times: P1 = 5, P2 = 3, P3 = 8.\n- The scheduling algorithm is Round Robin.\n\nHowever, **the time quantum is not provided**.\n\nWithout knowing the time quantum, we cannot determine the exact order of execution, the waiting times for each process, or the average waiting time.\n\n---\n\n**What is needed to solve this?**\nPlease provide the **time quantum** (e.g., time slice = 2, or time slice = 3).\n\nOnce that is given, I will walk through the full Round Robin scheduling step by step, showing the execution order, waiting times, and compute the average waiting time.\n\nFor now, the answer cannot be determined due to missing input."
+   },
+   {
+    "index": 56,
+    "kind": "clarify",
+    "final_correct": true,
+    "delegated": false,
+    "reason": "incomplete",
+    "finish": "stop",
+    "output": "**This question is missing an input.**\n\nWhat is the number of page frames?\n\n(A page fault occurs when a page is accessed that is not currently in memory. The number of page faults depends on how many page frames are available \u2014 that is, how many pages can be stored in memory at once.)\n\nPlease specify the number of page frames (e.g., 3 frames, 4 frames, etc.), and I will solve the problem step by step using the LRU (Least Recently Used) algorithm."
+   }
+  ]
+ }
+]

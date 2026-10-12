@@ -1,0 +1,344 @@
+{
+ "CPU scheduling (any algorithm)": {
+  "unit": "processes",
+  "eval_size": "4-10",
+  "rows": [
+   {
+    "size": 4,
+    "mean": 601,
+    "max": 1000,
+    "budget": 1100
+   },
+   {
+    "size": 6,
+    "mean": 865,
+    "max": 1382,
+    "budget": 1520
+   },
+   {
+    "size": 8,
+    "mean": 1140,
+    "max": 1914,
+    "budget": 2105
+   },
+   {
+    "size": 10,
+    "mean": 1498,
+    "max": 2731,
+    "budget": 3004
+   },
+   {
+    "size": 15,
+    "mean": 2510,
+    "max": 5749,
+    "budget": 6323
+   },
+   {
+    "size": 20,
+    "mean": 3738,
+    "max": 7577,
+    "budget": 8334
+   },
+   {
+    "size": 30,
+    "mean": 5897,
+    "max": 14164,
+    "budget": 15580
+   }
+  ]
+ },
+ "CPU scheduling, worst case (RR q=2, long bursts)": {
+  "unit": "processes",
+  "eval_size": "-",
+  "rows": [
+   {
+    "size": 4,
+    "mean": 1666,
+    "max": 2088,
+    "budget": 2296
+   },
+   {
+    "size": 6,
+    "mean": 2673,
+    "max": 3412,
+    "budget": 3753
+   },
+   {
+    "size": 8,
+    "mean": 3862,
+    "max": 4522,
+    "budget": 4974
+   },
+   {
+    "size": 10,
+    "mean": 5218,
+    "max": 6025,
+    "budget": 6627
+   },
+   {
+    "size": 15,
+    "mean": 9880,
+    "max": 11186,
+    "budget": 12304
+   },
+   {
+    "size": 20,
+    "mean": 15480,
+    "max": 18273,
+    "budget": 20100
+   }
+  ]
+ },
+ "Page replacement": {
+  "unit": "references",
+  "eval_size": "12-24",
+  "rows": [
+   {
+    "size": 10,
+    "mean": 337,
+    "max": 452,
+    "budget": 497
+   },
+   {
+    "size": 15,
+    "mean": 482,
+    "max": 632,
+    "budget": 695
+   },
+   {
+    "size": 20,
+    "mean": 674,
+    "max": 903,
+    "budget": 993
+   },
+   {
+    "size": 30,
+    "mean": 990,
+    "max": 1352,
+    "budget": 1487
+   },
+   {
+    "size": 50,
+    "mean": 1627,
+    "max": 2273,
+    "budget": 2500
+   },
+   {
+    "size": 75,
+    "mean": 2535,
+    "max": 3419,
+    "budget": 3760
+   },
+   {
+    "size": 100,
+    "mean": 3277,
+    "max": 4562,
+    "budget": 5018
+   }
+  ]
+ },
+ "Disk scheduling": {
+  "unit": "requests",
+  "eval_size": "5-10",
+  "rows": [
+   {
+    "size": 5,
+    "mean": 347,
+    "max": 474,
+    "budget": 521
+   },
+   {
+    "size": 8,
+    "mean": 498,
+    "max": 688,
+    "budget": 756
+   },
+   {
+    "size": 10,
+    "mean": 607,
+    "max": 904,
+    "budget": 994
+   },
+   {
+    "size": 15,
+    "mean": 918,
+    "max": 1325,
+    "budget": 1457
+   },
+   {
+    "size": 20,
+    "mean": 1120,
+    "max": 1724,
+    "budget": 1896
+   },
+   {
+    "size": 30,
+    "mean": 1742,
+    "max": 2530,
+    "budget": 2783
+   },
+   {
+    "size": 50,
+    "mean": 2894,
+    "max": 4353,
+    "budget": 4788
+   }
+  ]
+ },
+ "Contiguous allocation (fit)": {
+  "unit": "holes = requests",
+  "eval_size": "3-6",
+  "rows": [
+   {
+    "size": 3,
+    "mean": 252,
+    "max": 287,
+    "budget": 315
+   },
+   {
+    "size": 5,
+    "mean": 455,
+    "max": 537,
+    "budget": 590
+   },
+   {
+    "size": 8,
+    "mean": 787,
+    "max": 1000,
+    "budget": 1100
+   },
+   {
+    "size": 10,
+    "mean": 1039,
+    "max": 1246,
+    "budget": 1370
+   },
+   {
+    "size": 15,
+    "mean": 1847,
+    "max": 2376,
+    "budget": 2613
+   },
+   {
+    "size": 20,
+    "mean": 2811,
+    "max": 3664,
+    "budget": 4030
+   }
+  ]
+ },
+ "Banker's safety": {
+  "unit": "processes",
+  "eval_size": "4-7",
+  "rows": [
+   {
+    "size": 4,
+    "mean": 714,
+    "max": 930,
+    "budget": 1023
+   },
+   {
+    "size": 5,
+    "mean": 869,
+    "max": 1125,
+    "budget": 1237
+   },
+   {
+    "size": 7,
+    "mean": 1206,
+    "max": 1813,
+    "budget": 1994
+   },
+   {
+    "size": 10,
+    "mean": 1711,
+    "max": 2393,
+    "budget": 2632
+   },
+   {
+    "size": 15,
+    "mean": 2429,
+    "max": 3176,
+    "budget": 3493
+   },
+   {
+    "size": 20,
+    "mean": 3130,
+    "max": 4680,
+    "budget": 5148
+   }
+  ]
+ },
+ "Banker's request": {
+  "unit": "processes",
+  "eval_size": "4-7",
+  "rows": [
+   {
+    "size": 4,
+    "mean": 628,
+    "max": 895,
+    "budget": 984
+   },
+   {
+    "size": 5,
+    "mean": 617,
+    "max": 1078,
+    "budget": 1185
+   },
+   {
+    "size": 7,
+    "mean": 775,
+    "max": 1503,
+    "budget": 1653
+   },
+   {
+    "size": 10,
+    "mean": 785,
+    "max": 1919,
+    "budget": 2110
+   },
+   {
+    "size": 15,
+    "mean": 1398,
+    "max": 3174,
+    "budget": 3491
+   },
+   {
+    "size": 20,
+    "mean": 1871,
+    "max": 4236,
+    "budget": 4659
+   }
+  ]
+ },
+ "Address translation": {
+  "unit": "page-table rows",
+  "eval_size": "4-8",
+  "rows": [
+   {
+    "size": 4,
+    "mean": 145,
+    "max": 157,
+    "budget": 172
+   },
+   {
+    "size": 8,
+    "mean": 145,
+    "max": 157,
+    "budget": 172
+   },
+   {
+    "size": 16,
+    "mean": 150,
+    "max": 160,
+    "budget": 176
+   },
+   {
+    "size": 32,
+    "mean": 149,
+    "max": 164,
+    "budget": 180
+   }
+  ]
+ }
+}

@@ -1,0 +1,85 @@
+{
+  "category": "conceptual",
+  "rows": 1485,
+  "distributions": {
+    "user_chars": {
+      "p10": 51,
+      "p50": 94,
+      "p90": 142,
+      "mean": 95.3
+    },
+    "assistant_chars": {
+      "p10": 709,
+      "p50": 3452,
+      "p90": 5014,
+      "mean": 3128.6
+    },
+    "turns": {
+      "p50": 2,
+      "p90": 2
+    },
+    "type_token_ratio": {
+      "p10": 0.3,
+      "p50": 0.385
+    },
+    "sources": {
+      "sdft_memory": 144,
+      "sdft_virtual_memory": 135,
+      "sdft_overview": 125,
+      "sdft_processes": 125,
+      "sdft_synchronization": 125,
+      "sdft_filesystems": 125,
+      "sdft_scheduling": 122,
+      "sdft_comparisons": 100
+    }
+  },
+  "redundancy": {
+    "distinct_answers": 1485,
+    "rows": 1485,
+    "distinct_ratio": 1.0,
+    "rows_with_duplicated_answer": 0,
+    "worst": []
+  },
+  "probes": {
+    "too_short": {
+      "hits": 3,
+      "rate": 0.002,
+      "verdict": "defect",
+      "note": "an explanation needs substance",
+      "samples": [
+        "A program is static code; a process is a running instance of that program executing on the system.  \nExample: ",
+        "A critical section is a segment of code in a program where shared resources are accessed, and only one process",
+        "A context switch is the process of saving the state of a running process and loading the state of another proc"
+      ]
+    },
+    "unstructured_wall": {
+      "hits": 1,
+      "rate": 0.0007,
+      "verdict": "defect",
+      "note": "a long single paragraph is unreadable",
+      "samples": [
+        "Demand paging is a memory management technique in which a program’s pages are loaded into main memory only whe"
+      ]
+    },
+    "no_example": {
+      "hits": 182,
+      "rate": 0.1226,
+      "verdict": "diagnostic",
+      "note": "concrete example present - informs quality score",
+      "samples": [
+        "A **hybrid kernel** is a type of operating system kernel that combines features of both **monolithic kernels**",
+        "The operating system is called a **resource manager** because it allocates and controls access to system resou",
+        "### What is a Real-Time System?\n\nA **real-time system** is one where the system must respond to events **withi"
+      ]
+    }
+  },
+  "derived_thresholds": {
+    "min_assistant_chars": 354,
+    "max_assistant_chars": 15042
+  },
+  "actionable_defects": {
+    "too_short": 3,
+    "unstructured_wall": 1
+  },
+  "rejected_rules": {}
+}

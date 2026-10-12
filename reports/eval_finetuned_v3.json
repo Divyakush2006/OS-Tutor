@@ -1,0 +1,610 @@
+{
+  "model": "D:\\os project\\models\\Qwen3-4B-Instruct-2507",
+  "adapter": "outputs/ostutor-lora-v3/ostutor-lora",
+  "limit": 57,
+  "four_bit": true,
+  "suites": {
+    "os_freeform": {
+      "n": 57,
+      "final_answer_accuracy": 0.6491,
+      "step_accuracy": 0.283,
+      "by_topic": {
+        "banker_request": {
+          "n": 2,
+          "accuracy": 1.0
+        },
+        "banker_safety": {
+          "n": 4,
+          "accuracy": 0.75
+        },
+        "cache_eat": {
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "clarify": {
+          "n": 3,
+          "accuracy": 0.0
+        },
+        "cpu_util": {
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "deadlock_min": {
+          "n": 2,
+          "accuracy": 1.0
+        },
+        "disk": {
+          "n": 7,
+          "accuracy": 1.0
+        },
+        "disk_access": {
+          "n": 1,
+          "accuracy": 0.0
+        },
+        "eat_pagefault": {
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "eat_tlb": {
+          "n": 2,
+          "accuracy": 0.5
+        },
+        "fork_count": {
+          "n": 2,
+          "accuracy": 0.5
+        },
+        "freespace": {
+          "n": 4,
+          "accuracy": 0.75
+        },
+        "internal_frag": {
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "multilevel_paging": {
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "paging": {
+          "n": 8,
+          "accuracy": 0.625
+        },
+        "paging_bits": {
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "scheduling": {
+          "n": 12,
+          "accuracy": 0.4167
+        },
+        "semaphore": {
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "translate": {
+          "n": 3,
+          "accuracy": 0.3333
+        }
+      },
+      "seconds": 4567.7,
+      "max_new_tokens": 4096,
+      "truncation_rate": 0.0175,
+      "accuracy_when_finished": 0.6607,
+      "items": [
+        {
+          "suite": "os_freeform",
+          "index": 0,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 652,
+          "truncated": false,
+          "output": "**Algorithm: SRTF (preemptive SJF)**\n\n**Step 1 - build the schedule**\n\n_Rule: at every arrival and completion, run the ready process with the SHORTEST REMAINING time; preempt the running process if a shorter one is ready (ties: earlier arrival, then name)._\n\n- t=0: P1 arrives; only P1 is ready -> run P1\n- t=1: P2 arrives; ready P2(4) < P1(7) -> PREEMPT P1, run P2\n- t=2: P3 arrives; ready P2(3) < P1(7) < P3(9) -> keep running P2\n- t=3: P4 arrives; ready P2(2) < P1(7) < P4(5) < P3(9) -> keep running P2\n- t=5: P2 completes; ready P1(7) < P4(5) < P3(9) -> run P1\n- t=12: P1 completes; ready P4(5) < P3(9) -> run P4\n- t=17: P4 completes; only P3 is ready -> run P3\n- t=26: P3 completes; all processes done\n\n**Step 2 - Gantt chart:** P1[0-1] P2[1-5] P1[5-12] P4[12-17] P3[17-26]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| P1 | 0 | 8 | 12 | 12 - 0 = 12 | 12 - 8 = 4 |\n| P2 | 1 | 4 | 5 | 5 - 1 = 4 | 4 - 4 = 0 |\n| P3 | 2 | 9 | 26 | 26 - 2 = 24 | 24 - 9 = 15 |\n| P4 | 3 | 5 | 17 | 17 - 3 = 14 | 14 - 5 = 9 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 4 + 0 = 4, 4 + 15 = 19, 19 + 9 = 28\n- Average waiting time = 28 / 4 = **7.0**\n- Sum of turnaround times: 12 + 4 = 16, 16 + 24 = 40, 40 + 14 = 54\n- Average turnaround time = 54 / 4 = **13.5**\n\n**Answer: average waiting time = 7.0**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 1,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 942,
+          "truncated": false,
+          "output": "**Algorithm: Round Robin (q=4)**\n\n**Step 1 - build the schedule**\n\n_Rule: run the process at the HEAD of the queue for up to q = 4 units; processes arriving during a slice join the tail BEFORE the preempted process goes back to the tail._\n\n- t=0-4: run P1 (head of [P1, P2, P3]) for 4; 24 - 4 = 20 left; P1 back to tail -> queue [P2, P3, P1]\n- t=4-7: run P2 (head of [P2, P3, P1]) for 3; 3 - 3 = 0 left; arrived P4(t=4) -> tail; P2 DONE at 7 -> queue [P3, P1, P4]\n- t=7-10: run P3 (head of [P3, P1, P4]) for 3; 3 - 3 = 0 left; P3 DONE at 10 -> queue [P1, P4]\n- t=10-14: run P1 (head of [P1, P4]) for 4; 20 - 4 = 16 left; P1 back to tail -> queue [P4, P1]\n- t=14-18: run P4 (head of [P4, P1]) for 4; 0 - 4 = -4 < 0; P4 DONE at 18 -> queue [P1]\n- t=18-22: run P1 (head of [P1]) for 4; 16 - 4 = 12 left; P1 back to tail -> queue [P1]\n- t=22-26: run P1 (head of [P1]) for 4; 12 - 4 = 8 left; P1 back to tail -> queue [P1]\n- t=26-30: run P1 (head of [P1]) for 4; 8 - 4 = 4 left; P1 back to tail -> queue [P1]\n- t=30-34: run P1 (head of [P1]) for 4; 4 - 4 = 0 left; P1 DONE at 34 -> queue []\n\n**Step 2 - Gantt chart:** P1[0-4] P2[4-7] P3[7-10] P1[10-14] P4[14-18] P1[18-22] P1[22-26] P1[26-30] P1[30-34]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|--------------|--------------|\n| P1 | 0 | 24 | 34 | 34 - 0 = 34 | 34 - 24 = 10 |\n| P2 | 0 | 3 | 7 | 7 - 0 = 7 | 7 - 3 = 4 |\n| P3 | 0 | 3 | 10 | 10 - 0 = 10 | 10 - 3 = 7 |\n| P4 | 4 | 0 | 18 | 18 - 4 = 14 | 14 - 0 = 14 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 10 + 4 = 14, 14 + 7 = 21, 21 + 14 = 35\n- Average waiting time = 35 / 4 = **8.75**\n- Sum of turnaround times: 34 + 7 = 41, 41 + 10 = 51, 51 + 14 = 65\n- Average turnaround time = 65 / 4 = **16.25**\n\n**Answer: average waiting time = 8.75, average turnaround time = 16.25**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 2,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 697,
+          "truncated": false,
+          "output": "**Algorithm: Priority (non-preemptive)**\n\n**Step 1 - build the schedule**\n\n_Rule: whenever the CPU is free, run the ready process with the HIGHEST priority (LOWEST number) to completion (ties: earlier arrival, then name)._\n\n- t=0: ready P1(p3) < P2(p1) < P3(p4) < P4(p5) < P5(p2) -> run P2, done at 0 + 1 = 1\n- t=1: ready P1(p3) < P5(p2) < P3(p4) < P4(p5) -> run P1, done at 1 + 10 = 11\n- t=11: ready P5(p2) < P3(p4) < P4(p5) -> run P5, done at 11 + 5 = 16\n- t=16: ready P3(p4) < P4(p5) -> run P3, done at 16 + 2 = 18\n- t=18: only P4 is ready -> run P4, done at 18 + 1 = 19\n\n**Step 2 - Gantt chart:** P2[0-1] P1[1-11] P5[11-16] P3[16-18] P4[18-19]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| P1 | 0 | 10 | 11 | 11 - 0 = 11 | 11 - 10 = 1 |\n| P2 | 0 | 1 | 1 | 1 - 0 = 1 | 1 - 1 = 0 |\n| P3 | 0 | 2 | 18 | 18 - 0 = 18 | 18 - 2 = 16 |\n| P4 | 0 | 1 | 19 | 19 - 0 = 19 | 19 - 1 = 18 |\n| P5 | 0 | 5 | 16 | 16 - 0 = 16 | 16 - 5 = 11 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 1 + 0 = 1, 1 + 16 = 17, 17 + 18 = 35, 35 + 11 = 46\n- Average waiting time = 46 / 5 = **9.2**\n- Sum of turnaround times: 11 + 1 = 12, 12 + 18 = 30, 30 + 19 = 49, 49 + 16 = 65\n- Average turnaround time = 65 / 5 = **13.0**\n\n**Answer: average waiting time = 9.2**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 3,
+          "kind": "scheduling",
+          "final_correct": true,
+          "new_tokens": 457,
+          "truncated": false,
+          "output": "**Algorithm: FCFS**\n\n**Step 1 - build the schedule**\n\n_Rule: run processes in order of ARRIVAL; each runs to completion._\n\n- arrival order: A(t=2), B(t=10), C(t=11)\n- t=0: CPU idle until t=2\n- t=2: A runs (arrived t=2, burst 3) -> completes at 2 + 3 = 5\n- t=5: CPU idle until t=10\n- t=10: B runs (arrived t=10, burst 4) -> completes at 10 + 4 = 14\n- t=14: C runs (arrived t=11, burst 2) -> completes at 14 + 2 = 16\n\n**Step 2 - Gantt chart:** A[2-5] B[10-14] C[14-16]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| A | 2 | 3 | 5 | 5 - 2 = 3 | 3 - 3 = 0 |\n| B | 10 | 4 | 14 | 14 - 10 = 4 | 4 - 4 = 0 |\n| C | 11 | 2 | 16 | 16 - 11 = 5 | 5 - 2 = 3 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 0 = 0, 0 + 3 = 3\n- Average waiting time = 3 / 3 = **1.0**\n- Sum of turnaround times: 3 + 4 = 7, 7 + 5 = 12\n- Average turnaround time = 12 / 3 = **4.0**\n\n**Answer: average turnaround time = 4.0**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 4,
+          "kind": "scheduling",
+          "final_correct": true,
+          "new_tokens": 542,
+          "truncated": false,
+          "output": "**Algorithm: SJF (non-preemptive)**\n\n**Step 1 - build the schedule**\n\n_Rule: whenever the CPU is free, run the ready process with the SHORTEST BURST to completion (ties: earlier arrival, then name)._\n\n- t=0: only T1 is ready -> run T1, done at 0 + 7 = 7\n- t=7: ready T3(1) < T2(4) = T4(4) -> run T3, done at 7 + 1 = 8\n- t=8: ready T2(4) = T4(4) (tie -> earlier arrival, then name) -> run T2, done at 8 + 4 = 12\n- t=12: only T4 is ready -> run T4, done at 12 + 4 = 16\n\n**Step 2 - Gantt chart:** T1[0-7] T3[7-8] T2[8-12] T4[12-16]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| T1 | 0 | 7 | 7 | 7 - 0 = 7 | 7 - 7 = 0 |\n| T2 | 2 | 4 | 12 | 12 - 2 = 10 | 10 - 4 = 6 |\n| T3 | 4 | 1 | 8 | 8 - 4 = 4 | 4 - 1 = 3 |\n| T4 | 5 | 4 | 16 | 16 - 5 = 11 | 11 - 4 = 7 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 6 = 6, 6 + 3 = 9, 9 + 7 = 16\n- Average waiting time = 16 / 4 = **4.0**\n- Sum of turnaround times: 7 + 10 = 17, 17 + 4 = 21, 21 + 11 = 32\n- Average turnaround time = 32 / 4 = **8.0**\n\n**Answer: average waiting time = 4.0**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 5,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 518,
+          "truncated": false,
+          "output": "**Algorithm: SRTF (preemptive SJF)**\n\n**Step 1 - build the schedule**\n\n_Rule: at every arrival and completion, run the ready process with the SHORTEST REMAINING time; preempt the running process if a shorter one is ready (ties: earlier arrival, then name)._\n\n- t=0: P0 arrives; only P0 is ready -> run P0\n- t=2: P1 arrives; ready P0(8) < P1(20) -> keep running P0\n- t=6: P2 arrives; ready P0(2) < P1(20) < P2(30) -> keep running P0\n- t=8: P0 completes; ready P1(20) < P2(30) -> run P1\n- t=28: P1 completes; only P2 is ready -> run P2\n- t=58: P2 completes; all processes done\n\n**Step 2 - Gantt chart:** P0[0-8] P1[8-28] P2[28-58]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| P0 | 0 | 10 | 8 | 8 - 0 = 8 | 8 - 10 = -2 < 0 |\n| P1 | 2 | 20 | 28 | 28 - 2 = 26 | 26 - 20 = 6 |\n| P2 | 6 | 30 | 58 | 58 - 6 = 52 | 52 - 30 = 22 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 6 = 6, 6 + 22 = 28\n- Average waiting time = 28 / 3 = **9.33**\n- Sum of turnaround times: 8 + 26 = 34, 34 + 52 = 86\n- Average turnaround time = 86 / 3 = **28.67**\n\n**Answer: average waiting time = 9.33**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 6,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 702,
+          "truncated": false,
+          "output": "**Algorithm: Round Robin (q=2)**\n\n**Step 1 - build the schedule**\n\n_Rule: run the process at the head of the queue for up to q = 2 units; processes arriving during a slice join the tail BEFORE the running process finishes._\n\n- t=0-2: run A (5) used 2 / left 3\n- t=2-3: run C (1) used 1 / left 0 arrived B t=1 / burst 3 -> queue B\n- t=3-5: run B (3) used 2 / left 1 arrived D t=3 / burst 2 -> queue D\n- t=5-6: run D (2) used 1 / left 1 arrived E t=4 / burst 3 -> queue E\n- t=6-7: run E (3) used 1 / left 2 -> B back queue\n- t=7-8: run B (1) used 1 / left 0 -> B back queue\n- t=8-9: run B (0) used 0 / left 0 -> B done\n- t=9-11: run A (3) used 2 / left 1 -> A back queue\n- t=11-12: run A (1) used 1 / left 0 -> A done\n\n**Step 2 - Gantt chart:** A[0-2] C[2-3] B[3-5] D[5-6] E[6-7] B[7-8] A[8-11]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| A | 0 | 5 | 11 | 11 - 0 = 11 | 11 - 5 = 6 |\n| B | 1 | 3 | 8 | 8 - 1 = 7 | 7 - 3 = 4 |\n| C | 2 | 1 | 3 | 3 - 2 = 1 | 1 - 1 = 0 |\n| D | 3 | 2 | 6 | 6 - 3 = 3 | 3 - 2 = 1 |\n| E | 4 | 3 | 7 | 7 - 4 = 3 | 3 - 3 = 0 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 6 + 4 = 10, 10 + 0 = 10, 10 + 1 = 11, 11 + 0 = 11\n- Average waiting time = 11 / 5 = **2.2**\n- Sum of turnaround times: 11 + 7 = 18, 18 + 1 = 19, 19 + 3 = 22, 22 + 3 = 25\n- Average turnaround time = 25 / 5 = **5.0**\n\n**Answer: average waiting time = 2.2**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 7,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 649,
+          "truncated": false,
+          "output": "**Algorithm: Priority (preemptive)**\n\n**Step 1 - build the schedule**\n\n_Rule: at every arrival and completion, run the ready process with the HIGHEST priority (LOWEST number); preempt the running process if a higher-priority one is ready (ties: earlier arrival, then name)._\n\n- t=0: P1 arrives; only P1 is ready -> run P1\n- t=1: P2 arrives; ready P2(p1) < P1(p3) -> PREEMPT P1, run P2\n- t=2: P3 arrives; ready P2(p1) < P1(p3) < P3(p4) -> keep running P2\n- t=3: P4 arrives; ready P2(p1) < P4(p2) < P1(p3) < P3(p4) -> keep running P2\n- t=4: P2 completes; ready P4(p2) < P1(p3) < P3(p4) -> run P4\n- t=6: P4 completes; ready P1(p3) < P3(p4) -> run P1\n- t=11: P1 completes; only P3 is ready -> run P3\n- t=19: P3 completes; all processes done\n\n**Step 2 - Gantt chart:** P1[0-1] P2[1-4] P4[4-6] P1[6-11] P3[11-19]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| P1 | 0 | 5 | 11 | 11 - 0 = 11 | 11 - 5 = 6 |\n| P2 | 1 | 3 | 4 | 4 - 1 = 3 | 3 - 3 = 0 |\n| P3 | 2 | 8 | 19 | 19 - 2 = 17 | 17 - 8 = 9 |\n| P4 | 3 | 2 | 6 | 6 - 3 = 3 | 3 - 2 = 1 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 6 + 0 = 6, 6 + 9 = 15, 15 + 1 = 16\n- Average waiting time = 16 / 4 = **4.0**\n- Sum of turnaround times: 11 + 3 = 14, 14 + 17 = 31, 31 + 3 = 34\n- Average turnaround time = 34 / 4 = **8.5**\n\n**Answer: average waiting time = 4.0, average turnaround time = 8.5**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 8,
+          "kind": "scheduling",
+          "final_correct": true,
+          "new_tokens": 848,
+          "truncated": false,
+          "output": "**Algorithm: HRRN (Highest Response Ratio Next)**\n\n**Step 1 - build the schedule**\n\n_Rule: whenever the CPU is free, compute each ready process's response ratio = (waiting + burst) / burst and run the HIGHEST ratio to completion (ties: earlier arrival, then name)._\n\n- t=0: only A is ready -> run A, done at 0 + 3 = 3\n- t=3: ratios: B waited 3 - 2 = 1, (1 + 6) / 6 = 1.17, C waited 3 - 4 = -1 < 0 not ready, D waited 3 - 6 = -3 < 0 not ready, E waited 3 - 8 = -5 < 0 not ready; order B(1.17) -> run B, done at 3 + 6 = 9\n- t=9: ratios: C waited 9 - 4 = 5, (5 + 4) / 4 = 2.25, D waited 9 - 6 = 3, (3 + 5) / 5 = 1.60, E waited 9 - 8 = 1, (1 + 2) / 2 = 1.50; order C(2.25) > D(1.60) > E(1.50) -> run C, done at 9 + 4 = 13\n- t=13: ratios: D waited 13 - 6 = 7, (7 + 5) / 5 = 2.40, E waited 13 - 8 = 5, (5 + 2) / 2 = 3.50; order E(3.50) > D(2.40) -> run E, done at 13 + 2 = 15\n- t=15: only D is ready -> run D, done at 15 + 5 = 20\n\n**Step 2 - Gantt chart:** A[0-3] B[3-9] C[9-13] E[13-15] D[15-20]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|--------------|--------------|\n| A | 0 | 3 | 3 | 3 - 0 = 3 | 3 - 3 = 0 |\n| B | 2 | 6 | 9 | 9 - 2 = 7 | 7 - 6 = 1 |\n| C | 4 | 4 | 13 | 13 - 4 = 9 | 9 - 4 = 5 |\n| D | 6 | 5 | 20 | 20 - 6 = 14 | 14 - 5 = 9 |\n| E | 8 | 2 | 15 | 15 - 8 = 7 | 7 - 2 = 5 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 1 = 1, 1 + 5 = 6, 6 + 9 = 15, 15 + 5 = 20\n- Average waiting time = 20 / 5 = **4.0**\n- Sum of turnaround times: 3 + 7 = 10, 10 + 9 = 19, 19 + 14 = 33, 33 + 7 = 40\n- Average turnaround time = 40 / 5 = **8.0**\n\n**Answer: average waiting time = 4.0**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 9,
+          "kind": "scheduling",
+          "final_correct": true,
+          "new_tokens": 561,
+          "truncated": false,
+          "output": "**Algorithm: SJF (non-preemptive)**\n\n**Step 1 - build the schedule**\n\n_Rule: whenever the CPU is free, run the ready process with the SHORTEST BURST to completion (ties: earlier arrival, then name)._\n\n- t=0: ready P3(2) < P1(5) < P4(7) < P2(9) -> run P3, done at 0 + 2 = 2\n- t=2: ready P1(5) < P4(7) < P2(9) -> run P1, done at 2 + 5 = 7\n- t=7: ready P4(7) < P2(9) -> run P4, done at 7 + 7 = 14\n- t=14: only P2 is ready -> run P2, done at 14 + 9 = 23\n\n**Step 2 - Gantt chart:** P3[0-2] P1[2-7] P4[7-14] P2[14-23]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| P1 | 0 | 5 | 7 | 7 - 0 = 7 | 7 - 5 = 2 |\n| P2 | 0 | 9 | 23 | 23 - 0 = 23 | 23 - 9 = 14 |\n| P3 | 0 | 2 | 2 | 2 - 0 = 2 | 2 - 2 = 0 |\n| P4 | 0 | 7 | 14 | 14 - 0 = 14 | 14 - 7 = 7 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 2 + 14 = 16, 16 + 0 = 16, 16 + 7 = 23\n- Average waiting time = 23 / 4 = **5.75**\n- Sum of turnaround times: 7 + 23 = 30, 30 + 2 = 32, 32 + 14 = 46\n- Average turnaround time = 46 / 4 = **11.5**\n\n**Answer: average waiting time = 5.75**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 10,
+          "kind": "scheduling",
+          "final_correct": true,
+          "new_tokens": 1395,
+          "truncated": false,
+          "output": "**Algorithm: Round Robin (q=3)**\n\n**Step 1 - build the schedule**\n\n_Rule: run the process at the HEAD of the queue for up to q = 3 units; processes arriving during a slice join the tail BEFORE the preempted process goes back to the tail._\n\n- t=0-3: run P1 (head of [P1]) for 3; 7 - 3 = 4 left; arrived P2(t=1), P3(t=3) -> tail; P1 back to tail -> queue [P2, P3, P1]\n- t=3-6: run P2 (head of [P2, P3, P1]) for 3; 4 - 3 = 1 left; arrived P4(t=4), P5(t=6) -> tail; P2 back to tail -> queue [P3, P1, P4, P5, P2]\n- t=6-9: run P3 (head of [P3, P1, P4, P5, P2]) for 3; 9 - 3 = 6 left; arrived P6(t=8) -> tail; P3 back to tail -> queue [P1, P4, P5, P2, P6, P3]\n- t=9-12: run P1 (head of [P1, P4, P5, P2, P6, P3]) for 3; 4 - 3 = 1 left; P1 back to tail -> queue [P4, P5, P2, P6, P3, P1]\n- t=12-14: run P4 (head of [P4, P5, P2, P6, P3, P1]) for 2; 2 - 2 = 0 left; P4 DONE at 14 -> queue [P5, P2, P6, P3, P1]\n- t=14-17: run P5 (head of [P5, P2, P6, P3, P1]) for 3; 5 - 3 = 2 left; P5 back to tail -> queue [P2, P6, P3, P1, P5]\n- t=17-18: run P2 (head of [P2, P6, P3, P1, P5]) for 1; 1 - 1 = 0 left; P2 DONE at 18 -> queue [P6, P3, P1, P5]\n- t=18-21: run P6 (head of [P6, P3, P1, P5]) for 3; 3 - 3 = 0 left; P6 DONE at 21 -> queue [P3, P1, P5]\n- t=21-24: run P3 (head of [P3, P1, P5]) for 3; 6 - 3 = 3 left; P3 back to tail -> queue [P1, P5, P3]\n- t=24-25: run P1 (head of [P1, P5, P3]) for 1; 1 - 1 = 0 left; P1 DONE at 25 -> queue [P5, P3]\n- t=25-27: run P5 (head of [P5, P3]) for 2; 2 - 2 = 0 left; P5 DONE at 27 -> queue [P3]\n- t=27-30: run P3 (head of [P3]) for 3; 3 - 3 = 0 left; P3 DONE at 30 -> queue []\n\n**Step 2 - Gantt chart:** P1[0-3] P2[3-6] P3[6-9] P1[9-12] P4[12-14] P5[14-17] P2[17-18] P6[18-21] P3[21-24] P1[24-25] P5[25-27] P3[27-30]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|--------------|--------------|\n| P1 | 0 | 7 | 25 | 25 - 0 = 25 | 25 - 7 = 18 |\n| P2 | 1 | 4 | 18 | 18 - 1 = 17 | 17 - 4 = 13 |\n| P3 | 3 | 9 | 30 | 30 - 3 = 27 | 27 - 9 = 18 |\n| P4 | 4 | 2 | 14 | 14 - 4 = 10 | 10 - 2 = 8 |\n| P5 | 6 | 5 | 27 | 27 - 6 = 21 | 21 - 5 = 16 |\n| P6 | 8 | 3 | 21 | 21 - 8 = 13 | 13 - 3 = 10 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 18 + 13 = 31, 31 + 18 = 49, 49 + 8 = 57, 57 + 16 = 73, 73 + 10 = 83\n- Average waiting time = 83 / 6 = **13.83**\n- Sum of turnaround times: 25 + 17 = 42, 42 + 27 = 69, 69 + 10 = 79, 79 + 21 = 100, 100 + 13 = 113\n- Average turnaround time = 113 / 6 = **18.83**\n\n**Answer: average turnaround time = 18.83**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 11,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 495,
+          "truncated": false,
+          "output": "**Algorithm: SRTF (preemptive SJF)**\n\n**Step 1 - build the schedule**\n\n_Rule: at every arrival and completion, run the ready process with the SHORTEST REMAINING time; preempt the running process if a shorter one is ready (ties: earlier arrival, then name)._\n\n- t=0: J1 arrives; only J1 is ready -> run J1\n- t=5: J2 arrives; ready J1(1) < J2(4) -> keep running J1\n- t=6: J3 arrives; ready J1(0) = J3(1) < J2(4) (tie -> earlier arrival, then name) -> keep running J1\n- t=6: J1 completes; ready J3(1) < J2(4) -> run J3\n- t=7: J3 completes; only J2 is ready -> run J2\n- t=11: J2 completes; all processes done\n\n**Step 2 - Gantt chart:** J1[0-6] J3[6-7] J2[7-11]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| J1 | 0 | 2 | 6 | 6 - 0 = 6 | 6 - 2 = 4 |\n| J2 | 5 | 4 | 11 | 11 - 5 = 6 | 6 - 4 = 2 |\n| J3 | 6 | 1 | 7 | 7 - 6 = 1 | 1 - 1 = 0 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 4 + 2 = 6, 6 + 0 = 6\n- Average waiting time = 6 / 3 = **2.0**\n- Sum of turnaround times: 6 + 6 = 12, 12 + 1 = 13\n- Average turnaround time = 13 / 3 = **4.33**\n\n**Answer: average waiting time = 2.0**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 12,
+          "kind": "paging",
+          "final_correct": false,
+          "new_tokens": 893,
+          "truncated": false,
+          "output": "**Policy: FIFO, 3 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page loaded EARLIEST._\n\n| # | Ref | Result | Evicted | Why | Frames (oldest first) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 7 | miss | - | free frame (1/3 used) | 7 | 1 |\n| 2 | 0 | miss | - | free frame (2/3 used) | 7 0 | 2 |\n| 3 | 1 | miss | - | free frame (3/3 used) | 7 0 1 | 3 |\n| 4 | 2 | miss | 7 | frames full; load order 7 0 1 -> oldest = 7 | 0 1 2 | 4 |\n| 5 | 0 | hit | - | 0 already in frames | 0 1 2 | 4 |\n| 6 | 3 | miss | 0 | frames full; load order 0 1 2 -> oldest = 0 | 1 2 3 | 5 |\n| 7 | 0 | miss | 1 | frames full; load order 1 2 3 -> oldest = 1 | 2 3 0 | 6 |\n| 8 | 4 | miss | 2 | frames full; load order 2 3 0 -> oldest = 2 | 3 0 4 | 7 |\n| 9 | 2 | miss | 3 | frames full; load order 3 0 4 -> oldest = 3 | 0 4 2 | 8 |\n| 10 | 3 | miss | 0 | frames full; load order 0 4 2 -> oldest = 0 | 4 2 3 | 9 |\n| 11 | 0 | miss | 4 | frames full; load order 4 2 3 -> oldest = 4 | 2 3 0 | 10 |\n| 12 | 3 | hit | - | 3 already in frames | 2 3 0 | 10 |\n| 13 | 2 | hit | - | 2 already in frames | 2 3 0 | 10 |\n| 14 | 1 | miss | 2 | frames full; load order 2 3 0 -> oldest = 2 | 3 0 1 | 11 |\n| 15 | 2 | miss | 3 | frames full; load order 3 0 1 -> oldest = 3 | 0 1 2 | 12 |\n| 16 | 0 | hit | - | 0 already in frames | 0 1 2 | 12 |\n| 17 | 1 | hit | - | 1 already in frames | 0 1 2 | 12 |\n| 18 | 7 | miss | 0 | frames full; load order 0 1 2 -> oldest = 0 | 1 2 7 | 13 |\n| 19 | 0 | miss | 1 | frames full; load order 1 2 7 -> oldest = 1 | 2 7 0 | 14 |\n| 20 | 1 | miss | 2 | frames full; load order 2 7 0 -> oldest = 2 | 7 0 1 | 15 |\n| 21 | 3 | miss | 7 | frames full; load order 7 0 1 -> oldest = 7 | 0 1 3 | 16 |\n\n**Total page faults = 16** (hits = 21 - 16 = 5, hit ratio = 5 / 21 = 0.2381, fault ratio = 16 / 21 = 0.7619)\n\n**Answer: page faults = 16**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 13,
+          "kind": "paging",
+          "final_correct": false,
+          "new_tokens": 4096,
+          "truncated": true,
+          "output": "**Policy: LRU, 3 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page used LEAST RECENTLY._\n\n| # | Ref | Result | Evicted | Why | Frames (least recently used first) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 7 | miss | - | free frame (1/3 used) | 7 | 1 |\n| 2 | 0 | miss | - | free frame (2/3 used) | 7 0 | 2 |\n| 3 | 1 | miss | - | free frame (3/3 used) | 7 0 1 | 3 |\n| 4 | 2 | miss | 7 | frames full; last used 7@#1 < 0@#2 < 1@#3 -> least recent = 7 | 0 1 2 | 4 |\n| 5 | 0 | hit | - | 0 already in frames | 1 2 0 | 4 |\n| 6 | 3 | miss | 1 | frames full; last used 1@#3 < 2@#4 < 0@#5 -> least recent = 1 | 2 0 3 | 5 |\n| 7 | 0 | hit | - | 0 already in frames | 2 3 0 | 5 |\n| 8 | 4 | miss | 2 | frames full; last used 2@#4 < 3@#6 < 0@#7 -> least recent = 2 | 3 0 4 | 6 |\n| 9 | 2 | miss | 3 | frames full; last used 3@#6 < 0@#7 < 4@#8 -> least recent = 3 | 0 4 2 | 7 |\n| 10 | 3 | miss | 0 | frames full; last used 0@#7 < 4@#8 < 2@#9 -> least recent = 0 | 4 2 3 | 8 |\n| 11 | 0 | miss | 4 | frames full; last used 4@#8 < 2@#9 < 3@#10 -> least recent = 4 | 2 3 0 | 9 |\n| 12 | 3 | hit | - | 3 already in frames | 2 0 3 | 9 |\n| 13 | 2 | hit | - | 2 already in frames | 0 3 2 | 9 |\n| 14 | 1 | miss | 0 | frames full; last used 0@#11 < 3@#12 < 2@#13 -> least recent = 0 | 3 2 1 | 10 |\n| 15 | 2 | hit | - | 2 already in frames | 3 1 2 | 10 |\n| 16 | 0 | miss | 3 | frames full; last used 3@#12 < 1@#14 < 2@#15 -> least recent = 3 | 1 2 0 | 11 |\n| 17 | 1 | hit | - | 1 already in frames | 2 0 1 | 11 |\n| 18 | 7 | miss | 2 | frames full; last used 2@#15 < 0@#16 < 1@#17 -> least recent = 2 | 0 1 7 | 12 |\n| 19 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 20 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 21 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 22 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 23 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 24 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 25 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 26 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 27 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 28 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 29 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 30 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 31 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 32 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 33 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 34 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 35 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 36 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 37 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 38 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 39 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 40 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 41 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 42 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 43 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 44 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 45 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 46 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 47 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 48 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 49 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 50 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 51 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 52 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 53 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 54 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 55 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 56 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 57 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 58 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 59 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 60 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 61 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 62 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 63 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 64 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 65 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 66 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 67 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 68 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 69 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 70 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 71 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 72 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 73 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 74 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 75 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 76 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 77 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 78 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 79 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 80 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 81 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 82 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 83 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 84 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 85 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 86 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 87 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 88 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 89 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 90 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 91 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 92 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 93 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 94 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 95 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 96 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 97 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 98 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 99 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 100 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 101 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 102 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 103 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 104 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 105 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 106 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 107 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 108 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 109 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 110 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 111 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 112 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 113 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 114 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 115 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 116 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 117 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 118 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 119 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 120 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 121 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 122 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 123 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 124 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 125 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 126 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 127 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 128 | 1 | hit | - | 1 already in frames | 7 0 1 | 12 |\n| 129 | 7 | hit | - | 7 already in frames | 0 1 7 | 12 |\n| 130 | 0 | hit | - | 0 already in frames | 1 7 0 | 12 |\n| 131 | 1 | hit |"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 14,
+          "kind": "paging",
+          "final_correct": false,
+          "new_tokens": 956,
+          "truncated": false,
+          "output": "**Policy: OPT, 3 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page whose NEXT USE is FARTHEST in the future (never used again = farthest)._\n\n| # | Ref | Result | Evicted | Why | Frames (frame order) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 7 | miss | - | free frame (1/3 used) | 7 | 1 |\n| 2 | 0 | miss | - | free frame (2/3 used) | 7 0 | 2 |\n| 3 | 1 | miss | - | free frame (3/3 used) | 7 0 1 | 3 |\n| 4 | 2 | miss | 7 | frames full; next use 7@#18 > 0@#5 > 1@#4 -> farthest = 7 | 2 0 1 | 4 |\n| 5 | 0 | hit | - | 0 already in frames | 2 0 1 | 4 |\n| 6 | 3 | miss | 0 | frames full; next use 0@#7 > 1@#14 > 2@#9 -> farthest = 0 | 2 3 1 | 5 |\n| 7 | 0 | miss | 3 | frames full; next use 3@#10 > 1@#14 > 2@#9 -> farthest = 3 | 2 0 1 | 6 |\n| 8 | 4 | miss | 1 | frames full; next use 1@#14 > 2@#9 > 0@#11 -> farthest = 1 | 2 0 4 | 7 |\n| 9 | 2 | hit | - | 2 already in frames | 2 0 4 | 7 |\n| 10 | 3 | miss | 2 | frames full; next use 2@#13 > 0@#11 > 4@never -> farthest = 2 | 3 0 4 | 8 |\n| 11 | 0 | hit | - | 0 already in frames | 3 0 4 | 8 |\n| 12 | 3 | hit | - | 3 already in frames | 3 0 4 | 8 |\n| 13 | 2 | miss | 3 | frames full; next use 3@never > 0@#16 > 4@never -> farthest = 3 | 2 0 4 | 9 |\n| 14 | 1 | miss | 2 | frames full; next use 2@#15 > 0@#16 > 4@never -> farthest = 2 | 1 0 4 | 10 |\n| 15 | 2 | miss | 1 | frames full; next use 1@#17 > 0@#16 > 4@never -> farthest = 1 | 2 0 4 | 11 |\n| 16 | 0 | hit | - | 0 already in frames | 2 0 4 | 11 |\n| 17 | 1 | hit | - | 1 already in frames | 2 0 4 | 11 |\n| 18 | 7 | miss | 2 | frames full; next use 2@never > 0@never > 4@never -> farthest = 2 | 7 0 4 | 12 |\n| 19 | 0 | hit | - | 0 already in frames | 7 0 4 | 12 |\n| 20 | 1 | miss | 7 | frames full; next use 7@never > 0@never > 4@never -> farthest = 7 | 1 0 4 | 13 |\n\n**Total page faults = 13** (hits = 20 - 13 = 7, hit ratio = 7 / 20 = 0.35, fault ratio = 13 / 20 = 0.65)\n\n**Answer: page faults = 13**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 15,
+          "kind": "paging",
+          "final_correct": true,
+          "new_tokens": 537,
+          "truncated": false,
+          "output": "**Policy: FIFO, 3 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page loaded EARLIEST._\n\n| # | Ref | Result | Evicted | Why | Frames (oldest first) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 3 | miss | - | free frame (1/3 used) | 3 | 1 |\n| 2 | 2 | miss | - | free frame (2/3 used) | 3 2 | 2 |\n| 3 | 1 | miss | - | free frame (3/3 used) | 3 2 1 | 3 |\n| 4 | 0 | miss | 3 | frames full; load order 3 2 1 -> oldest = 3 | 2 1 0 | 4 |\n| 5 | 3 | miss | 2 | frames full; load order 2 1 0 -> oldest = 2 | 1 0 3 | 5 |\n| 6 | 2 | miss | 1 | frames full; load order 1 0 3 -> oldest = 1 | 0 3 2 | 6 |\n| 7 | 4 | miss | 0 | frames full; load order 0 3 2 -> oldest = 0 | 3 2 4 | 7 |\n| 8 | 3 | hit | - | 3 already in frames | 3 2 4 | 7 |\n| 9 | 2 | hit | - | 2 already in frames | 3 2 4 | 7 |\n| 10 | 1 | miss | 3 | frames full; load order 3 2 4 -> oldest = 3 | 2 4 1 | 8 |\n| 11 | 0 | miss | 2 | frames full; load order 2 4 1 -> oldest = 2 | 4 1 0 | 9 |\n| 12 | 4 | hit | - | 4 already in frames | 4 1 0 | 9 |\n\n**Total page faults = 9** (hits = 12 - 9 = 3, hit ratio = 3 / 12 = 0.25, fault ratio = 9 / 12 = 0.75)\n\n**Answer: faults = 9**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 16,
+          "kind": "paging",
+          "final_correct": true,
+          "new_tokens": 582,
+          "truncated": false,
+          "output": "**Policy: FIFO, 4 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page loaded EARLIEST._\n\n| # | Ref | Result | Evicted | Why | Frames (oldest first) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 3 | miss | - | free frame (1/4 used) | 3 | 1 |\n| 2 | 2 | miss | - | free frame (2/4 used) | 3 2 | 2 |\n| 3 | 1 | miss | - | free frame (3/4 used) | 3 2 1 | 3 |\n| 4 | 0 | miss | - | free frame (4/4 used) | 3 2 1 0 | 4 |\n| 5 | 3 | hit | - | 3 already in frames | 3 2 1 0 | 4 |\n| 6 | 2 | hit | - | 2 already in frames | 3 2 1 0 | 4 |\n| 7 | 4 | miss | 3 | frames full; load order 3 2 1 0 -> oldest = 3 | 2 1 0 4 | 5 |\n| 8 | 3 | miss | 2 | frames full; load order 2 1 0 4 -> oldest = 2 | 1 0 4 3 | 6 |\n| 9 | 2 | miss | 1 | frames full; load order 1 0 4 3 -> oldest = 1 | 0 4 3 2 | 7 |\n| 10 | 1 | miss | 0 | frames full; load order 0 4 3 2 -> oldest = 0 | 4 3 2 1 | 8 |\n| 11 | 0 | miss | 4 | frames full; load order 4 3 2 1 -> oldest = 4 | 3 2 1 0 | 9 |\n| 12 | 4 | miss | 3 | frames full; load order 3 2 1 0 -> oldest = 3 | 2 1 0 4 | 10 |\n\n**Total page faults = 10**\n- Hits = 12 - 10 = 2\n- Hit ratio = 2 / 12 = 0.1667\n- Fault ratio = 10 / 12 = 0.8333\n\n**Answer: page faults = 10**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 17,
+          "kind": "paging",
+          "final_correct": true,
+          "new_tokens": 932,
+          "truncated": false,
+          "output": "**Policy: LRU, 4 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page used LEAST RECENTLY._\n\n| # | Ref | Result | Evicted | Why | Frames (least recently used first) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 1 | miss | - | free frame (1/4 used) | 1 | 1 |\n| 2 | 2 | miss | - | free frame (2/4 used) | 1 2 | 2 |\n| 3 | 3 | miss | - | free frame (3/4 used) | 1 2 3 | 3 |\n| 4 | 4 | miss | - | free frame (4/4 used) | 1 2 3 4 | 4 |\n| 5 | 2 | hit | - | 2 already in frames | 1 3 4 2 | 4 |\n| 6 | 1 | hit | - | 1 already in frames | 3 4 2 1 | 4 |\n| 7 | 5 | miss | 3 | frames full; last used 3@#3 < 4@#4 < 2@#5 < 1@#6 -> least recent = 3 | 4 2 1 5 | 5 |\n| 8 | 6 | miss | 4 | frames full; last used 4@#4 < 2@#5 < 1@#6 < 5@#7 -> least recent = 4 | 2 1 5 6 | 6 |\n| 9 | 2 | hit | - | 2 already in frames | 1 5 6 2 | 6 |\n| 10 | 1 | hit | - | 1 already in frames | 5 6 2 1 | 6 |\n| 11 | 2 | hit | - | 2 already in frames | 5 6 1 2 | 6 |\n| 12 | 3 | miss | 5 | frames full; last used 5@#7 < 6@#8 < 1@#10 < 2@#11 -> least recent = 5 | 6 1 2 3 | 7 |\n| 13 | 7 | miss | 6 | frames full; last used 6@#8 < 1@#10 < 2@#11 < 3@#12 -> least recent = 6 | 1 2 3 7 | 8 |\n| 14 | 6 | miss | 1 | frames full; last used 1@#10 < 2@#11 < 3@#12 < 7@#13 -> least recent = 1 | 2 3 7 6 | 9 |\n| 15 | 3 | hit | - | 3 already in frames | 2 7 6 3 | 9 |\n| 16 | 2 | hit | - | 2 already in frames | 7 6 3 2 | 9 |\n| 17 | 1 | miss | 7 | frames full; last used 7@#13 < 6@#14 < 3@#15 < 2@#16 -> least recent = 7 | 6 3 2 1 | 10 |\n| 18 | 2 | hit | - | 2 already in frames | 6 3 1 2 | 10 |\n| 19 | 3 | hit | - | 3 already in frames | 6 1 2 3 | 10 |\n| 20 | 6 | hit | - | 6 already in frames | 1 2 3 6 | 10 |\n\n**Total page faults = 10** (hits = 20 - 10 = 10, hit ratio = 10 / 20 = 0.5, fault ratio = 10 / 20 = 0.5)\n\n**Answer: page faults = 10**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 18,
+          "kind": "paging",
+          "final_correct": true,
+          "new_tokens": 725,
+          "truncated": false,
+          "output": "**Policy: CLOCK, 3 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, advance the hand: a page with bit 1 gets a second chance (bit cleared), the first page with bit 0 is evicted; a hit sets the bit to 1._\n\n| # | Ref | Result | Evicted | Why | Frames (reference bit in brackets) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 2 | miss | - | free frame (1/3 used) | 2(1) | 1 |\n| 2 | 3 | miss | - | free frame (2/3 used) | 2(1) 3(1) | 2 |\n| 3 | 2 | hit | - | hit, set bit of 2 to 1 | 2(1) 3(1) | 2 |\n| 4 | 1 | miss | - | free frame (3/3 used) | 2(1) 3(1) 1(1), hand 2 | 3 |\n| 5 | 5 | miss | 2 | frames full; hand 2(1) clear, 3(1) clear, 1(1) clear, 2(0) evict | 5(1) 3(0) 1(0), hand 3 | 4 |\n| 6 | 2 | miss | 3 | frames full; hand 3(0) evict | 5(1) 2(1) 1(0), hand 1 | 5 |\n| 7 | 4 | miss | 1 | frames full; hand 1(0) evict | 5(1) 2(1) 4(1), hand 5 | 6 |\n| 8 | 5 | hit | - | hit, set bit of 5 to 1 | 5(1) 2(1) 4(1), hand 5 | 6 |\n| 9 | 3 | miss | 5 | frames full; hand 5(1) clear, 2(1) clear, 4(1) clear, 5(0) evict | 3(1) 2(0) 4(0), hand 2 | 7 |\n| 10 | 2 | hit | - | hit, set bit of 2 to 1 | 3(1) 2(1) 4(0), hand 2 | 7 |\n| 11 | 5 | miss | 4 | frames full; hand 2(1) clear, 4(0) evict | 3(1) 2(0) 5(1), hand 3 | 8 |\n| 12 | 2 | hit | - | hit, set bit of 2 to 1 | 3(1) 2(1) 5(1), hand 3 | 8 |\n\n**Total page faults = 8** (hits = 12 - 8 = 4, hit ratio = 4 / 12 = 0.3333, fault ratio = 8 / 12 = 0.6667)\n\n**Answer: page faults = 8**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 19,
+          "kind": "paging",
+          "final_correct": true,
+          "new_tokens": 558,
+          "truncated": false,
+          "output": "**Policy: OPT, 4 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page whose NEXT USE is FARTHEST in the future (never used again = farthest)._\n\n| # | Ref | Result | Evicted | Why | Frames (frame order) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 3 | miss | - | free frame (1/4 used) | 3 | 1 |\n| 2 | 2 | miss | - | free frame (2/4 used) | 3 2 | 2 |\n| 3 | 1 | miss | - | free frame (3/4 used) | 3 2 1 | 3 |\n| 4 | 0 | miss | - | free frame (4/4 used) | 3 2 1 0 | 4 |\n| 5 | 3 | hit | - | 3 already in frames | 3 2 1 0 | 4 |\n| 6 | 2 | hit | - | 2 already in frames | 3 2 1 0 | 4 |\n| 7 | 4 | miss | 0 | frames full; next use 0@#10 > 3@#8 > 2@#9 > 1@#10 -> farthest = 0 | 3 2 1 4 | 5 |\n| 8 | 3 | hit | - | 3 already in frames | 3 2 1 4 | 5 |\n| 9 | 2 | hit | - | 2 already in frames | 3 2 1 4 | 5 |\n| 10 | 1 | hit | - | 1 already in frames | 3 2 1 4 | 5 |\n| 11 | 0 | miss | 1 | frames full; next use 1@never > 3@never > 2@never > 4@#12 -> farthest = 1 | 3 2 0 4 | 6 |\n| 12 | 4 | hit | - | 4 already in frames | 3 2 0 4 | 6 |\n\n**Total page faults = 6** (hits = 12 - 6 = 6, hit ratio = 6 / 12 = 0.5, fault ratio = 6 / 12 = 0.5)\n\n**Answer: page faults = 6**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 20,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 866,
+          "truncated": false,
+          "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P0: [7, 5, 3] - [0, 1, 0] = [7, 4, 3]\n- P1: [3, 2, 2] - [2, 0, 0] = [1, 2, 2]\n- P2: [9, 0, 2] - [3, 0, 2] = [6, 0, 0]\n- P3: [2, 2, 2] - [2, 1, 1] = [0, 1, 1]\n- P4: [4, 3, 3] - [0, 0, 2] = [4, 3, 1]\n\n**Step 2 - run the safety algorithm** (scan the processes in order; run the first one whose Need fits in Work, then add its Allocation to Work and scan again)\n\n- Work = Available = [3, 3, 2]\n- P0: Need [7, 4, 3] vs Work [3, 3, 2]: 7>3, 4>3, 3>2 -> cannot run yet\n- P1: Need [1, 2, 2] vs Work [3, 3, 2]: 1<=3, 2<=3, 2<=2 -> all fit, run it. Work = [3, 3, 2] + Allocation [2, 0, 0] = [5, 3, 2]\n- P0: Need [7, 4, 3] vs Work [5, 3, 2]: 7>5, 4>3, 3>2 -> cannot run yet\n- P2: Need [6, 0, 0] vs Work [5, 3, 2]: 6>5, 0<=3, 0<=2 -> cannot run yet\n- P3: Need [0, 1, 1] vs Work [5, 3, 2]: 0<=5, 1<=3, 1<=2 -> all fit, run it. Work = [5, 3, 2] + Allocation [2, 1, 1] = [7, 4, 3]\n- P0: Need [7, 4, 3] vs Work [7, 4, 3]: 7<=7, 4<=4, 3<=3 -> all fit, run it. Work = [7, 4, 3] + Allocation [0, 1, 0] = [7, 5, 3]\n- P2: Need [6, 0, 0] vs Work [7, 5, 3]: 6<=7, 0<=5, 0<=3 -> all fit, run it. Work = [7, 5, 3] + Allocation [3, 0, 2] = [10, 5, 5]\n- P4: Need [4, 3, 1] vs Work [10, 5, 5]: 4<=10, 3<=5, 1<=5 -> all fit, run it. Work = [10, 5, 5] + Allocation [0, 0, 2] = [10, 5, 7]\n\n**Step 3 - conclusion**\n\nAll 5 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< P1, P3, P0, P2, P4 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._\n\n**Answer: SAFE, safe sequence < P1, P3, P0, P2, P4 >**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 21,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 961,
+          "truncated": false,
+          "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P0: [7, 5, 3] - [0, 1, 0] = [7, 4, 3]\n- P1: [3, 2, 2] - [2, 0, 0] = [1, 2, 2]\n- P2: [9, 0, 2] - [3, 0, 2] = [6, 0, 0]\n- P3: [2, 2, 2] - [2, 1, 1] = [0, 1, 1]\n- P4: [4, 3, 3] - [0, 0, 2] = [4, 3, 1]\n\n**Step 2 - apply the three tests of the resource-request algorithm**\n\n- Test 1: Request [1, 0, 2] vs Need [1, 2, 2]: 1<=1, 0<=2, 2<=2 -> OK\n- Test 2: Request [1, 0, 2] vs Available [3, 3, 2]: 1<=3, 0<=3, 2<=2 -> OK\n- Test 3: pretend to grant. Available = [3, 3, 2] - [1, 0, 2] = [2, 3, 0]; Allocation[P1] = [3, 0, 2]. Now run the safety algorithm.\n- Work = Available = [2, 3, 0]\n- P0: Need [7, 4, 3] vs Work [2, 3, 0]: 7>2, 4>3, 3>0 -> cannot run yet\n- P1: Need [0, 2, 0] vs Work [2, 3, 0]: 0<=2, 2<=3, 0<=0 -> all fit, run it. Work = [2, 3, 0] + Allocation [3, 0, 2] = [5, 3, 2]\n- P0: Need [7, 4, 3] vs Work [5, 3, 2]: 7>5, 4>3, 3>2 -> cannot run yet\n- P2: Need [6, 0, 0] vs Work [5, 3, 2]: 6>5, 0<=3, 0<=2 -> cannot run yet\n- P3: Need [0, 1, 1] vs Work [5, 3, 2]: 0<=5, 1<=3, 1<=2 -> all fit, run it. Work = [5, 3, 2] + Allocation [2, 1, 1] = [7, 4, 3]\n- P0: Need [7, 4, 3] vs Work [7, 4, 3]: 7<=7, 4<=4, 3<=3 -> all fit, run it. Work = [7, 4, 3] + Allocation [0, 1, 0] = [7, 5, 3]\n- P2: Need [6, 0, 0] vs Work [7, 5, 3]: 6<=7, 0<=5, 0<=3 -> all fit, run it. Work = [7, 5, 3] + Allocation [3, 0, 2] = [10, 5, 5]\n- P4: Need [4, 3, 1] vs Work [10, 5, 5]: 4<=10, 3<=5, 1<=5 -> all fit, run it. Work = [10, 5, 5] + Allocation [0, 0, 2] = [10, 5, 7]\n- SAFE. Safe sequence: < P1, P3, P0, P2, P4 >\n- Resulting state is SAFE (sequence < P1, P3, P0, P2, P4 >) -> GRANT the request\n\n**Conclusion: the request is GRANTED.**\n\n**Answer: GRANTED**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 22,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 1005,
+          "truncated": false,
+          "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P0: [7, 5, 3] - [0, 1, 0] = [7, 4, 3]\n- P1: [3, 2, 2] - [2, 0, 0] = [1, 2, 2]\n- P2: [9, 0, 2] - [3, 0, 2] = [6, 0, 0]\n- P3: [2, 2, 2] - [2, 1, 1] = [0, 1, 1]\n- P4: [4, 3, 3] - [0, 0, 2] = [4, 3, 1]\n\n**Step 2 - apply the three tests of the resource-request algorithm**\n\n- Test 1: Request [0, 2, 0] vs Need [7, 4, 3]: 0<=7, 2<=4, 0<=3 -> OK\n- Test 2: Request [0, 2, 0] vs Available [3, 3, 2]: 0<=3, 2<=3, 0<=2 -> OK\n- Test 3: pretend to grant. Available = [3, 3, 2] - [0, 2, 0] = [3, 1, 2]; Allocation[P0] = [0, 3, 0]. Now run the safety algorithm.\n- Work = Available = [3, 1, 2]\n- P0: Need [7, 2, 3] vs Work [3, 1, 2]: 7>3, 2>1, 3>2 -> cannot run yet\n- P1: Need [1, 2, 2] vs Work [3, 1, 2]: 1<=3, 2>1, 2<=2 -> cannot run yet\n- P2: Need [6, 0, 0] vs Work [3, 1, 2]: 6>3, 0<=1, 0<=2 -> cannot run yet\n- P3: Need [0, 1, 1] vs Work [3, 1, 2]: 0<=3, 1<=1, 1<=2 -> all fit, run it. Work = [3, 1, 2] + Allocation [2, 1, 1] = [5, 2, 3]\n- P0: Need [7, 2, 3] vs Work [5, 2, 3]: 7>5, 2<=2, 3<=3 -> cannot run yet\n- P1: Need [1, 2, 2] vs Work [5, 2, 3]: 1<=5, 2<=2, 2<=3 -> all fit, run it. Work = [5, 2, 3] + Allocation [2, 0, 0] = [7, 2, 3]\n- P0: Need [7, 2, 3] vs Work [7, 2, 3]: 7<=7, 2<=2, 3<=3 -> all fit, run it. Work = [7, 2, 3] + Allocation [0, 3, 0] = [7, 5, 3]\n- P2: Need [6, 0, 0] vs Work [7, 5, 3]: 6<=7, 0<=5, 0<=3 -> all fit, run it. Work = [7, 5, 3] + Allocation [3, 0, 2] = [10, 5, 5]\n- P4: Need [4, 3, 1] vs Work [10, 5, 5]: 4<=10, 3<=5, 1<=5 -> all fit, run it. Work = [10, 5, 5] + Allocation [0, 0, 2] = [10, 5, 7]\n- SAFE. Safe sequence: < P3, P1, P0, P2, P4 >\n- Resulting state is SAFE (sequence < P3, P1, P0, P2, P4 >) -> GRANT the request\n\n**Conclusion: the request is GRANTED.**\n\n**Answer: GRANTED**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 23,
+          "kind": "banker_safety",
+          "final_correct": false,
+          "new_tokens": 755,
+          "truncated": false,
+          "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P0: [7, 5, 3] - [0, 1, 0] = [7, 4, 3]\n- P1: [3, 2, 2] - [2, 0, 0] = [1, 2, 2]\n- P2: [9, 0, 2] - [3, 0, 2] = [6, 0, 0]\n- P3: [2, 2, 2] - [2, 1, 1] = [0, 1, 1]\n- P4: [4, 3, 3] - [0, 0, 2] = [4, 3, 1]\n\n**Step 2 - run the safety algorithm** (scan the processes in order; run the first one whose Need fits in Work, then add its Allocation to Work and scan again)\n\n- Work = Available = [10, 5, 7]\n- P0: Need [7, 4, 3] vs Work [10, 5, 7]: 7<=10, 4<=5, 3<=7 -> all fit, run it. Work = [10, 5, 7] + Allocation [0, 1, 0] = [10, 6, 7]\n- P1: Need [1, 2, 2] vs Work [10, 6, 7]: 1<=10, 2<=6, 2<=7 -> all fit, run it. Work = [10, 6, 7] + Allocation [2, 0, 0] = [12, 6, 7]\n- P2: Need [6, 0, 0] vs Work [12, 6, 7]: 6<=12, 0<=6, 0<=7 -> all fit, run it. Work = [12, 6, 7] + Allocation [3, 0, 2] = [15, 6, 9]\n- P3: Need [0, 1, 1] vs Work [15, 6, 9]: 0<=15, 1<=6, 1<=9 -> all fit, run it. Work = [15, 6, 9] + Allocation [2, 1, 1] = [17, 7, 10]\n- P4: Need [4, 3, 1] vs Work [17, 7, 10]: 4<=17, 3<=7, 1<=10 -> all fit, run it. Work = [17, 7, 10] + Allocation [0, 0, 2] = [17, 7, 12]\n\n**Step 3 - conclusion**\n\nAll 5 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< P0, P1, P2, P3, P4 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._\n\n**Answer: SAFE, safe sequence < P0, P1, P2, P3, P4 >**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 24,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 391,
+          "truncated": false,
+          "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources R1, R2, R3)\n\n- A: [3, 2, 1] - [1, 1, 0] = [2, 1, 1]\n- B: [1, 3, 2] - [0, 1, 1] = [1, 2, 1]\n- C: [2, 1, 3] - [1, 0, 1] = [1, 1, 2]\n\n**Step 2 - run the safety algorithm** (scan the processes in order; run the first one whose Need fits in Work, then add its Allocation to Work and scan again)\n\n- Work = Available = [1, 0, 0]\n- A: Need [2, 1, 1] vs Work [1, 0, 0]: 2>1, 1>0, 1>0 -> cannot run yet\n- B: Need [1, 2, 1] vs Work [1, 0, 0]: 1<=1, 2>0, 1>0 -> cannot run yet\n- C: Need [1, 1, 2] vs Work [1, 0, 0]: 1<=1, 1>0, 2>0 -> cannot run yet\n\n**Step 3 - conclusion**\n\nNo remaining process (A, B, C) has a Need that fits in Work [1, 0, 0], so they can never all finish: the system is **NOT in a safe state (UNSAFE)**.\n\n_Unsafe does not mean deadlocked yet: it means a deadlock is possible if the processes request their maximum._\n\n**Answer: UNSAFE, no safe sequence exists**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 25,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 788,
+          "truncated": false,
+          "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- P1: [1, 2, 2] - [1, 0, 0] = [0, 2, 2]\n- P2: [0, 1, 1] - [2, 1, 1] = [2, 0, 0]\n- P3: [4, 3, 1] - [0, 0, 2] = [4, 3, -1]\n- P4: [1, 0, 0] - [1, 1, 0] = [0, -1, 0]\n\n**Step 2 - run the safety algorithm** (scan the processes in order; run the first one whose Need fits in Work, then add its Allocation to Work and scan again)\n\n- Work = Available = [1, 1, 1]\n- P1: Need [0, 2, 2] vs Work [1, 1, 1]: 0<=1, 2>1, 2>1 -> cannot run yet\n- P2: Need [2, 0, 0] vs Work [1, 1, 1]: 2>1, 0<=1, 0<=1 -> cannot run yet\n- P3: Need [4, 3, -1] vs Work [1, 1, 1]: 4>1, 3>1, -1<=1 -> cannot run yet\n- P4: Need [0, -1, 0] vs Work [1, 1, 1]: 0<=1, -1<1, 0<=1 -> all fit, run it. Work = [1, 1, 1] + Allocation [1, 1, 0] = [2, 2, 1]\n- P1: Need [0, 2, 2] vs Work [2, 2, 1]: 0<=2, 2<=2, 2>1 -> cannot run yet\n- P2: Need [2, 0, 0] vs Work [2, 2, 1]: 2<=2, 0<=2, 0<=1 -> all fit, run it. Work = [2, 2, 1] + Allocation [2, 1, 1] = [4, 3, 2]\n- P1: Need [0, 2, 2] vs Work [4, 3, 2]: 0<=4, 2<=3, 2<=2 -> all fit, run it. Work = [4, 3, 2] + Allocation [1, 0, 0] = [5, 3, 2]\n- P3: Need [4, 3, -1] vs Work [5, 3, 2]: 4<=5, 3<=3, -1<=2 -> all fit, run it. Work = [5, 3, 2] + Allocation [0, 0, 2] = [5, 3, 4]\n\n**Step 3 - conclusion**\n\nAll 4 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< P4, P2, P1, P3 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._\n\n**Answer: SAFE, safe sequence < P4, P2, P1, P3 >**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 26,
+          "kind": "disk",
+          "final_correct": true,
+          "new_tokens": 722,
+          "truncated": false,
+          "output": "**Policy: SSTF**\n\n- at 53: nearest below 37 (53 - 37 = 16) vs above 65 (65 - 53 = 12); 12 < 16 -> 65\n- at 65: nearest below 37 (65 - 37 = 28) vs above 67 (67 - 65 = 2); 2 < 28 -> 67\n- at 67: nearest below 37 (67 - 37 = 30) vs above 122 (122 - 67 = 55); 30 < 55 -> 37\n- at 37: nearest below 14 (37 - 14 = 23) vs above 122 (122 - 37 = 85); 23 < 85 -> 14\n- at 14: nearest below 14 (14 - 14 = 0) vs above 122 (122 - 14 = 108); 0 < 108 -> 14\n- at 14: only requests above remain; nearest above 122 (122 - 14 = 108) -> 122\n- at 122: only requests above remain; nearest above 124 (124 - 122 = 2) -> 124\n- at 124: only requests above remain; nearest above 183 (183 - 124 = 59) -> 183\n- 53 -> 65: 65 - 53 = 12; running total 0 + 12 = 12\n- 65 -> 67: 67 - 65 = 2; running total 12 + 2 = 14\n- 67 -> 37: 67 - 37 = 30; running total 14 + 30 = 44\n- 37 -> 14: 37 - 14 = 23; running total 44 + 23 = 67\n- 14 -> 122: 122 - 14 = 108; running total 67 + 108 = 175\n- 122 -> 124: 124 - 122 = 2; running total 175 + 2 = 177\n- 124 -> 183: 183 - 124 = 59; running total 177 + 59 = 236\n\n**Service order:** 65 -> 67 -> 37 -> 14 -> 14 -> 122 -> 124 -> 183\n**Total head movement = 236 cylinders**\n- Average seek length = 236 / 8 = 29.5\n\n**Answer: total head movement = 236 cylinders**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 27,
+          "kind": "disk",
+          "final_correct": true,
+          "new_tokens": 563,
+          "truncated": false,
+          "output": "**Policy: SCAN**\n\n- sorted requests: [14, 37, 65, 67, 98, 122, 124, 183]; below head 53: [14, 37]; at/above head: [65, 67, 98, 122, 124, 183]\n- SCAN, head moving DOWN, towards cylinder 0: service [37, 14], continue to the disk edge 0, reverse, then service [65, 67, 98, 122, 124, 183]\n- 53 -> 37: 53 - 37 = 16; running total 0 + 16 = 16\n- 37 -> 14: 37 - 14 = 23; running total 16 + 23 = 39\n- 14 -> 0: 14 - 0 = 14; running total 39 + 14 = 53\n- 0 -> 65: 65 - 0 = 65; running total 53 + 65 = 118\n- 65 -> 67: 67 - 65 = 2; running total 118 + 2 = 120\n- 67 -> 98: 98 - 67 = 31; running total 120 + 31 = 151\n- 98 -> 122: 122 - 98 = 24; running total 151 + 24 = 175\n- 122 -> 124: 124 - 122 = 2; running total 175 + 2 = 177\n- 124 -> 183: 183 - 124 = 59; running total 177 + 59 = 236\n\n**Service order:** 37 -> 14 -> 0 -> 65 -> 67 -> 98 -> 122 -> 124 -> 183\n**Total head movement = 236 cylinders**\n- Average seek length = 236 / 8 = 29.5\n\n**Answer: total head movement = 236 cylinders**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 28,
+          "kind": "disk",
+          "final_correct": true,
+          "new_tokens": 669,
+          "truncated": false,
+          "output": "**Policy: CSCAN**\n\n- direction: UP, at 53\n- sorted requests: [14, 37, 65, 67, 98, 122, 124, 183]; below head 53: [14, 37]; at/above head: [65, 67, 98, 122, 124, 183]\n- C-SCAN, head moving UP, towards higher cylinders: service [65, 67, 98, 122, 124, 183], go to the end (199), jump to 0, continue up through [14, 37]\n- 53 -> 65: 65 - 53 = 12; running total 0 + 12 = 12\n- 65 -> 67: 67 - 65 = 2; running total 12 + 2 = 14\n- 67 -> 98: 98 - 67 = 31; running total 14 + 31 = 45\n- 98 -> 122: 122 - 98 = 24; running total 45 + 24 = 69\n- 122 -> 124: 124 - 122 = 2; running total 69 + 2 = 71\n- 124 -> 183: 183 - 124 = 59; running total 71 + 59 = 130\n- 183 -> 199: 199 - 183 = 16; running total 130 + 16 = 146\n- 199 -> 0: 199 - 0 = 199; running total 146 + 199 = 345\n- 0 -> 14: 14 - 0 = 14; running total 345 + 14 = 359\n- 14 -> 37: 37 - 14 = 23; running total 359 + 23 = 382\n\n**Service order:** 65 -> 67 -> 98 -> 122 -> 124 -> 183 -> 199 -> 0 -> 14 -> 37\n**Total head movement = 382 cylinders**\n- Average seek length = 382 / 8 = 47.75\n- _Convention: this total counts the return jump of 199 cylinders. If your course excludes the jump, the total is 382 - 199 = 183._\n\n**Answer: total head movement = 382 cylinders**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 29,
+          "kind": "disk",
+          "final_correct": true,
+          "new_tokens": 722,
+          "truncated": false,
+          "output": "**Policy: LOOK**\n\n- direction: previous request 125 < 143, so the head is moving UP\n- sorted requests: [86, 130, 913, 948, 1022, 1470, 1509, 1750, 1774]; below head 143: [86, 130]; at/above head: [913, 948, 1022, 1470, 1509, 1750, 1774]\n- LOOK, head moving UP, towards higher cylinders: service [913, 948, 1022, 1470, 1509, 1750, 1774], reverse at the last request (not the edge), then service [130, 86]\n- 143 -> 913: 913 - 143 = 770; running total 0 + 770 = 770\n- 913 -> 948: 948 - 913 = 35; running total 770 + 35 = 805\n- 948 -> 1022: 1022 - 948 = 74; running total 805 + 74 = 879\n- 1022 -> 1470: 1470 - 1022 = 448; running total 879 + 448 = 1327\n- 1470 -> 1509: 1509 - 1470 = 39; running total 1327 + 39 = 1366\n- 1509 -> 1750: 1750 - 1509 = 241; running total 1366 + 241 = 1607\n- 1750 -> 1774: 1774 - 1750 = 24; running total 1607 + 24 = 1631\n- 1774 -> 130: 1774 - 130 = 1644; running total 1631 + 1644 = 3275\n- 130 -> 86: 130 - 86 = 44; running total 3275 + 44 = 3319\n\n**Service order:** 913 -> 948 -> 1022 -> 1470 -> 1509 -> 1750 -> 1774 -> 130 -> 86\n**Total head movement = 3319 cylinders**\n- Average seek length = 3319 / 9 = 368.78\n\n**Answer: total head movement = 3319 cylinders**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 30,
+          "kind": "disk",
+          "final_correct": true,
+          "new_tokens": 524,
+          "truncated": false,
+          "output": "**Policy: FCFS**\n\n- 143 -> 86: 143 - 86 = 57; running total 0 + 57 = 57\n- 86 -> 1470: 1470 - 86 = 1384; running total 57 + 1384 = 1441\n- 1470 -> 913: 1470 - 913 = 557; running total 1441 + 557 = 1998\n- 913 -> 1774: 1774 - 913 = 861; running total 1998 + 861 = 2859\n- 1774 -> 948: 1774 - 948 = 826; running total 2859 + 826 = 3685\n- 948 -> 1509: 1509 - 948 = 561; running total 3685 + 561 = 4246\n- 1509 -> 1022: 1509 - 1022 = 487; running total 4246 + 487 = 4733\n- 1022 -> 1750: 1750 - 1022 = 728; running total 4733 + 728 = 5461\n- 1750 -> 130: 1750 - 130 = 1620; running total 5461 + 1620 = 7081\n\n**Service order:** 86 -> 1470 -> 913 -> 1774 -> 948 -> 1509 -> 1022 -> 1750 -> 130\n**Total head movement = 7081 cylinders**\n- Average seek length = 7081 / 9 = 786.78\n\n**Answer: total head movement = 7081 cylinders**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 31,
+          "kind": "disk",
+          "final_correct": true,
+          "new_tokens": 532,
+          "truncated": false,
+          "output": "**Policy: CLOOK**\n\n- direction: towards lower cylinders (50 -> 0)\n- sorted requests: [16, 24, 43, 82, 140, 170, 190]; below head 50: [16, 24, 43]; at/above head: [82, 140, 170, 190]\n- C-LOOK, head moving DOWN, towards cylinder 0: service [43, 24, 16], jump to highest pending request, continue down through [190, 170, 140, 82]\n- 50 -> 43: 50 - 43 = 7; running total 0 + 7 = 7\n- 43 -> 24: 43 - 24 = 19; running total 7 + 19 = 26\n- 24 -> 16: 24 - 16 = 8; running total 26 + 8 = 34\n- 16 -> 190: 190 - 16 = 174; running total 34 + 174 = 208\n- 190 -> 170: 190 - 170 = 20; running total 208 + 20 = 228\n- 170 -> 140: 170 - 140 = 30; running total 228 + 30 = 258\n- 140 -> 82: 140 - 82 = 58; running total 258 + 58 = 316\n\n**Service order:** 43 -> 24 -> 16 -> 190 -> 170 -> 140 -> 82\n**Total head movement = 316 cylinders**\n- Average seek length = 316 / 7 = 45.14\n- _Convention: this total counts the return jump of 174 cylinders. If your course excludes the jump, the total is 316 - 174 = 142._\n\n**Answer: total head movement = 316 cylinders**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 32,
+          "kind": "disk",
+          "final_correct": true,
+          "new_tokens": 704,
+          "truncated": false,
+          "output": "**Policy: SSTF**\n\n- at 50: nearest below 43 (50 - 43 = 7) vs above 82 (82 - 50 = 32); 7 < 32 -> 43\n- at 43: nearest below 24 (43 - 24 = 19) vs above 82 (82 - 43 = 39); 19 < 39 -> 24\n- at 24: nearest below 16 (24 - 16 = 8) vs above 82 (82 - 24 = 58); 8 < 58 -> 16\n- at 16: nearest below 140 (140 - 16 = 124) vs above 82 (82 - 16 = 66); 66 < 124 -> 82\n- at 82: nearest below 140 (140 - 82 = 58) vs above 170 (170 - 82 = 88); 58 < 88 -> 140\n- at 140: nearest below 170 (170 - 140 = 30) vs above 190 (190 - 140 = 50); 30 < 50 -> 170\n- at 170: only requests above remain; nearest above 190 (190 - 170 = 20) -> 190\n- 50 -> 43: 50 - 43 = 7; running total 0 + 7 = 7\n- 43 -> 24: 43 - 24 = 19; running total 7 + 19 = 26\n- 24 -> 16: 24 - 16 = 8; running total 26 + 8 = 34\n- 16 -> 82: 82 - 16 = 66; running total 34 + 66 = 100\n- 82 -> 140: 140 - 82 = 58; running total 100 + 58 = 158\n- 140 -> 170: 170 - 140 = 30; running total 158 + 30 = 188\n- 170 -> 190: 190 - 170 = 20; running total 188 + 20 = 208\n\n**Service order:** 43 -> 24 -> 16 -> 82 -> 140 -> 170 -> 190\n**Total head movement = 208 cylinders**\n- Average seek length = 208 / 7 = 29.71\n\n**Answer: total head movement = 208 cylinders**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 33,
+          "kind": "translate",
+          "final_correct": true,
+          "new_tokens": 152,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(9000 / 4096) = 2 (check: 2 x 4096 = 8192 <= 9000 < 12288)\n- page offset = 9000 - 8192 = 808\n- page table[2] = frame 1\n- frame base = 1 x 4096 = 4096\n- physical address = 4096 + 808 = 4904\n\n**Physical address = 4904**\n\n**Answer: physical address = 4904**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 34,
+          "kind": "translate",
+          "final_correct": false,
+          "new_tokens": 301,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- convert 0x0A2C to decimal: 0 x 4096 = 0; 10 x 256 = 2560; 2 x 16 = 32; 12 x 1 = 12\n- sum: 0 + 2560 = 2560, 2560 + 32 = 2592, 2592 + 12 = 2604 -> 0x0A2C = 2604\n- page number = floor(2604 / 1024) = 2 (check: 2 x 1024 = 2048 <= 2604 < 3072)\n- page offset = 2604 - 2048 = 556\n- page table[2] = frame 7\n- frame base = 7 x 1024 = 7168\n- physical address = 7168 + 556 = 7724\n\n**Physical address = 7724**\n- in hexadecimal: 7724 = 0x1E2C\n\n**Answer: physical address = 7724 (0x1E2C)**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 35,
+          "kind": "translate",
+          "final_correct": false,
+          "new_tokens": 164,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(10000 / 2048) = 4 (check: 4 x 2048 = 8192 <= 10000 < 10240)\n- page offset = 10000 - 8192 = 1808\n- page table[4] = frame 11\n- frame base = 11 x 2048 = 22528\n- physical address = 22528 + 1808 = 24336\n\n**Physical address = 24336**\n\n**Answer: physical address = 24336**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 36,
+          "kind": "freespace",
+          "final_correct": true,
+          "new_tokens": 703,
+          "truncated": false,
+          "output": "**Policy: BEST-fit**\n\n_Rule: take the SMALLEST hole that is large enough; the leftover stays as a smaller hole. A request that fits nowhere must wait._\n\n- holes (free KB, numbered in order): hole 1=100, hole 2=500, hole 3=200, hole 4=300, hole 5=600\n- request 212: hole 1=100 < 212 no; hole 2=500 >= 212 fits; hole 3=200 < 212 no; hole 4=300 >= 212 fits; hole 5=600 >= 212 fits -> smallest fitting: 300 < 500 < 600 -> hole 4; 300 - 212 = 88\n- request 417: hole 1=100 < 417 no; hole 2=500 >= 417 fits; hole 3=200 < 417 no; hole 4=88 < 417 no; hole 5=600 >= 417 fits -> smallest fitting: 500 < 600 -> hole 2; 500 - 417 = 83\n- request 112: hole 1=100 < 112 no; hole 2=83 < 112 no; hole 3=200 >= 112 fits; hole 4=88 < 112 no; hole 5=600 >= 112 fits -> smallest fitting: 200 < 600 -> hole 3; 200 - 112 = 88\n- request 426: hole 1=100 < 426 no; hole 2=83 < 426 no; hole 3=88 < 426 no; hole 4=88 < 426 no; hole 5=600 >= 426 fits -> smallest fitting: 600 -> hole 5; 600 - 426 = 174\n\n**Placement:** 212 KB -> hole 4; 417 KB -> hole 2; 112 KB -> hole 3; 426 KB -> hole 5\n**Remaining free space per hole:** [100, 83, 88, 88, 174]\n- Sum of free space: 100 + 83 = 183, 183 + 88 = 271, 271 + 88 = 359, 359 + 174 = 533\n**Total external fragmentation = 533 KB**\n\n**Answer: 212 KB -> hole 4; 417 KB -> hole 2; 112 KB -> hole 3; 426 KB -> hole 5**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 37,
+          "kind": "freespace",
+          "final_correct": true,
+          "new_tokens": 694,
+          "truncated": false,
+          "output": "**Policy: WORST-fit**\n\n_Rule: take the LARGEST hole that is large enough; the leftover stays as a smaller hole. A request that fits nowhere must wait._\n\n- holes (free KB, numbered in order of increasing size): hole 1=100, hole 2=500, hole 3=200, hole 4=300, hole 5=600\n- request 212: hole 1=100 < 212 no; hole 2=500 >= 212 fits; hole 3=200 < 212 no; hole 4=300 >= 212 fits; hole 5=600 >= 212 fits -> largest fitting: 600 > 500 > 300 -> hole 5; 600 - 212 = 388\n- request 417: hole 1=100 < 417 no; hole 2=500 >= 417 fits; hole 3=200 < 417 no; hole 4=300 < 417 no; hole 5=388 < 417 no -> largest fitting: 500 -> hole 2; 500 - 417 = 83\n- request 112: hole 1=100 < 112 no; hole 2=83 < 112 no; hole 3=200 >= 112 fits; hole 4=300 >= 112 fits; hole 5=388 >= 112 fits -> largest fitting: 388 > 300 > 200 -> hole 5; 388 - 112 = 276\n- request 426: hole 1=100 < 426 no; hole 2=83 < 426 no; hole 3=200 < 426 no; hole 4=300 < 426 no; hole 5=276 < 426 no -> no hole fits -> must WAIT\n\n**Placement:** 212 KB -> hole 5; 417 KB -> hole 2; 112 KB -> hole 5; 426 KB -> WAIT\n**Remaining free space per hole:** [100, 83, 200, 300, 276]\n- Sum of free space: 100 + 83 = 183, 183 + 200 = 383, 383 + 300 = 683, 683 + 276 = 959\n**Total external fragmentation = 959 KB**\n\n**Answer: 212 KB -> hole 5; 417 KB -> hole 2; 112 KB -> hole 5; 426 KB -> WAIT**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 38,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 438,
+          "truncated": false,
+          "output": "**Policy: FIRST-fit**\n\n- free blocks: [100, 500, 200, 300, 600] KB\n- request 212: hole >= 212, first hole >= 212 is 500 fits 500 - 212 = 288 free [100, 288, 200, 300, 600]\n- request 417: hole >= 417, first hole >= 417 is 600 fits 600 - 417 = 183 free [100, 288, 200, 300, 183]\n- request 112: hole >= 112, first hole >= 112 is 183 fits 183 - 112 = 71 free [100, 288, 200, 300, 71]\n- request 426: hole >= 426, first hole >= 426 is 300 300 < 426 no hole fits cannot allocate 426 KB\n\n**Cannot allocate:** 426 KB\n- 212 KB allocated hole 500 KB\n- 417 KB allocated hole 600 KB\n- 112 KB allocated hole 183 KB\n- 426 KB cannot allocate no hole >= 426\n\n**Total external fragmentation:** 100 + 288 = 388, 388 + 200 = 588, 588 + 300 = 888, 888 + 71 = 959\n- Sum of free blocks: 959 KB\n\n**Answer: cannot allocate 426 KB**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 39,
+          "kind": "freespace",
+          "final_correct": true,
+          "new_tokens": 619,
+          "truncated": false,
+          "output": "**Policy: BEST-fit**\n\n_Rule: take the SMALLEST hole that is large enough; the leftover stays as a smaller hole. A request that fits nowhere must wait._\n\n- holes (free KB, numbered in order): hole 1=40, hole 2=25, hole 3=90, hole 4=30, hole 5=60\n- request 28: hole 1=40 >= 28 fits; hole 2=25 < 28 no; hole 3=90 >= 28 fits; hole 4=30 >= 28 fits; hole 5=60 >= 28 fits -> smallest fitting: 30 < 40 < 60 < 90 -> hole 4; 30 - 28 = 2\n- request 55: hole 1=40 < 55 no; hole 2=25 < 55 no; hole 3=90 >= 55 fits; hole 4=2 < 55 no; hole 5=60 >= 55 fits -> smallest fitting: 60 < 90 -> hole 5; 60 - 55 = 5\n- request 35: hole 1=40 >= 35 fits; hole 2=25 < 35 no; hole 3=90 >= 35 fits; hole 4=2 < 35 no; hole 5=5 < 35 no -> smallest fitting: 40 < 90 -> hole 1; 40 - 35 = 5\n- request 20: hole 1=5 < 20 no; hole 2=25 >= 20 fits; hole 3=90 >= 20 fits; hole 4=2 < 20 no; hole 5=5 < 20 no -> smallest fitting: 25 < 90 -> hole 2; 25 - 20 = 5\n\n**Placement:** 28 KB -> hole 4; 55 KB -> hole 5; 35 KB -> hole 1; 20 KB -> hole 2\n**Remaining free space per hole:** [5, 5, 90, 2, 5]\n- Sum of free space: 5 + 5 = 10, 10 + 90 = 100, 100 + 2 = 102, 102 + 5 = 107\n**Total external fragmentation = 107 KB**\n\n**Answer: 28 KB -> hole 4; 55 KB -> hole 5; 35 KB -> hole 1; 20 KB -> hole 2**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 40,
+          "kind": "eat_tlb",
+          "final_correct": true,
+          "new_tokens": 223,
+          "truncated": false,
+          "output": "**Formula:** EAT = h x (t + m) + (1 - h) x (t + (L + 1) x m)\n\n**Working**\n\n- TLB hit: TLB + one memory access = 20 + 100 = 120 ns\n- TLB miss: 1 page-table access = 1 x 100 = 100 ns\n- miss time = TLB + page tables + data = 20 + 100 = 120, 120 + 100 = 220 ns\n- h x hit = 0.8 x 120 = 96\n- 1 - h = 1 - 0.8 = 0.2\n- (1 - h) x miss = 0.2 x 220 = 44\n- EAT = 96 + 44 = 140 ns\n\n**Answer: EAT (ns) = 140**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 41,
+          "kind": "eat_tlb",
+          "final_correct": false,
+          "new_tokens": 235,
+          "truncated": false,
+          "output": "**Formula:** EAT = h x (t + m) + (1 - h) x (t + (L + 1) x m)\n\n**Working**\n\n- TLB hit: TLB + one memory access = 10 + 120 = 130 ns\n- TLB miss: 1 page-table access = 1 x 120 = 120 ns\n- miss time = TLB + page tables + data = 10 + 120 = 130, 130 + 120 = 250 ns\n- h x hit = 0.98 x 130 = 127.4\n- 1 - h = 1 - 0.98 = 0.02\n- (1 - h) x miss = 0.02 x 250 = 5\n- EAT = 127.4 + 5 = 132.4 ns\n\n**Answer: EAT (ns) = 132.4**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 42,
+          "kind": "eat_pagefault",
+          "final_correct": true,
+          "new_tokens": 170,
+          "truncated": false,
+          "output": "**Formula:** EAT = (1 - p) x ma + p x (page-fault-service)\n\n**Working**\n\n- page-fault service time = 8 ms = 8 x 1,000,000 = 8,000,000 ns\n- 1 - p = 1 - 0.001 = 0.999\n- (1 - p) x 200 = 199.8 ns\n- p x 8,000,000 = 8000 ns\n- EAT = 199.8 + 8000 = 8199.8 ns\n\n**Answer: EAT (ns) = 8199.8**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 43,
+          "kind": "paging_bits",
+          "final_correct": true,
+          "new_tokens": 256,
+          "truncated": false,
+          "output": "**Formula:** offset = log2(page size); pages = 2^(logical bits - offset); table = pages x PTE size\n\n**Working**\n\n- logical address = 32 bits\n- physical address bits = log2(1 GB) = log2(1,073,741,824) = 30\n- offset bits = log2(page size) = log2(4096) = 12\n- page-number bits = 32 - 12 = 20\n- number of pages = 2^20 = 1,048,576\n- frame-number bits = 30 - 12 = 18\n- number of frames = 2^18 = 262,144\n- page table size = pages x PTE size = 1,048,576 x 4 = 4,194,304 bytes = 4 MB\n\n**Answer: offset bits = 12, frame bits = 18, pages = 1048576, page table bytes = 4194304**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 44,
+          "kind": "multilevel_paging",
+          "final_correct": true,
+          "new_tokens": 136,
+          "truncated": false,
+          "output": "**Formula:** levels = ceil((VA bits - offset bits) / log2(page size / PTE size))\n\n**Working**\n\n- offset bits = log2(4096) = 12\n- bits left for page table indices = 39 - 12 = 27\n- each PTE describes 2^12 = 4096 pages\n- bits of page table index per level = log2(4096) = 12\n- levels = ceil(27 / 12) = ceil(2.25) = 3\n\n**Answer: levels = 3**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 45,
+          "kind": "disk_access",
+          "final_correct": false,
+          "new_tokens": 200,
+          "truncated": false,
+          "output": "**Formula:** access time = seek + rotational latency (half a rotation) + transfer (+ controller overhead)\n\n**Working**\n\n- one rotation = 7200 / 60 = 120 Hz\n- rotational latency = 1 / 120 = 0.008333 min = 0.5 s\n- transfer time = block size / bandwidth = 4096 / 100,000 x 1000 = 0.04096 s\n- total = seek + latency = 0.009 + 0.008333 = 0.017333 s\n- 0.017333 + transfer 0.04096 = 0.058293 s\n\n**Answer: access time (s) = 0.058293**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 46,
+          "kind": "deadlock_min",
+          "final_correct": true,
+          "new_tokens": 91,
+          "truncated": false,
+          "output": "**Formula:** minimum = n x (k - 1) + 1\n\n**Working**\n\n- worst case: every process holds 3 - 1 = 2 drives and waits for one more\n- drives held in this worst case = 6 x 2 = 12\n- one extra drive lets some process finish: 12 + 1 = 13\n\n**Answer: minimum drives = 13**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 47,
+          "kind": "deadlock_min",
+          "final_correct": true,
+          "new_tokens": 106,
+          "truncated": false,
+          "output": "**Formula:** minimum = sum of (max_i - 1) + 1\n\n**Working**\n\n- each process can be denied one less than its maximum: 3 - 1 = 2, 4 - 1 = 3, 5 - 1 = 4\n- sum of (max - 1) = 2 + 3 + 4 = 9\n- minimum = 9 + 1 = 10\n\n**Answer: minimum = 10 printers**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 48,
+          "kind": "fork_count",
+          "final_correct": true,
+          "new_tokens": 63,
+          "truncated": false,
+          "output": "**Formula:** prints = 2^n\n\n**Working**\n\n- each `fork()` creates 1 new process, so after n forks: 2^n processes\n- every process executes the `printf` once\n- 2^5 = 32\n\n**Answer: prints = 32**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 49,
+          "kind": "fork_count",
+          "final_correct": false,
+          "new_tokens": 132,
+          "truncated": false,
+          "output": "**Formula:** children = 2^n - 1\n\n**Working**\n\n- each fork() creates 1 child process: 1 x 4 = 4\n- after 1st fork(): 1 + 1 = 2 processes\n- after 2nd fork(): 2 + 1 = 3 processes\n- after 3rd fork(): 3 + 1 = 4 processes\n- after 4th fork(): 4 + 1 = 5 processes\n- number of child processes = total - 1 = 5 - 1 = 4\n\n**Answer: child processes = 4**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 50,
+          "kind": "semaphore",
+          "final_correct": true,
+          "new_tokens": 66,
+          "truncated": false,
+          "output": "**Formula:** final = initial - (P operations) + (V operations)\n\n**Working**\n\n- each P subtracts 1: 7 - 20 = -13\n- each V adds 1: -13 + 15 = 2\n\n**Answer: final value = 2**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 51,
+          "kind": "internal_frag",
+          "final_correct": true,
+          "new_tokens": 123,
+          "truncated": false,
+          "output": "**Formula:** pages = ceil(size / page size); fragmentation = pages x page size - size\n\n**Working**\n\n- pages = ceil(72,766 / 2048) = ceil(35.53) = 36\n- memory allocated = 36 x 2048 = 73,728 bytes\n- internal fragmentation = 73,728 - 72,766 = 962 bytes\n\n**Answer: pages = 36, internal fragmentation = 962 bytes**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 52,
+          "kind": "cpu_util",
+          "final_correct": true,
+          "new_tokens": 84,
+          "truncated": false,
+          "output": "**Formula:** utilisation = 1 - p^n\n\n**Working**\n\n- probability all 4 are waiting = 0.8^4 = 0.4096\n- CPU utilisation = 1 - 0.4096 = 0.5904 = 59.04%\n\n**Answer: utilisation = 59.04%**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 53,
+          "kind": "cache_eat",
+          "final_correct": true,
+          "new_tokens": 137,
+          "truncated": false,
+          "output": "**Formula:** T = h x c + (1 - h) x (c + m)\n\n**Working**\n\n- hit cost = 5 ns; miss cost = 5 + 60 = 65 ns\n- h x hit = 0.95 x 5 = 4.75\n- 1 - h = 0.05\n- (1 - h) x miss = 0.05 x 65 = 3.25\n- average access time = 4.75 + 3.25 = 8 ns\n\n**Answer: access time (ns) = 8**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 54,
+          "kind": "clarify",
+          "final_correct": false,
+          "new_tokens": 712,
+          "truncated": false,
+          "output": "**Policy: BEST-fit**\n\n_Holes are listed as [120, 300, 80, 500] KB, in order of increasing size._\n\n- hole 120 KB: next fit start = hole 120; best fit for processes\n- hole 300 KB: next fit start = hole 300; best fit for processes\n- hole 80 KB: next fit start = hole 80; best fit for processes\n- hole 500 KB: next fit start = hole 500; best fit for processes\n\n**Process 120 KB:** hole 120 fits (120 >= 120) best fit hole 120 120 - 120 = 0\n**Process 180 KB:** hole 120 120 < 180 no hole 300 300 >= 180 best fit hole 300 300 - 180 = 120\n**Process 200 KB:** hole 120 120 < 200 no hole 300 300 >= 200 best fit hole 300 300 - 200 = 100\n**Process 250 KB:** hole 120 120 < 250 no hole 300 300 >= 250 best fit hole 300 300 - 250 = 50\n**Process 300 KB:** hole 120 120 < 300 no hole 300 300 >= 300 best fit hole 300 300 - 300 = 0\n**Process 350 KB:** hole 120 120 < 350 no hole 300 300 < 350 no hole 80 80 < 350 no hole 500 500 >= 350 best fit hole 500 500 - 350 = 150\n\n**Placement:** 120 KB hole 120; 180 KB hole 300; 200 KB hole 300; 250 KB hole 300; 300 KB hole 300; 350 KB hole 500\n**Remaining free space per hole:** [0, 100, 0, 150]\n- Sum of free space: 0 + 100 = 100, 100 + 0 = 100, 100 + 150 = 250\n**Total external fragmentation = 250 KB**\n\n**Answer: 120 KB hole 120; 180 KB hole 300; 200 KB hole 300; 250 KB hole 300; 300 KB hole 300; 350 KB hole 500**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 55,
+          "kind": "clarify",
+          "final_correct": false,
+          "new_tokens": 1085,
+          "truncated": false,
+          "output": "**Algorithm: Round Robin (q=2)**\n\n**Step 1 - build the schedule**\n\n_Rule: run the process at the HEAD of the queue for up to q = 2 units; processes arriving during a slice join the tail BEFORE the preempted process goes back to the tail._\n\n- t=0-2: run P1 (head of [P1, P2, P3]) for 2; 5 - 2 = 3 left; arrived P4(t=2) -> tail; P1 back to tail -> queue [P2, P3, P1, P4]\n- t=2-4: run P2 (head of [P2, P3, P1, P4]) for 2; 3 - 2 = 1 left; P2 back to tail -> queue [P3, P1, P4, P2]\n- t=4-6: run P3 (head of [P3, P1, P4, P2]) for 2; 8 - 2 = 6 left; P3 back to tail -> queue [P1, P4, P2, P3]\n- t=6-8: run P1 (head of [P1, P4, P2, P3]) for 2; 3 - 2 = 1 left; P1 back to tail -> queue [P4, P2, P3, P1]\n- t=8-10: run P4 (head of [P4, P2, P3, P1]) for 2; 0 - 2 = -2 < 0 arrived; P4 back to tail -> queue [P2, P3, P1, P4]\n- t=10-11: run P2 (head of [P2, P3, P1, P4]) for 1; 1 - 1 = 0 left; P2 DONE -> queue [P3, P1, P4]\n- t=11-13: run P3 (head of [P3, P1, P4]) for 2; 6 - 2 = 4 left; P3 back to tail -> queue [P1, P4, P3]\n- t=13-14: run P1 (head of [P1, P4, P3]) for 1; 1 - 1 = 0 left; P1 DONE -> queue [P4, P3]\n- t=14-16: run P4 (head of [P4, P3]) for 2; -2 < 0 arrived; P4 DONE -> queue [P3]\n- t=16-18: run P3 (head of [P3]) for 2; 4 - 2 = 2 left; P3 back to tail -> queue [P3]\n- t=18-20: run P3 (head of [P3]) for 2; 2 - 2 = 0 left; P3 DONE -> queue []\n\n**Step 2 - Gantt chart:** P1[0-2] P2[2-4] P3[4-6] P1[6-8] P4[8-10] P2[10-11] P3[11-13] P1[13-14] P4[14-16] P3[16-20]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|--------------|--------------|\n| P1 | 0 | 5 | 14 | 14 - 0 = 14 | 14 - 5 = 9 |\n| P2 | 0 | 3 | 11 | 11 - 0 = 11 | 11 - 3 = 8 |\n| P3 | 0 | 8 | 20 | 20 - 0 = 20 | 20 - 8 = 12 |\n| P4 | 2 | 0 | 16 | 16 - 2 = 14 | 14 - 0 = 14 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 9 + 8 = 17, 17 + 12 = 29, 29 + 14 = 43\n- Average waiting time = 43 / 4 = **10.75**\n- Sum of turnaround times: 14 + 11 = 25, 25 + 20 = 45, 45 + 14 = 59\n- Average turnaround time = 59 / 4 = **14.75**\n\n**Answer: average waiting time = 10.75**"
+        },
+        {
+          "suite": "os_freeform",
+          "index": 56,
+          "kind": "clarify",
+          "final_correct": false,
+          "new_tokens": 648,
+          "truncated": false,
+          "output": "**Policy: LRU, 3 frames** (initially empty)\n\n_Rule: on a fault with all frames full, evict the page used LEAST RECENTLY._\n\n| # | Ref | Result | Evicted | Why | Frames (least recently used first) | Faults |\n|---|-----|--------|---------|-----|--------|--------|\n| 1 | 1 | miss | - | free frame (1/3 used) | 1 | 1 |\n| 2 | 2 | miss | - | free frame (2/3 used) | 1 2 | 2 |\n| 3 | 3 | miss | - | free frame (3/3 used) | 1 2 3 | 3 |\n| 4 | 4 | miss | 1 | frames full; last used 1@#1 < 2@#2 < 3@#3 -> least recent = 1 | 2 3 4 | 4 |\n| 5 | 1 | miss | 2 | frames full; last used 2@#2 < 3@#3 < 4@#4 -> least recent = 2 | 3 4 1 | 5 |\n| 6 | 2 | miss | 3 | frames full; last used 3@#3 < 4@#4 < 1@#5 -> least recent = 3 | 4 1 2 | 6 |\n| 7 | 5 | miss | 4 | frames full; last used 4@#4 < 1@#5 < 2@#6 -> least recent = 4 | 1 2 5 | 7 |\n| 8 | 1 | hit | - | 1 already in frames | 2 5 1 | 7 |\n| 9 | 2 | hit | - | 2 already in frames | 5 1 2 | 7 |\n| 10 | 3 | miss | 5 | frames full; last used 5@#7 < 1@#8 < 2@#9 -> least recent = 5 | 1 2 3 | 8 |\n| 11 | 4 | miss | 1 | frames full; last used 1@#8 < 2@#9 < 3@#10 -> least recent = 1 | 2 3 4 | 9 |\n| 12 | 5 | miss | 2 | frames full; last used 2@#9 < 3@#10 < 4@#11 -> least recent = 2 | 3 4 5 | 10 |\n\n**Total page faults = 10** (hits = 12 - 10 = 2, hit ratio = 2 / 12 = 0.1667, fault ratio = 10 / 12 = 0.8333)\n\n**Answer: page faults = 10**"
+        }
+      ]
+    }
+  }
+}

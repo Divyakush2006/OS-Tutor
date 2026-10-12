@@ -1,0 +1,139 @@
+{
+  "category": "shell",
+  "rows": 21066,
+  "distributions": {
+    "user_chars": {
+      "p10": 29,
+      "p50": 63,
+      "p90": 114,
+      "mean": 68.3
+    },
+    "assistant_chars": {
+      "p10": 13,
+      "p50": 34,
+      "p90": 71,
+      "mean": 39.0
+    },
+    "turns": {
+      "p50": 2,
+      "p90": 2
+    },
+    "type_token_ratio": {
+      "p10": 0.824,
+      "p50": 1.0
+    },
+    "sources": {
+      "nl2bash": 12607,
+      "tldr": 8259,
+      "intercode_curated": 200
+    }
+  },
+  "redundancy": {
+    "distinct_answers": 18873,
+    "rows": 21066,
+    "distinct_ratio": 0.8959,
+    "rows_with_duplicated_answer": 3803,
+    "worst": [
+      [
+        "find .",
+        22
+      ],
+      [
+        "find . -type f",
+        16
+      ],
+      [
+        "man find",
+        11
+      ]
+    ]
+  },
+  "probes": {
+    "editor_keystrokes": {
+      "hits": 70,
+      "rate": 0.0033,
+      "verdict": "defect",
+      "note": "tldr ships interactive-editor pages; '<Esc>:%s/re/x/g<Enter>' is a vim keystroke sequence, not a shell command. Training on these teaches the model to emit keystrokes.",
+      "samples": [
+        "alt + q or ctrl + c",
+        "alt + a",
+        "alt + number_key"
+      ]
+    },
+    "bash_syntax_error": {
+      "hits": 126,
+      "rate": 0.006,
+      "verdict": "defect",
+      "note": "fails `bash -n`; validated offline in a real bash (Python subprocess cannot reach WSL)",
+      "samples": [
+        "select /dev/sdX",
+        "->",
+        "lwp-request -H 'User-Agent: user_agent -m METHOD http://example.com/some/path"
+      ]
+    },
+    "instruction_too_vague": {
+      "hits": 181,
+      "rate": 0.0086,
+      "verdict": "defect",
+      "note": "a two-word prompt cannot specify a command",
+      "samples": [
+        "nmon",
+        "kdocker --version",
+        "bpytop"
+      ]
+    },
+    "absurd_length": {
+      "hits": 1,
+      "rate": 0.0,
+      "verdict": "defect",
+      "note": "not a teachable one-liner",
+      "samples": [
+        "rsync -av --progress --exclude=*.VOB --exclude=*.avi --exclude=*.mkv --exclude=*.ts --exclude=*.mpg --exclude="
+      ]
+    },
+    "answer_ends_midsentence": {
+      "hits": 5012,
+      "rate": 0.2379,
+      "verdict": "false_positive",
+      "note": "shell commands legitimately end lowercase: `... | xargs grep foo /dev/null`. REJECTED.",
+      "samples": [
+        "sudo pacman --sync --refresh --sysupgrade",
+        "sudo pacman --sync --refresh --sysupgrade --noconfirm package_name",
+        "sudo pacman --sync --refresh --sysupgrade --overwrite path/to/file"
+      ]
+    },
+    "brace_placeholder": {
+      "hits": 19,
+      "rate": 0.0009,
+      "verdict": "false_positive",
+      "note": "matches `find -exec {} +` and Clojure `{:deps {...}}`. REJECTED.",
+      "samples": [
+        "clj -Sdeps '{:deps {nrepl {:mvn/version \"0.7.0\"} cider/cider-nrepl {:mvn/version \"0.25.2\"}}}' -m nrepl.cmdline",
+        "clj -Sdeps '{:deps {org.clojure/clojurescript {:mvn/version \"1.10.758\"}}}' --main cljs.main --repl",
+        "mysqldump --host={(ip_or_hostname)} --user user --password --all-databases > ({path/to/file.sql}}"
+      ]
+    }
+  },
+  "derived_thresholds": {
+    "min_assistant_chars": 12,
+    "max_assistant_chars": 213
+  },
+  "actionable_defects": {
+    "editor_keystrokes": 70,
+    "bash_syntax_error": 126,
+    "instruction_too_vague": 181,
+    "absurd_length": 1
+  },
+  "rejected_rules": {
+    "answer_ends_midsentence": {
+      "hits": 5012,
+      "rate": 0.2379,
+      "note": "shell commands legitimately end lowercase: `... | xargs grep foo /dev/null`. REJECTED."
+    },
+    "brace_placeholder": {
+      "hits": 19,
+      "rate": 0.0009,
+      "note": "matches `find -exec {} +` and Clojure `{:deps {...}}`. REJECTED."
+    }
+  }
+}

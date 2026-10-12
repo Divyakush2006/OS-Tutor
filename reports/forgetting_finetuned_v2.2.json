@@ -1,0 +1,4944 @@
+{
+ "model": "D:\\os project\\models\\Qwen3-4B-Instruct-2507",
+ "adapter": "outputs/ostutor-lora",
+ "four_bit": true,
+ "per_subject": 100,
+ "seed": 42,
+ "summary": {
+  "adjacent_cs": {
+   "n": 300,
+   "accuracy": 0.6367,
+   "by_subject": {
+    "college_computer_science": 0.68,
+    "computer_security": 0.74,
+    "machine_learning": 0.49
+   }
+  },
+  "general": {
+   "n": 400,
+   "accuracy": 0.7975,
+   "by_subject": {
+    "high_school_biology": 0.87,
+    "high_school_world_history": 0.89,
+    "nutrition": 0.78,
+    "philosophy": 0.65
+   }
+  }
+ },
+ "items": [
+  {
+   "id": "high_school_biology:0",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:1",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:2",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:3",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:4",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:5",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:6",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:7",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:8",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:9",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:10",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:11",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:12",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:13",
+   "group": "general",
+   "pred": 1,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "high_school_biology:14",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:15",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:16",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:17",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:18",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:19",
+   "group": "general",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "high_school_biology:20",
+   "group": "general",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "high_school_biology:21",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:22",
+   "group": "general",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "high_school_biology:23",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:24",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:25",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:26",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:27",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:28",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:29",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:30",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:31",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:32",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:33",
+   "group": "general",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "high_school_biology:34",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:35",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:36",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:37",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:38",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:39",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:40",
+   "group": "general",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "high_school_biology:41",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:42",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:43",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:44",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:45",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:46",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:47",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:48",
+   "group": "general",
+   "pred": 1,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "high_school_biology:49",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:50",
+   "group": "general",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "high_school_biology:51",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:52",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:53",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:54",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:55",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:56",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:57",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:58",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:59",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:60",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:61",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:62",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:63",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:64",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:65",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:66",
+   "group": "general",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "high_school_biology:67",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:68",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:69",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:70",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:71",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:72",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:73",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:74",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:75",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:76",
+   "group": "general",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "high_school_biology:77",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:78",
+   "group": "general",
+   "pred": 0,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "high_school_biology:79",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:80",
+   "group": "general",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "high_school_biology:81",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:82",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:83",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:84",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:85",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:86",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:87",
+   "group": "general",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "high_school_biology:88",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:89",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:90",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:91",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:92",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:93",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:94",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:95",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:96",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:97",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:98",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_biology:99",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:0",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:1",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:2",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:3",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:4",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:5",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:6",
+   "group": "general",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "high_school_world_history:7",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:8",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:9",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:10",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:11",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:12",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:13",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:14",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:15",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:16",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:17",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:18",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:19",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:20",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:21",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:22",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:23",
+   "group": "general",
+   "pred": 1,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "high_school_world_history:24",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:25",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:26",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:27",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:28",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:29",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:30",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:31",
+   "group": "general",
+   "pred": 1,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "high_school_world_history:32",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:33",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:34",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:35",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:36",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:37",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:38",
+   "group": "general",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "high_school_world_history:39",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:40",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:41",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:42",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:43",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:44",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:45",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:46",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:47",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:48",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:49",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:50",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:51",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:52",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:53",
+   "group": "general",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "high_school_world_history:54",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:55",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:56",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:57",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:58",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:59",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:60",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:61",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:62",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:63",
+   "group": "general",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "high_school_world_history:64",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:65",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:66",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:67",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:68",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:69",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:70",
+   "group": "general",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "high_school_world_history:71",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:72",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:73",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:74",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:75",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:76",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:77",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:78",
+   "group": "general",
+   "pred": 1,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "high_school_world_history:79",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:80",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:81",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:82",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:83",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:84",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:85",
+   "group": "general",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "high_school_world_history:86",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:87",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:88",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:89",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:90",
+   "group": "general",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "high_school_world_history:91",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:92",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:93",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:94",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:95",
+   "group": "general",
+   "pred": 0,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "high_school_world_history:96",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:97",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:98",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "high_school_world_history:99",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:0",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:1",
+   "group": "general",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "nutrition:2",
+   "group": "general",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "nutrition:3",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:4",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:5",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:6",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:7",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:8",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:9",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:10",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:11",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:12",
+   "group": "general",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "nutrition:13",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:14",
+   "group": "general",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "nutrition:15",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:16",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:17",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:18",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:19",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:20",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:21",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:22",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:23",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:24",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:25",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:26",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:27",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:28",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:29",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:30",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:31",
+   "group": "general",
+   "pred": 0,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "nutrition:32",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:33",
+   "group": "general",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "nutrition:34",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:35",
+   "group": "general",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "nutrition:36",
+   "group": "general",
+   "pred": 1,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "nutrition:37",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:38",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:39",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:40",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:41",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:42",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:43",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:44",
+   "group": "general",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "nutrition:45",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:46",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:47",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:48",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:49",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:50",
+   "group": "general",
+   "pred": 1,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "nutrition:51",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:52",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:53",
+   "group": "general",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "nutrition:54",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:55",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:56",
+   "group": "general",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "nutrition:57",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:58",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:59",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:60",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:61",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:62",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:63",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:64",
+   "group": "general",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "nutrition:65",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:66",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:67",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:68",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:69",
+   "group": "general",
+   "pred": 1,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "nutrition:70",
+   "group": "general",
+   "pred": 0,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "nutrition:71",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:72",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:73",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:74",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:75",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:76",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:77",
+   "group": "general",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "nutrition:78",
+   "group": "general",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "nutrition:79",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:80",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:81",
+   "group": "general",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "nutrition:82",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:83",
+   "group": "general",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "nutrition:84",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:85",
+   "group": "general",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "nutrition:86",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:87",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:88",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "nutrition:89",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:90",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:91",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:92",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:93",
+   "group": "general",
+   "pred": 0,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "nutrition:94",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:95",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "nutrition:96",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "nutrition:97",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "nutrition:98",
+   "group": "general",
+   "pred": 1,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "nutrition:99",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:0",
+   "group": "general",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "philosophy:1",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:2",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:3",
+   "group": "general",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "philosophy:4",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:5",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:6",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:7",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:8",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "philosophy:9",
+   "group": "general",
+   "pred": 1,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "philosophy:10",
+   "group": "general",
+   "pred": 0,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "philosophy:11",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "philosophy:12",
+   "group": "general",
+   "pred": 3,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "philosophy:13",
+   "group": "general",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "philosophy:14",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "philosophy:15",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:16",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:17",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:18",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:19",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "philosophy:20",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:21",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:22",
+   "group": "general",
+   "pred": 1,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "philosophy:23",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "philosophy:24",
+   "group": "general",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "philosophy:25",
+   "group": "general",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "philosophy:26",
+   "group": "general",
+   "pred": 0,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "philosophy:27",
+   "group": "general",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "philosophy:28",
+   "group": "general",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "philosophy:29",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:30",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "philosophy:31",
+   "group": "general",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "philosophy:32",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:33",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:34",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:35",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "philosophy:36",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:37",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:38",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:39",
+   "group": "general",
+   "pred": 1,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "philosophy:40",
+   "group": "general",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "philosophy:41",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:42",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:43",
+   "group": "general",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "philosophy:44",
+   "group": "general",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "philosophy:45",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:46",
+   "group": "general",
+   "pred": 1,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "philosophy:47",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "philosophy:48",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:49",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:50",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:51",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:52",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:53",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:54",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:55",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:56",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:57",
+   "group": "general",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "philosophy:58",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "philosophy:59",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "philosophy:60",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "philosophy:61",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:62",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "philosophy:63",
+   "group": "general",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "philosophy:64",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "philosophy:65",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:66",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:67",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:68",
+   "group": "general",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "philosophy:69",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:70",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:71",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:72",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:73",
+   "group": "general",
+   "pred": 0,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "philosophy:74",
+   "group": "general",
+   "pred": 0,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "philosophy:75",
+   "group": "general",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "philosophy:76",
+   "group": "general",
+   "pred": 1,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "philosophy:77",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:78",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:79",
+   "group": "general",
+   "pred": 0,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "philosophy:80",
+   "group": "general",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "philosophy:81",
+   "group": "general",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "philosophy:82",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:83",
+   "group": "general",
+   "pred": 1,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "philosophy:84",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:85",
+   "group": "general",
+   "pred": 0,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "philosophy:86",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:87",
+   "group": "general",
+   "pred": 1,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "philosophy:88",
+   "group": "general",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "philosophy:89",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:90",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "philosophy:91",
+   "group": "general",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "philosophy:92",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:93",
+   "group": "general",
+   "pred": 1,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "philosophy:94",
+   "group": "general",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "philosophy:95",
+   "group": "general",
+   "pred": 0,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "philosophy:96",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:97",
+   "group": "general",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "philosophy:98",
+   "group": "general",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "philosophy:99",
+   "group": "general",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:0",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:1",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:2",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:3",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:4",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:5",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:6",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:7",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:8",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:9",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:10",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:11",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:12",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:13",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:14",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:15",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:16",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:17",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:18",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:19",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:20",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:21",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:22",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:23",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:24",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:25",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:26",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:27",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:28",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:29",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:30",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:31",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:32",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:33",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:34",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:35",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:36",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:37",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:38",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:39",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:40",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:41",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:42",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:43",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:44",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:45",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:46",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:47",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:48",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:49",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:50",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:51",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:52",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:53",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:54",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:55",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:56",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:57",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:58",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:59",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:60",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:61",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:62",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:63",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:64",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:65",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:66",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:67",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:68",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:69",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:70",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:71",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:72",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:73",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:74",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:75",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:76",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:77",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:78",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:79",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:80",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:81",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:82",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:83",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:84",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:85",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:86",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:87",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:88",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:89",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:90",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:91",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:92",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:93",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:94",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:95",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:96",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:97",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "college_computer_science:98",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "college_computer_science:99",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:0",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "computer_security:1",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "computer_security:2",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:3",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "computer_security:4",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:5",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:6",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "computer_security:7",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "computer_security:8",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "computer_security:9",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "computer_security:10",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "computer_security:11",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "computer_security:12",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "computer_security:13",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:14",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:15",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "computer_security:16",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:17",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "computer_security:18",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "computer_security:19",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "computer_security:20",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "computer_security:21",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:22",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "computer_security:23",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:24",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "computer_security:25",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:26",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:27",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "computer_security:28",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:29",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:30",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:31",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:32",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "computer_security:33",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "computer_security:34",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "computer_security:35",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "computer_security:36",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:37",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:38",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:39",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:40",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:41",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:42",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:43",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "computer_security:44",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:45",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "computer_security:46",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:47",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:48",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:49",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "computer_security:50",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "computer_security:51",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "computer_security:52",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:53",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "computer_security:54",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "computer_security:55",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "computer_security:56",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "computer_security:57",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "computer_security:58",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "computer_security:59",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:60",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:61",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "computer_security:62",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "computer_security:63",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:64",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:65",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "computer_security:66",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:67",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "computer_security:68",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:69",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "computer_security:70",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:71",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:72",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "computer_security:73",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "computer_security:74",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "computer_security:75",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:76",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:77",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "computer_security:78",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "computer_security:79",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:80",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "computer_security:81",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:82",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "computer_security:83",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "computer_security:84",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:85",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "computer_security:86",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:87",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:88",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "computer_security:89",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "computer_security:90",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:91",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "computer_security:92",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:93",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:94",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "computer_security:95",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:96",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "computer_security:97",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "computer_security:98",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "computer_security:99",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:0",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:1",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:2",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:3",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:4",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:5",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:6",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:7",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:8",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:9",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:10",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:11",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:12",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:13",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:14",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:15",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:16",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:17",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:18",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:19",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:20",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:21",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:22",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:23",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:24",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:25",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:26",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:27",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:28",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:29",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:30",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:31",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:32",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:33",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:34",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:35",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:36",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:37",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:38",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:39",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:40",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:41",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:42",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:43",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:44",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:45",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:46",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:47",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:48",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:49",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:50",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:51",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:52",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:53",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:54",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:55",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:56",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:57",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:58",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:59",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:60",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:61",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:62",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:63",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:64",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:65",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:66",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:67",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:68",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:69",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:70",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 1,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:71",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:72",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:73",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:74",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:75",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:76",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:77",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:78",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 3,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:79",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:80",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:81",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:82",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:83",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:84",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 3,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:85",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:86",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:87",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:88",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:89",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:90",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 0,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:91",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:92",
+   "group": "adjacent_cs",
+   "pred": 3,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:93",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:94",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 2,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:95",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:96",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  },
+  {
+   "id": "machine_learning:97",
+   "group": "adjacent_cs",
+   "pred": 2,
+   "answer": 1,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:98",
+   "group": "adjacent_cs",
+   "pred": 1,
+   "answer": 2,
+   "correct": false
+  },
+  {
+   "id": "machine_learning:99",
+   "group": "adjacent_cs",
+   "pred": 0,
+   "answer": 0,
+   "correct": true
+  }
+ ],
+ "comparison": {
+  "adjacent_cs": {
+   "delta": -0.01,
+   "right_to_wrong": 19,
+   "wrong_to_right": 16,
+   "n": 300
+  },
+  "general": {
+   "delta": -0.005,
+   "right_to_wrong": 17,
+   "wrong_to_right": 15,
+   "n": 400
+  }
+ }
+}

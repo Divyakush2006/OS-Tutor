@@ -1,0 +1,138 @@
+{
+  "category": "tutoring",
+  "rows": 3633,
+  "distributions": {
+    "user_chars": {
+      "p10": 317,
+      "p50": 691,
+      "p90": 1975,
+      "mean": 954.7
+    },
+    "assistant_chars": {
+      "p10": 231,
+      "p50": 786,
+      "p90": 3330,
+      "mean": 1404.0
+    },
+    "turns": {
+      "p50": 7,
+      "p90": 20
+    },
+    "type_token_ratio": {
+      "p10": 0.255,
+      "p50": 0.514
+    },
+    "sources": {
+      "mathdial_dialogue": 2125,
+      "os_freespace": 626,
+      "os_scheduling": 459,
+      "os_paging": 423
+    }
+  },
+  "redundancy": {
+    "distinct_answers": 2998,
+    "rows": 3633,
+    "distinct_ratio": 0.8252,
+    "rows_with_duplicated_answer": 739,
+    "worst": [
+      [
+        "correct",
+        105
+      ],
+      [
+        "well done",
+        70
+      ],
+      [
+        "excellent",
+        27
+      ]
+    ]
+  },
+  "probes": {
+    "non_alternating_roles": {
+      "hits": 283,
+      "rate": 0.0779,
+      "verdict": "defect",
+      "note": "breaks the chat template; REPAIRABLE by merging turns",
+      "samples": [
+        "since antonio is also included in 8 people and each people will eat 4 meatballs. so antonio will eat 4 meatbal",
+        "well done",
+        "You have reached the correct answer"
+      ]
+    },
+    "dead_tail": {
+      "hits": 262,
+      "rate": 0.0721,
+      "verdict": "defect",
+      "note": "dialogue ends on 'correct'/'ok' - a target with no teaching signal; REPAIRABLE by trimming the tail",
+      "samples": [
+        "Perfect!",
+        "yep",
+        "correct"
+      ]
+    },
+    "never_asks_question": {
+      "hits": 212,
+      "rate": 0.0584,
+      "verdict": "defect",
+      "note": "a tutor that never questions is not Socratic",
+      "samples": [
+        "well done",
+        "great the answer is 500",
+        "correct"
+      ]
+    },
+    "leaks_answer_first_turn": {
+      "hits": 31,
+      "rate": 0.0085,
+      "verdict": "defect",
+      "note": "reveals the result before the student attempts it",
+      "samples": [
+        "Great can you see where you went wrong before?",
+        "You got it right so nothing to see here :)",
+        "can you see how we need to interpret the information accordingly?"
+      ]
+    },
+    "mostly_degenerate": {
+      "hits": 1,
+      "rate": 0.0003,
+      "verdict": "defect",
+      "note": "majority of teacher turns carry no content",
+      "samples": [
+        "correct"
+      ]
+    },
+    "answer_shorter_than_question": {
+      "hits": 1990,
+      "rate": 0.5478,
+      "verdict": "false_positive",
+      "note": "a SHORT Socratic teacher turn after a long student answer is the desired behaviour, not a defect. REJECTED.",
+      "samples": [
+        "You just said 15 + 15= 29!",
+        "Super!",
+        "Perfect!"
+      ]
+    }
+  },
+  "derived_thresholds": {
+    "min_assistant_chars": 115,
+    "max_assistant_chars": 9990,
+    "min_turns": 4,
+    "max_degenerate_share": 0.4
+  },
+  "actionable_defects": {
+    "non_alternating_roles": 283,
+    "dead_tail": 262,
+    "never_asks_question": 212,
+    "leaks_answer_first_turn": 31,
+    "mostly_degenerate": 1
+  },
+  "rejected_rules": {
+    "answer_shorter_than_question": {
+      "hits": 1990,
+      "rate": 0.5478,
+      "note": "a SHORT Socratic teacher turn after a long student answer is the desired behaviour, not a defect. REJECTED."
+    }
+  }
+}

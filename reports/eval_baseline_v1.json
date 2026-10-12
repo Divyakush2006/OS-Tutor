@@ -1,0 +1,81 @@
+{
+  "model": "D:\\os project\\models\\Qwen3-4B-Instruct-2507",
+  "adapter": null,
+  "limit": 40,
+  "four_bit": true,
+  "suites": {
+    "os_solve_indist": {
+      "n": 40,
+      "final_answer_accuracy": 0.175,
+      "step_accuracy": 0.1636,
+      "by_topic": {
+        "banker_request": {
+          "n": 1,
+          "accuracy": 0.0
+        },
+        "banker_safety": {
+          "n": 8,
+          "accuracy": 0.0
+        },
+        "disk": {
+          "n": 2,
+          "accuracy": 0.0
+        },
+        "freespace": {
+          "n": 4,
+          "accuracy": 0.0
+        },
+        "paging": {
+          "n": 8,
+          "accuracy": 0.0
+        },
+        "scheduling": {
+          "n": 9,
+          "accuracy": 0.0
+        },
+        "translate": {
+          "n": 8,
+          "accuracy": 0.875
+        }
+      },
+      "seconds": 2684.9
+    },
+    "os_solve_ood": {
+      "n": 40,
+      "final_answer_accuracy": 0.3,
+      "step_accuracy": 0.0444,
+      "by_topic": {
+        "banker_request": {
+          "n": 11,
+          "accuracy": 0.8182
+        },
+        "banker_safety": {
+          "n": 9,
+          "accuracy": 0.0
+        },
+        "disk": {
+          "n": 5,
+          "accuracy": 0.0
+        },
+        "freespace": {
+          "n": 7,
+          "accuracy": 0.0
+        },
+        "paging": {
+          "n": 1,
+          "accuracy": 0.0
+        },
+        "scheduling": {
+          "n": 4,
+          "accuracy": 0.0
+        },
+        "translate": {
+          "n": 3,
+          "accuracy": 1.0
+        }
+      },
+      "seconds": 3249.8
+    }
+  },
+  "generalisation_gap": -0.125
+}

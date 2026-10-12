@@ -1,0 +1,132 @@
+{
+  "category": "replay",
+  "rows": 37828,
+  "distributions": {
+    "user_chars": {
+      "p10": 74,
+      "p50": 323,
+      "p90": 1407,
+      "mean": 804.1
+    },
+    "assistant_chars": {
+      "p10": 27,
+      "p50": 1304,
+      "p90": 5780,
+      "mean": 2176.5
+    },
+    "turns": {
+      "p50": 2,
+      "p90": 6
+    },
+    "type_token_ratio": {
+      "p10": 0.266,
+      "p50": 0.51
+    },
+    "sources": {
+      "OpenHermes_2.5_no_think": 6000,
+      "smoltalk_smollm3_smol_magpie_ultra_no_think": 6000,
+      "tulu_3_sft_personas_instruction_following_no_think": 4000,
+      "ai2-adapt-dev/personahub_math_v5_regen_149960": 3121,
+      "ai2-adapt-dev/evol_codealpaca_heval_decontaminated": 2312,
+      "ai2-adapt-dev/tulu_v3.9_aya_100k": 2173,
+      "ai2-adapt-dev/tulu_v3.9_wildchat_100k": 2106,
+      "smoltalk_smollm3_systemchats_30k_no_think": 2000
+    }
+  },
+  "redundancy": {
+    "distinct_answers": 36038,
+    "rows": 37828,
+    "distinct_ratio": 0.9527,
+    "rows_with_duplicated_answer": 2362,
+    "worst": [
+      [
+        "yes",
+        60
+      ],
+      [
+        "no",
+        57
+      ],
+      [
+        "i'm sorry, but i can't fulfill this request.",
+        48
+      ]
+    ]
+  },
+  "probes": {
+    "non_latin_script": {
+      "hits": 1498,
+      "rate": 0.0396,
+      "verdict": "defect",
+      "note": "translation tasks inside an English corpus",
+      "samples": [
+        "### 祛斑：了解斑点的形成及如何有效治疗\n\n皮肤上的斑点是许多人面临的一个常见问题，它们可能是由于遗传、环境因素、年龄增长或生活习惯造成的。理解斑点的成因和掌握正确的祛斑方法对于维持皮肤健康和美丽至关重要。\n\n####",
+        "و فرشته خداوند وی را گفت: «الاغ خود را این سه مرتبه چرا زدی؟ اینک من به مقاومت تو بیرون آمدم، زیرا که این سفر ",
+        "ती चराचरांत संपूर्णपणे व्यापक असून साधकांना स्वरूपाच्या अनुभवाच्या योगे तीच निर्गुणाचा परिचय करून देते. (१८)\n\n"
+      ]
+    },
+    "answer_tiny": {
+      "hits": 3900,
+      "rate": 0.1031,
+      "verdict": "defect",
+      "note": "no instruction-following signal",
+      "samples": [
+        "70",
+        "[22, 69]",
+        "और, श्रीमती टॉरंस?"
+      ]
+    },
+    "answer_wall": {
+      "hits": 434,
+      "rate": 0.0115,
+      "verdict": "defect",
+      "note": "dumps that dominate the token budget",
+      "samples": [
+        "To solve the problem, we will tackle each part separately.\n\n**Part 1: Determine the difficulty level \\(d\\).**\n",
+        "To solve the given problem, we need to tackle it in two main steps:\n\n### Step 1: Determine the Parameters of A",
+        "To solve the given problem, we'll address each part step-by-step.\n\n### Part 1: Determine the month \\( t \\) whe"
+      ]
+    },
+    "model_self_reference": {
+      "hits": 117,
+      "rate": 0.0031,
+      "verdict": "defect",
+      "note": "persona leakage a tutor must not inherit",
+      "samples": [
+        "\"I'm sorry, but I cannot assist with that. As an AI language model, my guidelines prevent me from generating c",
+        "As an AI language model, I am not able to create or provide SVG code for specific illustrations. However, I ca",
+        "When installing essential open-source software on a Windows XP operating system, it's important to note that W"
+      ]
+    },
+    "refusal": {
+      "hits": 936,
+      "rate": 0.0247,
+      "verdict": "defect",
+      "note": "teaches refusal on benign requests",
+      "samples": [
+        "I'm sorry, but as an AI text-based model, I do not have the capability to create video content. However, I can",
+        "I'm sorry, but I can't fulfill this request.",
+        "I'm sorry, but I can't assist with that. As an AI, I'm committed to promoting truthful, unbiased information a"
+      ]
+    },
+    "think_block": {
+      "hits": 0,
+      "rate": 0.0,
+      "verdict": "defect",
+      "note": "CoT replay would reintroduce thinking into a model chosen specifically for having none",
+      "samples": []
+    }
+  },
+  "derived_thresholds": {
+    "min_assistant_chars": 13,
+    "max_assistant_chars": 17340
+  },
+  "actionable_defects": {
+    "non_latin_script": 1498,
+    "answer_tiny": 3900,
+    "answer_wall": 434,
+    "model_self_reference": 117,
+    "refusal": 936
+  },
+  "rejected_rules": {}
+}

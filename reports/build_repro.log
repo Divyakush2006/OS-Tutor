@@ -1,0 +1,80 @@
+
+[1] ingest
+    80732 records | {'procedural': 16720, 'conceptual': 1485, 'tutoring': 3633, 'shell': 21066, 'replay': 37828}
+
+[2] per-category forensic analysis (before any cleaning)
+    procedural    16720 rows | defects   712 | rules rejected on evidence: 0 | distinct answers 0.901
+    conceptual     1485 rows | defects     4 | rules rejected on evidence: 0 | distinct answers 1.000
+    tutoring       3633 rows | defects   789 | rules rejected on evidence: 1 | distinct answers 0.825
+    shell         21066 rows | defects   378 | rules rejected on evidence: 2 | distinct answers 0.896
+    replay        37828 rows | defects  6885 | rules rejected on evidence: 0 | distinct answers 0.953
+
+[3] clean / scrub / repair
+    kept 70170/80732 | repaired 522 | PII redactions 707
+
+[4] deduplicate (exact + lexical)
+    exact -656 | lexical -1133 | 68184 remain
+
+[5] decontaminate vs held-out eval + OOD
+    removed 643 {'procedural': 15, 'shell': 102, 'tutoring': 491, 'replay': 35} | 67541 remain
+
+[6] score
+    {'conceptual': 0.6924, 'procedural': 0.8334, 'replay': 0.7675, 'shell': 0.7278, 'tutoring': 0.8042}
+
+[7] gold selection: quality gate -> semantic dedup -> farthest-point
+    embedding 67541 texts on cuda
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|##########| 103/103 [00:00<00:00, 12881.69it/s]
+[1mBertModel LOAD REPORT[0m from: sentence-transformers/all-MiniLM-L6-v2
+Key                     | Status     |  | 
+------------------------+------------+--+-
+embeddings.position_ids | UNEXPECTED |  | 
+
+Notes:
+- UNEXPECTED:	can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+    achievable total 12000 (ceiling 12000), bound by 'tutoring'
+    procedural   pool  15420 -> gate  15420 -> distinct  15092 -> picked  7680  meanQ 0.845  [OK]
+    conceptual   pool   1342 -> gate   1274 -> distinct   1039 -> picked   720  meanQ 0.725  [OK]
+    tutoring     pool   2836 -> gate   1705 -> distinct   1152 -> picked   960  meanQ 0.862  [OK]
+    shell        pool  18710 -> gate  13543 -> distinct  11606 -> picked   720  meanQ 0.742  [OK]
+    replay       pool  29233 -> gate  17544 -> distinct  17349 -> picked  1920  meanQ 0.867  [OK]
+    diversity (1 - mean cosine): {'procedural': 0.599, 'conceptual': 0.708, 'tutoring': 0.694, 'shell': 0.944, 'replay': 0.958}
+
+[8] render to ChatML
+    12000 rows | tokens mean 689.2 p99 2753 max 11648 | total 8,270,468
+
+[9] split, then rectifier interleaving on the train split
+    train 11760 | val 240 | ood 600 (of which 600 genuinely OOD)
+
+[10] verify rectifier invariants on shipped train rows
+    category run 4/4 | source run 1/3 | spaced replay 4->14 | worst spacing violation 0
+
+[11] release gates
+
+RELEASE GATES                     
+------------------------------------------------------------------------------------------------
+  [PASS] secrets_zero                0 rows with credential material (limit 0)
+  [PASS] no_think_blocks             0 rows contain <think>
+  [PASS] licence_commercial          0 non-commercial rows
+  [PASS] schema_valid                0 rows fail schema
+  [PASS] defect_rate                 0 known defects = 0.000% (limit 0.000%)
+  [PASS] non_latin_rate              0 non-Latin-script rows
+  [PASS] token_p99                   p99 token length 2753 (limit 16384)
+  [PASS] rectifier_invariants        category run 4/4, worst spacing violation 0
+  [PASS] source_run_bounded          longest single-dataset run 1 across 81 sources (max 3)
+  [PASS] mixture_drift               worst drift +0.02pp (limit 2.0pp) {'procedural': -0.0, 'conceptual': -0.01, 'tutoring': -0.02, 'shell': 0.01, 'replay': 0.02}
+  [PASS] distinct_answers            lowest distinct-answer ratio 0.988 in "procedural" (min 0.9)
+  [PASS] template_share              largest template share 0.099 in "conceptual" (max 0.25)
+  [PASS] pairwise_diversity          lowest diversity 0.599 in "procedural" (min 0.3)
+  [PASS] min_rows_per_category       smallest category 705 rows (min 50)
+  [PASS] min_total_rows              11760 train rows (min 2000)
+  [PASS] ood_holdout_present         600 genuinely out-of-distribution rows in the holdout (600 total ood)
+  [PASS] procedural_inputs_complete  0 procedural questions omit an input they need (train sources, OOD holdout, eval suites)
+  [PASS] os_tutoring_present         563 OS-domain tutoring rows (min 300, 938 tutoring rows in total)
+  [PASS] family_weights_honoured     0 procedural families below half their designed share 
+------------------------------------------------------------------------------------------------
+
+BUILD PASSED in 356.3s
+  artefacts -> D:\os project\data\build
+  manifest  -> D:\os project\reports\manifest.json
+  analysis  -> D:\os project\reports\analysis

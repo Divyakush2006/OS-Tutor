@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OS Tutor — Case Study: Current Project Status</title>
+<style>
+  @page { size: A4; margin: 20mm 18mm 20mm 18mm; }
+
+  :root { --ink:#16181d; --mute:#5d636e; --rule:#d7dae0; --soft:#f5f6f8; --accent:#2b4c7e; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-size: 10.1pt; line-height: 1.55; color: var(--ink);
+  }
+
+  /* ---------- cover ---------- */
+  .cover { height: 252mm; display: flex; flex-direction: column; }
+  .cover .kicker { font-size: 8.6pt; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); margin-top: 34mm; }
+  .cover h1 { font-size: 26pt; line-height: 1.18; font-weight: 650; letter-spacing: -.02em; margin: 10px 0 12px; }
+  .cover .sub { font-size: 12pt; color: var(--mute); margin: 0 0 26px; max-width: 150mm; }
+  .cover .rule { height: 2px; background: var(--ink); width: 100%; margin: 4px 0 22px; }
+  .cover table.people { width: auto; margin: 0; font-size: 10.4pt; }
+  .cover table.people td { border: none; padding: 3px 34px 3px 0; }
+  .cover table.people th { border: none; font-size: 8.2pt; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); font-weight: 600; padding: 0 34px 6px 0; }
+  .cover .reg { font-family: Consolas, "SF Mono", monospace; font-size: 9.6pt; color: var(--mute); }
+  .cover .abstract { margin-top: auto; border-top: 1px solid var(--rule); padding-top: 14px; }
+  .cover .abstract h4 { font-size: 8.2pt; letter-spacing: .1em; text-transform: uppercase; color: var(--mute); margin: 0 0 6px; font-weight: 600; }
+  .cover .abstract p { font-size: 9.6pt; line-height: 1.6; margin: 0; }
+  .cover .date { font-size: 9.6pt; color: var(--mute); margin-top: 18px; }
+
+  .pb { break-before: page; page-break-before: always; }
+
+  /* ---------- contents ---------- */
+  .toc h2 { border: none; margin-top: 0; }
+  .toc ol { list-style: none; padding: 0; margin: 0; }
+  .toc li { display: flex; align-items: baseline; padding: 1.5px 0; line-height: 1.35; font-size: 9.8pt; }
+  .toc li.main { font-weight: 640; margin-top: 7px; }
+  .toc li.subi { padding-left: 18px; color: #2b2f37; font-size: 9.2pt; }
+  .toc .t { white-space: nowrap; }
+  .toc .dots { flex: 1; border-bottom: 1px dotted #b5bac3; margin: 0 6px; transform: translateY(-3px); }
+  .toc .pg { font-variant-numeric: tabular-nums; min-width: 16px; text-align: right; }
+
+  /* ---------- body ---------- */
+  h2 {
+    font-size: 14pt; font-weight: 650; margin: 26px 0 10px;
+    padding-bottom: 6px; border-bottom: 1.5px solid var(--ink);
+    break-after: avoid; page-break-after: avoid;
+  }
+  h2 .n { color: var(--accent); margin-right: 6px; }
+  h3 { font-size: 10.8pt; font-weight: 650; margin: 17px 0 6px; break-after: avoid; page-break-after: avoid; }
+  p { margin: 0 0 9px; text-align: left; }
+  ul, ol { margin: 0 0 10px; padding-left: 19px; }
+  li { margin-bottom: 4px; }
+  strong { font-weight: 640; }
+  code { font-family: Consolas, "SF Mono", monospace; font-size: 8.7pt; background: var(--soft); padding: 1px 4px; border-radius: 2px; }
+  .cite { color: var(--accent); font-size: 8.8pt; }
+
+  /* Every table here is short (<= 11 rows), so each is kept whole: a split would strand
+     a lone total row on the next page, which reads worse than a little white space. */
+  table { width: 100%; border-collapse: collapse; margin: 10px 0 14px; font-size: 9.1pt;
+          break-inside: avoid; page-break-inside: avoid; }
+  table.compact { width: 74%; }
+  /* A sentence that introduces a table ("...were:") must travel with it. */
+  p:has(+ table), p:has(+ ol), p:has(+ ul) { break-after: avoid; page-break-after: avoid; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; page-break-inside: avoid; }
+  th { text-align: left; font-weight: 640; padding: 5px 9px 5px 0; border-bottom: 1.4px solid var(--ink); vertical-align: bottom; }
+  td { padding: 4px 9px 4px 0; border-bottom: 1px solid var(--rule); vertical-align: top; line-height: 1.45; }
+  tr:last-child td { border-bottom: none; }
+  tr.total td { border-top: 1.4px solid var(--ink); border-bottom: none; font-weight: 640; }
+  td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .caption { font-size: 8.4pt; color: var(--mute); margin: -8px 0 14px; }
+
+  .ok { color: #1d6b3a; font-weight: 640; }
+  .warn { color: #9a5b00; font-weight: 640; }
+
+  .callout { border-left: 3px solid var(--accent); background: var(--soft); padding: 9px 13px; margin: 12px 0 14px; font-size: 9.6pt; break-inside: avoid; }
+  .callout p:last-child { margin-bottom: 0; }
+
+  figure { margin: 12px 0 16px; break-inside: avoid; page-break-inside: avoid; text-align: center; }
+  figure svg { width: 100%; height: auto; }
+  figcaption { font-size: 8.4pt; color: var(--mute); margin-top: 7px; }
+
+  .refs { font-size: 8.9pt; }
+  .refs li { margin-bottom: 6px; padding-left: 4px; }
+</style>
+</head>
+<body>
+
+<!-- ======================= COVER ======================= -->
+<section class="cover">
+  <div class="kicker">Case Study · Current Project Status</div>
+  <h1>OS Tutor: Fine-Tuning a Small Language Model into a Verified Operating Systems Tutor</h1>
+  <p class="sub">A 4-billion-parameter model that explains operating-system concepts, teaches Socratically, and delegates every calculation to deterministic simulators.</p>
+  <div class="rule"></div>
+
+  <table class="people">
+    <thead><tr><th>Author</th><th>Register number</th></tr></thead>
+    <tbody>
+      <tr><td>Divyakush Punjabi</td><td class="reg">24BCB0126</td></tr>
+    </tbody>
+  </table>
+
+  <div class="abstract">
+    <h4>Summary</h4>
+    <p>General-purpose language models state the rules of operating systems correctly but fail to execute them over many
+    steps, which makes them unreliable tutors for a subject assessed through worked numerical problems. This project
+    fine-tunes Qwen3-4B-Instruct-2507 on an 11,760-row dataset built by an eleven-stage, gate-checked pipeline, and pairs
+    the model with verified simulators that compute every procedural answer. The system is fully built and deployed
+    locally. On 57 hand-written problems it scores 63.2% when the model answers alone and <strong>100% (57/57)</strong>
+    with verified delegation. General knowledge is retained within 0.75 percentage points of the base model. One open
+    weakness — declarative OS theory, 4.29 points below the base model — is the focus of the next phase.</p>
+  </div>
+  <div class="date">28 September 2026</div>
+</section>
+
+<!-- ======================= CONTENTS ======================= -->
+<section class="toc pb">
+  <h2>Contents</h2>
+  <ol>
+    <li class="main"><span class="t">1. Introduction</span><span class="dots"></span><span class="pg" data-for="s1">0</span></li>
+    <li class="subi"><span class="t">1.1 Background</span><span class="dots"></span><span class="pg" data-for="s1-1">0</span></li>
+    <li class="subi"><span class="t">1.2 The problem</span><span class="dots"></span><span class="pg" data-for="s1-2">0</span></li>
+    <li class="subi"><span class="t">1.3 Project status at a glance</span><span class="dots"></span><span class="pg" data-for="s1-3">0</span></li>
+    <li class="main"><span class="t">2. Literature Review</span><span class="dots"></span><span class="pg" data-for="s2">0</span></li>
+    <li class="subi"><span class="t">2.1 Parameter-efficient fine-tuning</span><span class="dots"></span><span class="pg" data-for="s2-1">0</span></li>
+    <li class="subi"><span class="t">2.2 Catastrophic forgetting</span><span class="dots"></span><span class="pg" data-for="s2-2">0</span></li>
+    <li class="subi"><span class="t">2.3 Limits of procedural reasoning in LLMs</span><span class="dots"></span><span class="pg" data-for="s2-3">0</span></li>
+    <li class="subi"><span class="t">2.4 Language models as tutors</span><span class="dots"></span><span class="pg" data-for="s2-4">0</span></li>
+    <li class="subi"><span class="t">2.5 Research gap</span><span class="dots"></span><span class="pg" data-for="s2-5">0</span></li>
+    <li class="main"><span class="t">3. Objective</span><span class="dots"></span><span class="pg" data-for="s3">0</span></li>
+    <li class="main"><span class="t">4. Dataset Collection</span><span class="dots"></span><span class="pg" data-for="s4">0</span></li>
+    <li class="subi"><span class="t">4.1 Collection strategy</span><span class="dots"></span><span class="pg" data-for="s4-1">0</span></li>
+    <li class="subi"><span class="t">4.2 Sources</span><span class="dots"></span><span class="pg" data-for="s4-2">0</span></li>
+    <li class="subi"><span class="t">4.3 Generated data</span><span class="dots"></span><span class="pg" data-for="s4-3">0</span></li>
+    <li class="subi"><span class="t">4.4 Licensing policy</span><span class="dots"></span><span class="pg" data-for="s4-4">0</span></li>
+    <li class="subi"><span class="t">4.5 Evaluation data, held apart</span><span class="dots"></span><span class="pg" data-for="s4-5">0</span></li>
+    <li class="main"><span class="t">5. Dataset Processing</span><span class="dots"></span><span class="pg" data-for="s5">0</span></li>
+    <li class="subi"><span class="t">5.1 Pipeline overview</span><span class="dots"></span><span class="pg" data-for="s5-1">0</span></li>
+    <li class="subi"><span class="t">5.2 Analysis before cleaning</span><span class="dots"></span><span class="pg" data-for="s5-2">0</span></li>
+    <li class="subi"><span class="t">5.3 Cleaning, deduplication and decontamination</span><span class="dots"></span><span class="pg" data-for="s5-3">0</span></li>
+    <li class="subi"><span class="t">5.4 Quality scoring and gold selection</span><span class="dots"></span><span class="pg" data-for="s5-4">0</span></li>
+    <li class="subi"><span class="t">5.5 Final composition</span><span class="dots"></span><span class="pg" data-for="s5-5">0</span></li>
+    <li class="subi"><span class="t">5.6 Rectifier ordering and spaced replay</span><span class="dots"></span><span class="pg" data-for="s5-6">0</span></li>
+    <li class="subi"><span class="t">5.7 Release gates</span><span class="dots"></span><span class="pg" data-for="s5-7">0</span></li>
+    <li class="main"><span class="t">6. Model Architecture Design</span><span class="dots"></span><span class="pg" data-for="s6">0</span></li>
+    <li class="subi"><span class="t">6.1 Design principle</span><span class="dots"></span><span class="pg" data-for="s6-1">0</span></li>
+    <li class="subi"><span class="t">6.2 Base model selection</span><span class="dots"></span><span class="pg" data-for="s6-2">0</span></li>
+    <li class="subi"><span class="t">6.3 Fine-tuning configuration</span><span class="dots"></span><span class="pg" data-for="s6-3">0</span></li>
+    <li class="subi"><span class="t">6.4 Verified-solver layer</span><span class="dots"></span><span class="pg" data-for="s6-4">0</span></li>
+    <li class="subi"><span class="t">6.5 Serving architecture</span><span class="dots"></span><span class="pg" data-for="s6-5">0</span></li>
+    <li class="main"><span class="t">7. Conclusion</span><span class="dots"></span><span class="pg" data-for="s7">0</span></li>
+    <li class="subi"><span class="t">7.1 Current status: measured results</span><span class="dots"></span><span class="pg" data-for="s7-1">0</span></li>
+    <li class="subi"><span class="t">7.2 Findings</span><span class="dots"></span><span class="pg" data-for="s7-2">0</span></li>
+    <li class="subi"><span class="t">7.3 Limitations</span><span class="dots"></span><span class="pg" data-for="s7-3">0</span></li>
+    <li class="subi"><span class="t">7.4 Next steps</span><span class="dots"></span><span class="pg" data-for="s7-4">0</span></li>
+    <li class="main"><span class="t">References</span><span class="dots"></span><span class="pg" data-for="refs">0</span></li>
+  </ol>
+</section>
+
+<!-- ======================= 1. INTRODUCTION ======================= -->
+<h2 id="s1" class="pb"><span class="n">1.</span>Introduction</h2>
+
+<h3 id="s1-1">1.1 Background</h3>
+<p>Operating systems is taught and examined largely through procedures. Students are asked to build a Gantt chart for
+Round Robin scheduling, count page faults under LRU, trace a disk head through SCAN, or decide whether a Banker's
+algorithm state is safe. Each is a fixed rule applied over many dependent steps, and a single wrong step invalidates
+every step after it.</p>
+<p>Large language models are an attractive tutoring medium because they explain fluently, answer at any hour, and can
+adapt their explanation to a student's attempt. The question this project asks is whether a small model, trainable on
+free hardware and runnable on a student laptop, can be made <em>trustworthy</em> enough to tutor this subject.</p>
+
+<h3 id="s1-2">1.2 The problem</h3>
+<p>A general model fails an OS student in three distinct ways:</p>
+<ul>
+  <li><strong>It executes procedures unreliably.</strong> It can state the rule for SRTF correctly and still produce
+      the wrong schedule. In our own measurements, every one of the 7 scheduling failures on a hand-written suite
+      contained <strong>correct arithmetic paired with a wrong schedule</strong>.</li>
+  <li><strong>It gives answers away.</strong> A student who shows a wrong attempt needs to be guided to the error,
+      not handed the corrected answer.</li>
+  <li><strong>Fine-tuning can damage it.</strong> Training a model narrowly on OS material risks eroding the general
+      ability that makes its explanations good — catastrophic forgetting.</li>
+</ul>
+<p>The first failure is architectural rather than a gap in knowledge, as Section 2.3 shows. It cannot be solved by
+adding more training data: scheduling had the most training rows of any category (1,733) and the worst accuracy
+(42%), while disk scheduling had 990 rows and 100%.</p>
+
+<h3 id="s1-3">1.3 Project status at a glance</h3>
+<table>
+  <thead><tr><th style="width:30%">Component</th><th style="width:16%">Status</th><th>Detail</th></tr></thead>
+  <tbody>
+    <tr><td>Dataset pipeline</td><td class="ok">Complete</td><td>Version 3.0.0 — 11,760 training rows, all 19 release gates passed, reproducible build</td></tr>
+    <tr><td>Fine-tuned model</td><td class="ok">Complete</td><td>Qwen3-4B-Instruct-2507 + LoRA adapter v3.0, trained on Kaggle 2× T4</td></tr>
+    <tr><td>Verified-solver layer</td><td class="ok">Complete</td><td>Seven procedural families delegated to deterministic simulators</td></tr>
+    <tr><td>Serving stack</td><td class="ok">Deployed</td><td>Local llama.cpp + gateway + web interface, six tutoring modes, 26.9 tokens/s</td></tr>
+    <tr><td>Evaluation</td><td class="ok">Complete</td><td>Procedural suite, routing, catastrophic-forgetting check with paired flips</td></tr>
+    <tr><td>Declarative OS theory</td><td class="warn">Open issue</td><td>85.71% against 90.00% for the base model; remediation planned</td></tr>
+    <tr><td>Base-model upgrade study</td><td class="warn">In progress</td><td>2026-generation candidates identified; zero-shot probe pending (Section 7.4)</td></tr>
+  </tbody>
+</table>
+
+<!-- ======================= 2. LITERATURE REVIEW ======================= -->
+<h2 id="s2" class="pb"><span class="n">2.</span>Literature Review</h2>
+
+<p>The design draws on four bodies of work: efficient fine-tuning, catastrophic forgetting, the limits of procedural
+reasoning in language models, and language models used for tutoring. Each subsection closes with how the finding
+shaped this project.</p>
+
+<h3 id="s2-1">2.1 Parameter-efficient fine-tuning</h3>
+<p><strong>LoRA</strong> <span class="cite">[1]</span> freezes the pretrained weights and learns a low-rank update,
+reducing trainable parameters by orders of magnitude. <strong>QLoRA</strong> <span class="cite">[2]</span> stores the
+frozen base in 4-bit NormalFloat and back-propagates through it into LoRA adapters, which makes fine-tuning feasible
+on a single consumer or datacentre GPU. <strong>NEFTune</strong> <span class="cite">[3]</span> adds uniform noise to
+embeddings during training and measurably improves instruction-following quality at no inference cost.</p>
+<p><strong>LIMA</strong> <span class="cite">[4]</span> showed that a small set of carefully curated examples can
+align a strong base model, supporting the view that data quality matters more than volume.</p>
+<p class="callout"><strong>Applied here:</strong> QLoRA made training possible on free Kaggle T4 GPUs; NEFTune
+(α = 5) is enabled; and the LIMA principle informed a heavily curated pipeline — though applied to <em>knowledge</em>
+categories only, since procedural skill still benefits from many distinct worked examples.</p>
+
+<h3 id="s2-2">2.2 Catastrophic forgetting</h3>
+<p>Neural networks trained sequentially on new data lose earlier competence, a phenomenon first characterised as
+catastrophic interference <span class="cite">[5]</span>. Regularisation approaches such as Elastic Weight
+Consolidation <span class="cite">[6]</span> penalise movement of weights important to earlier tasks, but require
+estimating parameter importance over the original training distribution, which is unavailable for a pretrained
+model.</p>
+<p>Four recent results are more directly usable:</p>
+<ul>
+  <li><strong>LoRA forgets less</strong> than full fine-tuning, because the low-rank constraint bounds how far the
+      weights can move <span class="cite">[7]</span>.</li>
+  <li><strong>Self-distillation (SDFT)</strong> <span class="cite">[8]</span> rewrites training targets in the base
+      model's own words, shrinking the distribution gap that drives forgetting.</li>
+  <li><strong>SuRe</strong> <span class="cite">[9]</span> prioritises replay of the most <em>surprising</em>
+      sequences — those with the highest negative log-likelihood — which are the ones most at risk of being lost.</li>
+  <li><strong>FOREVER</strong> <span class="cite">[10]</span> observes that forgetting in language models follows an
+      Ebbinghaus-like curve, and spaces replay frequently early in training and increasingly sparsely later.</li>
+</ul>
+<p class="callout"><strong>Applied here:</strong> the anti-forgetting design combines all four — LoRA as the
+structural constraint, SDFT targets for theory and tutoring, 16% replay data ranked by surprise, and replay spaced on
+a forgetting-curve schedule — and it is <em>measured</em> with paired item-level flips rather than assumed.</p>
+
+<h3 id="s2-3">2.3 Limits of procedural reasoning in LLMs</h3>
+<p>Samiei et al. <span class="cite">[11]</span> measured long-horizon execution of explicit finite-state machines and
+found that even Qwen3-235B reaches only about <strong>50%</strong> task accuracy, degrading as the number of steps
+grows. The failure is in <em>executing</em> a known rule, not in knowing it.</p>
+<p>Guo, Wu and Yiu <span class="cite">[12]</span> explain why. They bound the state-tracking capacity of decoder-only
+attention by O(H · log(L/H) · √d<sub>h</sub>), where H is the number of attention heads and d<sub>h</sub> the head
+dimension, and identify a <strong>deterministic horizon d* between 19 and 31 steps</strong> beyond which extended
+chain-of-thought degrades. Across 12 models, tool-integrated reasoning reached 86–94% accuracy against 24–42% for
+purely neural chain-of-thought.</p>
+<p>Kambhampati et al. <span class="cite">[13]</span> argue on independent grounds that language models cannot
+reliably verify their own plans, and propose <strong>LLM-Modulo</strong> systems in which the model generates and an
+external, sound verifier checks.</p>
+<p class="callout"><strong>Applied here:</strong> this is the central design decision of the project. Because the
+limit is architectural, no amount of fine-tuning removes it — so the model is never asked to compute. It reads the
+question, deterministic simulators compute the answer, and the model explains the result.</p>
+
+<h3 id="s2-4">2.4 Language models as tutors</h3>
+<p><strong>MathDial</strong> <span class="cite">[14]</span> collected tutoring dialogues in which teachers guide
+students who hold genuine misconceptions, and showed that off-the-shelf models tend to reveal answers too early
+rather than scaffolding the student's reasoning. Its annotated teacher moves — probing, focusing, telling — give a
+vocabulary for what good tutoring looks like.</p>
+<p class="callout"><strong>Applied here:</strong> MathDial supplies real teacher moves for the tutoring category, and
+the OS half of that category is built the same way: each dialogue starts from a wrong attempt generated from a
+<em>named</em> misconception, and any reply that reveals the final answer is rejected.</p>
+
+<h3 id="s2-5">2.5 Research gap</h3>
+<table>
+  <thead><tr><th style="width:24%">Work</th><th style="width:38%">Finding</th><th>Gap this project addresses</th></tr></thead>
+  <tbody>
+    <tr><td>LoRA, QLoRA [1, 2]</td><td>Fine-tuning fits on one GPU</td><td>Applied at 16,384-token sequences on free T4 hardware</td></tr>
+    <tr><td>SDFT, SuRe, FOREVER [8–10]</td><td>Individual anti-forgetting techniques</td><td>Combined in one pipeline and verified with paired flips</td></tr>
+    <tr><td>Illusion of Procedural Reasoning [11]</td><td>Even 235B models execute procedures poorly</td><td>Diagnosed in a real teaching domain, not a synthetic task</td></tr>
+    <tr><td>Deterministic Horizon, LLM-Modulo [12, 13]</td><td>External tools must carry deterministic work</td><td>Built as a working tutor with grounded parameter extraction</td></tr>
+    <tr><td>MathDial [14]</td><td>Models leak answers when tutoring</td><td>Prevented structurally at the routing layer, not by prompting</td></tr>
+  </tbody>
+</table>
+<p>No prior work we found combines a fine-tuned small model, verified procedural delegation, enforced Socratic
+behaviour and measured forgetting resistance in a single deployable tutor for operating systems.</p>
+
+<!-- ======================= 3. OBJECTIVE ======================= -->
+<h2 id="s3" class="pb"><span class="n">3.</span>Objective</h2>
+
+<p><strong>Primary objective:</strong> build an offline operating-systems tutor that is numerically exact,
+pedagogically honest, resistant to catastrophic forgetting, and trainable entirely on free hardware.</p>
+
+<p>The primary objective breaks down into six measurable objectives. Each has a fixed target, and the current status
+is reported against it:</p>
+
+<table>
+  <thead><tr><th style="width:5%">#</th><th style="width:30%">Objective</th><th style="width:26%">Target</th><th>Current status</th></tr></thead>
+  <tbody>
+    <tr><td>O1</td><td>Exact answers to procedural problems</td><td>100% on a hand-written suite</td><td class="ok">Achieved — 57/57</td></tr>
+    <tr><td>O2</td><td>Socratic integrity: a shown attempt is taught, not answered</td><td>Correct routing of every attempt</td><td class="ok">Achieved — 28/28, zero misroutes</td></tr>
+    <tr><td>O3</td><td>No catastrophic forgetting of general ability</td><td>General MMLU within 1 pp of base</td><td class="ok">Achieved — −0.75 pp</td></tr>
+    <tr><td>O4</td><td>Declarative OS knowledge at least as good as base</td><td>OS theory MCQ ≥ base (90.00%)</td><td class="warn">Not yet — 85.71%</td></tr>
+    <tr><td>O5</td><td>Commercially clean, reproducible dataset</td><td>All release gates pass</td><td class="ok">Achieved — 19/19</td></tr>
+    <tr><td>O6</td><td>Free training and local interactive serving</td><td>Kaggle free tier; ≥ 20 tokens/s</td><td class="ok">Achieved — 26.9 tokens/s</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+<p><strong>What the tutor is not.</strong> It is deliberately not a retrieval-augmented chatbot over a textbook.
+Retrieval returns text that <em>resembles</em> an answer; it cannot certify that a Gantt chart for a student's
+specific numbers is correct, because that chart exists in no document. The tutor computes the answer instead.</p>
+</div>
+
+<!-- ======================= 4. DATASET COLLECTION ======================= -->
+<h2 id="s4" class="pb"><span class="n">4.</span>Dataset Collection</h2>
+
+<h3 id="s4-1">4.1 Collection strategy</h3>
+<p>Data was collected in five categories, each serving a distinct purpose in the finished tutor. The categories were
+defined before any data was gathered, so that collection followed the design rather than the reverse.</p>
+
+<table>
+  <thead><tr><th style="width:16%">Category</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>Procedural</td><td>Simulator-verified numerical problems, worked step by step, each decision written as a rule plus the comparison behind it</td></tr>
+    <tr><td>Conceptual</td><td>Explanations of OS concepts, fact-checked against a list of known misconceptions</td></tr>
+    <tr><td>Tutoring</td><td>Socratic dialogues that guide a student from a wrong attempt without revealing the answer</td></tr>
+    <tr><td>Shell</td><td>Natural language to bash commands — the practical side of an OS course</td></tr>
+    <tr><td>Replay</td><td>General instruction data, held as an anchor against catastrophic forgetting</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s4-2">4.2 Sources</h3>
+<p>In total <strong>80,732 rows</strong> were ingested from 31 source files, each row carrying line-level provenance
+(source file and row index) so that any training example can be traced to its origin.</p>
+
+<table>
+  <thead><tr><th style="width:15%">Category</th><th>Sources</th><th class="num" style="width:17%">Rows ingested</th></tr></thead>
+  <tbody>
+    <tr><td>Procedural</td><td>Project-built simulators (Section 4.3)</td><td class="num">16,720</td></tr>
+    <tr><td>Conceptual</td><td>Hand-written 295-question bank in four wordings, self-distilled; hand-written gold explanations; misconception set</td><td class="num">1,485</td></tr>
+    <tr><td>Tutoring</td><td>MathDial <span class="cite">[14]</span>; project-built OS dialogues from misconception-generated attempts</td><td class="num">3,633</td></tr>
+    <tr><td>Shell</td><td>tldr pages, NL2Bash (MIT, TellinaTool), InterCode, NL2SH-ALFA</td><td class="num">21,066</td></tr>
+    <tr><td>Replay</td><td>Tülu 3 SFT mixture <span class="cite">[16]</span> (commercial-safe subset), SmolTalk2 no-think</td><td class="num">37,828</td></tr>
+    <tr class="total"><td>Total</td><td></td><td class="num">80,732</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s4-3">4.3 Generated data</h3>
+<p>Public data for OS <em>numericals</em> is scarce and rarely verified, so the procedural category is generated by
+simulators written for this project. Every answer is computed, never written by hand or by a model. The simulators
+cover <strong>39 question types across 8 families</strong>:</p>
+<ul>
+  <li><strong>CPU scheduling</strong> — FCFS, SJF, SRTF, Round Robin, priority, preemptive priority, HRRN</li>
+  <li><strong>Page replacement</strong> — FIFO, LRU, OPT, CLOCK</li>
+  <li><strong>Deadlock</strong> — Banker's safety and request, including unsafe states</li>
+  <li><strong>Disk scheduling</strong> — FCFS, SSTF, SCAN, LOOK, C-SCAN, C-LOOK</li>
+  <li><strong>Contiguous allocation</strong> — first, best and worst fit</li>
+  <li><strong>Address translation</strong>, and <strong>11 formula kinds</strong> — effective access time,
+      multilevel paging, deadlock minimum, fork count and others</li>
+  <li><strong>Clarification</strong> — problems deliberately missing a required input, where the correct behaviour
+      is to ask rather than guess</li>
+</ul>
+<p>Two further categories are partly generated. Conceptual answers are <strong>self-distilled</strong>
+<span class="cite">[8]</span> from the base model, then sanitised and fact-checked; any answer asserting a known
+misconception is dropped, never repaired. OS tutoring dialogues begin from a wrong attempt produced by a
+<em>named</em> misconception — for example, applying non-preemptive SJF to an SRTF question.</p>
+
+<h3 id="s4-4">4.4 Licensing policy</h3>
+<p>Every training row carries a licence that permits commercial use. The shipped split contains MIT 8,991 rows,
+ODC-BY-1.0 959, mixed-permissive 925 and CC-BY-4.0 885. Three sources were excluded, and the reason is recorded for
+each:</p>
+<table>
+  <thead><tr><th style="width:30%">Excluded source</th><th>Reason</th></tr></thead>
+  <tbody>
+    <tr><td>ostep-homework</td><td>No declared licence — used only as an offline test oracle, never ingested</td></tr>
+    <tr><td>ceval/ceval-exam</td><td>CC BY-NC-SA — evaluation only, never training</td></tr>
+    <tr><td>AnishJoshi/nl2bash-custom</td><td>No declared licence — superseded by the MIT-licensed TellinaTool data</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s4-5">4.5 Evaluation data, held apart</h3>
+<p>Evaluation sets were collected separately and never trained on. They are ingested only so that the pipeline can
+remove any training row that overlaps them (Section 5.3).</p>
+<table>
+  <thead><tr><th style="width:36%">Evaluation set</th><th class="num" style="width:12%">Items</th><th>Measures</th></tr></thead>
+  <tbody>
+    <tr><td>Hand-written procedural suite</td><td class="num">57</td><td>Exact final answers across 19 question types</td></tr>
+    <tr><td>Hand-written OS theory MCQ</td><td class="num">70</td><td>Declarative OS knowledge</td></tr>
+    <tr><td>MMLU, general subjects</td><td class="num">400</td><td>Retention of general knowledge (forgetting)</td></tr>
+    <tr><td>MMLU, adjacent computer science</td><td class="num">300</td><td>Transfer to neighbouring subjects</td></tr>
+    <tr><td>Out-of-distribution holdout</td><td class="num">600</td><td>Generalisation to unseen problem framings</td></tr>
+  </tbody>
+</table>
+
+<!-- ======================= 5. DATASET PROCESSING ======================= -->
+<h2 id="s5" class="pb"><span class="n">5.</span>Dataset Processing</h2>
+
+<h3 id="s5-1">5.1 Pipeline overview</h3>
+<p>Raw data passes through eleven stages, run by a single command. Each stage writes its statistics to a manifest, so
+every number in this section is taken from the build record rather than estimated.</p>
+
+<figure>
+<svg viewBox="0 0 640 196" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="pa" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,1 L9,5 L0,9 z" fill="#5d636e"/>
+    </marker>
+  </defs>
+  <g fill="none" stroke="#5d636e" stroke-width="1.1">
+    <line x1="96"  y1="37" x2="106" y2="37" marker-end="url(#pa)"/>
+    <line x1="204" y1="37" x2="214" y2="37" marker-end="url(#pa)"/>
+    <line x1="312" y1="37" x2="322" y2="37" marker-end="url(#pa)"/>
+    <line x1="420" y1="37" x2="430" y2="37" marker-end="url(#pa)"/>
+    <line x1="528" y1="37" x2="538" y2="37" marker-end="url(#pa)"/>
+    <polyline points="590,64 590,92 48,92 48,114" marker-end="url(#pa)"/>
+    <line x1="96"  y1="143" x2="106" y2="143" marker-end="url(#pa)"/>
+    <line x1="204" y1="143" x2="214" y2="143" marker-end="url(#pa)"/>
+    <line x1="312" y1="143" x2="322" y2="143" marker-end="url(#pa)"/>
+    <line x1="420" y1="143" x2="430" y2="143" marker-end="url(#pa)"/>
+  </g>
+  <g stroke="#9aa0ab" stroke-width="1" fill="#ffffff">
+    <rect x="0"   y="10" width="96" height="54" rx="3"/>
+    <rect x="108" y="10" width="96" height="54" rx="3"/>
+    <rect x="216" y="10" width="96" height="54" rx="3"/>
+    <rect x="324" y="10" width="96" height="54" rx="3"/>
+    <rect x="432" y="10" width="96" height="54" rx="3"/>
+    <rect x="540" y="10" width="96" height="54" rx="3"/>
+    <rect x="0"   y="116" width="96" height="54" rx="3"/>
+    <rect x="108" y="116" width="96" height="54" rx="3"/>
+    <rect x="216" y="116" width="96" height="54" rx="3"/>
+    <rect x="324" y="116" width="96" height="54" rx="3"/>
+    <rect x="432" y="116" width="96" height="54" rx="3" fill="#eef2f8" stroke="#2b4c7e"/>
+  </g>
+  <g text-anchor="middle">
+    <g font-size="7.5" fill="#5d636e">
+      <text x="48"  y="24">STAGE 1</text><text x="156" y="24">STAGE 2</text><text x="264" y="24">STAGE 3</text>
+      <text x="372" y="24">STAGE 4</text><text x="480" y="24">STAGE 5</text><text x="588" y="24">STAGE 6</text>
+      <text x="48"  y="130">STAGE 7</text><text x="156" y="130">STAGE 8</text><text x="264" y="130">STAGE 9</text>
+      <text x="372" y="130">STAGE 10</text><text x="480" y="130">STAGE 11</text>
+    </g>
+    <g font-size="10" fill="#16181d" font-weight="600">
+      <text x="48"  y="40">Ingest</text><text x="156" y="40">Analyse</text><text x="264" y="40">Clean</text>
+      <text x="372" y="40">Deduplicate</text><text x="480" y="40">Decontaminate</text><text x="588" y="40">Score</text>
+      <text x="48"  y="146">Select gold</text><text x="156" y="146">Render</text><text x="264" y="146">Split</text>
+      <text x="372" y="146">Order</text><text x="480" y="146">Gate</text>
+    </g>
+    <g font-size="8.2" fill="#5d636e">
+      <text x="48"  y="55">80,732 rows</text><text x="156" y="55">rules tested first</text><text x="264" y="55">70,170 kept</text>
+      <text x="372" y="55">−1,789 rows</text><text x="480" y="55">−643 rows</text><text x="588" y="55">per category</text>
+      <text x="48"  y="161">quota + diversity</text><text x="156" y="161">12,000 rows</text><text x="264" y="161">11,760 / 240 / 600</text>
+      <text x="372" y="161">rectifier + replay</text><text x="480" y="161" fill="#2b4c7e">19 / 19 pass</text>
+    </g>
+  </g>
+</svg>
+<figcaption>Figure 1 — The eleven-stage dataset pipeline. A build is released only if every gate in stage 11 passes.</figcaption>
+</figure>
+
+<h3 id="s5-2">5.2 Analysis before cleaning</h3>
+<p>Before any row is removed, each category is analysed on its own. Every candidate cleaning rule is tested against
+the data and adopted only if the evidence supports it — so the rules follow the data rather than an assumption about
+it. The analysis found, for example:</p>
+<table>
+  <thead><tr><th style="width:16%">Category</th><th>Defects found</th><th style="width:30%">Rules rejected on evidence</th></tr></thead>
+  <tbody>
+    <tr><td>Procedural</td><td>434 missing a final-answer marker; 278 with no visible steps</td><td>—</td></tr>
+    <tr><td>Tutoring</td><td>283 non-alternating roles; 262 dead tails; 212 never ask the student a question; 31 leak the answer in the first turn</td><td>“answer shorter than question”</td></tr>
+    <tr><td>Shell</td><td>181 vague instructions; 126 bash syntax errors; 70 editor keystrokes</td><td>“ends mid-sentence”, “brace placeholder”</td></tr>
+  </tbody>
+</table>
+<p>Rejecting a rule is as important as adopting one. A tutoring rule that dropped replies shorter than the question
+looked sensible, but the analysis showed it would remove good Socratic prompts, which are short by design.</p>
+
+<h3 id="s5-3">5.3 Cleaning, deduplication and decontamination</h3>
+<p><strong>Cleaning</strong> kept 70,170 of 80,732 rows. The largest reasons for removal were:</p>
+<table class="compact">
+  <thead><tr><th>Reason</th><th class="num" style="width:16%">Rows removed</th></tr></thead>
+  <tbody>
+    <tr><td>Replay answer too short to teach anything</td><td class="num">3,617</td></tr>
+    <tr><td>Assistant turn too short</td><td class="num">1,515</td></tr>
+    <tr><td>Replay in a non-Latin script</td><td class="num">1,494</td></tr>
+    <tr><td>Degenerate repetition</td><td class="num">1,320</td></tr>
+    <tr><td>Refusals</td><td class="num">1,214</td></tr>
+    <tr><td>Tutoring reply that never asks the student a question</td><td class="num">212</td></tr>
+    <tr><td>Shell command that fails <code>bash -n</code></td><td class="num">126</td></tr>
+    <tr><td>Credential or secret material (destroyed, not redacted)</td><td class="num">54</td></tr>
+  </tbody>
+</table>
+<p>A further 261 rows were repaired rather than dropped, and 707 pieces of personal information were redacted — 377
+card numbers (Luhn-checked), 180 e-mail addresses, 149 phone numbers and one social-security number.</p>
+<p><strong>Deduplication</strong> removed 656 exact duplicates (blake2b hashing) and 1,133 near-duplicates
+(MinHash LSH at Jaccard 0.80).</p>
+<p><strong>Decontamination</strong> compared training data against all 4,836 evaluation items and removed 643 rows.
+Prose rows are matched on distinctive 13-grams, ignoring 93 boilerplate n-grams common to many rows. Generated
+problems are matched on an exact <em>parameter fingerprint</em>, which also catches a reworded leak of the same
+problem — 15 such matches were found. Without this step, evaluation scores would be inflated by memorised answers.</p>
+
+<h3 id="s5-4">5.4 Quality scoring and gold selection</h3>
+<p>Every surviving row is scored by a scorer specific to its category. Mean quality after selection:</p>
+<table class="compact">
+  <thead><tr><th>Category</th><th class="num">Mean quality</th><th class="num">Pairwise diversity</th></tr></thead>
+  <tbody>
+    <tr><td>Procedural</td><td class="num">0.833</td><td class="num">0.599</td></tr>
+    <tr><td>Tutoring</td><td class="num">0.804</td><td class="num">0.694</td></tr>
+    <tr><td>Replay</td><td class="num">0.767</td><td class="num">0.958</td></tr>
+    <tr><td>Shell</td><td class="num">0.728</td><td class="num">0.944</td></tr>
+    <tr><td>Conceptual</td><td class="num">0.692</td><td class="num">0.708</td></tr>
+  </tbody>
+</table>
+<p>Gold selection then applies a quality floor, removes semantic duplicates (328 from the procedural pool), and uses
+farthest-point diversity selection so that the chosen rows cover the space rather than cluster. Procedural selection
+is a weighted allocation over question families, so a scarce family cannot be crowded out by a common one.</p>
+
+<h3 id="s5-5">5.5 Final composition</h3>
+<table class="compact">
+  <thead><tr><th>Category</th><th class="num">Designed share</th><th class="num">Rows</th><th class="num">Realised share</th><th class="num">Drift</th></tr></thead>
+  <tbody>
+    <tr><td>Procedural</td><td class="num">64%</td><td class="num">7,526</td><td class="num">64.0%</td><td class="num">−0.00 pp</td></tr>
+    <tr><td>Replay</td><td class="num">16%</td><td class="num">1,884</td><td class="num">16.0%</td><td class="num">+0.02 pp</td></tr>
+    <tr><td>Tutoring</td><td class="num">8%</td><td class="num">938</td><td class="num">8.0%</td><td class="num">−0.02 pp</td></tr>
+    <tr><td>Shell</td><td class="num">6%</td><td class="num">707</td><td class="num">6.0%</td><td class="num">+0.01 pp</td></tr>
+    <tr><td>Conceptual</td><td class="num">6%</td><td class="num">705</td><td class="num">6.0%</td><td class="num">−0.01 pp</td></tr>
+    <tr class="total"><td>Training split</td><td class="num">100%</td><td class="num">11,760</td><td class="num"></td><td class="num"></td></tr>
+  </tbody>
+</table>
+<p>A further 240 rows form the validation split and 600 the out-of-distribution holdout. Within the procedural
+category, rows are distributed across families as follows: CPU scheduling 1,733; formula 1,530; deadlock and Banker's
+1,070; page replacement 990; disk scheduling 990; contiguous allocation 536; address translation 382; clarification
+295.</p>
+<p>Rendered in the model's own tokenizer, rows average 689 tokens (median 603, 99th percentile 2,753, longest 11,648).
+Training uses 16,384-token sequences, above the longest row, so <strong>no training example is ever truncated</strong>
+and no worked answer loses its final line.</p>
+
+<h3 id="s5-6">5.6 Rectifier ordering and spaced replay</h3>
+<p>Training data is read in a fixed order rather than shuffled, and that order is itself engineered. The
+<strong>rectifier</strong> interleaves categories so that no skill is learned in one uninterrupted block and then
+decays while another is learned:</p>
+<table class="compact">
+  <thead><tr><th>Ordering constraint</th><th class="num">Limit</th><th class="num">Measured</th></tr></thead>
+  <tbody>
+    <tr><td>Longest run of one category</td><td class="num">4</td><td class="num">4</td></tr>
+    <tr><td>Longest run from one source dataset (81 sources)</td><td class="num">3</td><td class="num">1</td></tr>
+    <tr><td>Replay spacing, early → late in training</td><td class="num">—</td><td class="num">every 4 → every 14 rows</td></tr>
+    <tr><td>Spacing violations</td><td class="num">0</td><td class="num">0</td></tr>
+  </tbody>
+</table>
+<p>Replay is spaced densely early and sparsely later, following the forgetting-curve schedule of FOREVER
+<span class="cite">[10]</span>, and within the replay pool examples are ranked by surprise, following SuRe
+<span class="cite">[9]</span>.</p>
+
+<h3 id="s5-7">5.7 Release gates</h3>
+<p>A build is released only if all 19 automated gates pass, checked on the rows actually shipped rather than on the
+plan. A failing gate stops the build; it does not emit a warning. The current build passes all 19.</p>
+<table>
+  <thead><tr><th style="width:18%">Group</th><th>Gates</th><th class="num" style="width:10%">Result</th></tr></thead>
+  <tbody>
+    <tr><td>Safety and licence</td><td>Zero secrets · zero non-commercial rows · no hidden reasoning blocks · no non-Latin rows</td><td class="num ok">4 / 4</td></tr>
+    <tr><td>Integrity</td><td>Schema valid · zero known defects · 99th-percentile length within limit · no procedural question missing an input</td><td class="num ok">4 / 4</td></tr>
+    <tr><td>Mixture</td><td>Drift under 2 pp · minimum rows per category · minimum total rows · family weights honoured · OS tutoring present</td><td class="num ok">5 / 5</td></tr>
+    <tr><td>Diversity</td><td>Distinct-answer ratio · template share · pairwise diversity</td><td class="num ok">3 / 3</td></tr>
+    <tr><td>Ordering</td><td>Rectifier invariants · bounded single-source runs</td><td class="num ok">2 / 2</td></tr>
+    <tr><td>Evaluation</td><td>Genuine out-of-distribution holdout present</td><td class="num ok">1 / 1</td></tr>
+    <tr class="total"><td>Total</td><td></td><td class="num">19 / 19</td></tr>
+  </tbody>
+</table>
+<p>The build is reproducible: the training file is content-addressed by its SHA-256 hash
+(<code>f56a7113e4aa5c0e…</code>), and the same configuration and seed reproduce it exactly.</p>
+
+<!-- ======================= 6. MODEL ARCHITECTURE ======================= -->
+<h2 id="s6" class="pb"><span class="n">6.</span>Model Architecture Design</h2>
+
+<h3 id="s6-1">6.1 Design principle</h3>
+<p><strong>The model explains; simulators compute.</strong> Following Section 2.3, the language model is never asked
+to carry out a procedure it cannot execute reliably. A fine-tuned 4B model handles reading, language and pedagogy;
+deterministic simulators handle every number. They are joined by an extraction step that turns a question into typed
+parameters.</p>
+
+<figure>
+<svg viewBox="0 0 620 452" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif" style="max-width:460px">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#5d636e"/>
+    </marker>
+  </defs>
+  <g fill="none" stroke="#5d636e" stroke-width="1.2">
+    <line x1="310" y1="44" x2="310" y2="74" marker-end="url(#a)"/>
+    <polyline points="310,112 310,136 95,136 95,154" marker-end="url(#a)"/>
+    <line x1="310" y1="112" x2="310" y2="154" marker-end="url(#a)"/>
+    <polyline points="310,136 525,136 525,154" marker-end="url(#a)"/>
+    <line x1="310" y1="194" x2="310" y2="236" marker-end="url(#a)"/>
+    <line x1="390" y1="177" x2="439" y2="177" marker-end="url(#a)"/>
+    <line x1="525" y1="194" x2="525" y2="236" marker-end="url(#a)"/>
+    <line x1="310" y1="276" x2="310" y2="318" marker-end="url(#a)"/>
+    <polyline points="95,194 95,386 310,386"/>
+    <polyline points="525,276 525,386 310,386"/>
+    <line x1="310" y1="358" x2="310" y2="400" marker-end="url(#a)"/>
+  </g>
+  <g font-size="8.5" fill="#5d636e">
+    <text x="150" y="131" text-anchor="middle">shows an attempt</text>
+    <text x="318" y="131">solvable problem</text>
+    <text x="470" y="131" text-anchor="middle">concept / analysis</text>
+    <text x="318" y="219">grounded</text>
+    <text x="414" y="172" text-anchor="middle">ungrounded</text>
+  </g>
+  <g stroke="#9aa0ab" stroke-width="1" fill="#ffffff">
+    <rect x="235" y="12" width="150" height="32" rx="3"/>
+    <rect x="235" y="80" width="150" height="32" rx="3" fill="#f5f6f8"/>
+    <rect x="15"  y="160" width="160" height="34" rx="3"/>
+    <rect x="230" y="160" width="160" height="34" rx="3"/>
+    <rect x="445" y="160" width="160" height="34" rx="3"/>
+    <rect x="230" y="242" width="160" height="34" rx="3" fill="#f5f6f8"/>
+    <rect x="445" y="242" width="160" height="34" rx="3"/>
+    <rect x="230" y="324" width="160" height="34" rx="3"/>
+    <rect x="245" y="400" width="130" height="32" rx="3" fill="#f5f6f8"/>
+  </g>
+  <g font-size="10" fill="#16181d" text-anchor="middle">
+    <text x="310" y="33">Student question</text>
+    <text x="310" y="101">Auto router</text>
+    <text x="95"  y="182">Tutor mode</text>
+    <text x="310" y="182">Parameter extraction</text>
+    <text x="525" y="182">Fine-tuned model</text>
+    <text x="310" y="264">Verified simulator</text>
+    <text x="525" y="264">Fact checker</text>
+    <text x="310" y="346">Rendered solution</text>
+    <text x="310" y="421">Answer</text>
+  </g>
+</svg>
+<figcaption>Figure 2 — Request flow. Shaded nodes are deterministic; the model is never asked to compute.</figcaption>
+</figure>
+
+<p>The router reads the question first. A shown attempt outranks every other signal and routes to tutoring — and the
+tutoring path has no access to the solver or the fact checker, so there is no route by which a computed answer can
+reach a student who is still working.</p>
+
+<h3 id="s6-2">6.2 Base model selection</h3>
+<p>The base model is <strong>Qwen3-4B-Instruct-2507</strong> <span class="cite">[15]</span>, Apache-2.0 licensed. It
+was selected for four reasons: its non-thinking variant writes reasoning as visible steps a student can read; its
+262,144-token native context comfortably covers 16,384-token training sequences; at 4B it fits QLoRA training on a
+16 GB T4; and it scores strongly for its size — MMLU-Pro 69.6, MMLU-Redux 84.2 and GPQA 62.0 on its model card, where
+it is benchmarked against the 30B-parameter Qwen3-30B-A3B.</p>
+<p>A study of the 10–20B range confirmed the choice for the current hardware. Figures below are estimates or vendor
+claims, not measurements on our machines:</p>
+<table>
+  <thead><tr><th style="width:26%">Alternative</th><th>Reason not selected</th></tr></thead>
+  <tbody>
+    <tr><td>Dense 14B (Qwen3-14B, Phi-4)</td><td>About 16–17 GB for QLoRA at 16,384 tokens — over a single T4 — and about 5 tokens/s served from 8 GB VRAM</td></tr>
+    <tr><td>gpt-oss-20b (MoE)</td><td>About 23 GB for training at 16,384 tokens; reasoning is hidden in a separate channel</td></tr>
+    <tr><td>Qwen3.5-9B</td><td>22 GB for 16-bit LoRA; its vendor advises against 4-bit QLoRA training</td></tr>
+  </tbody>
+</table>
+
+<h3 id="s6-3">6.3 Fine-tuning configuration</h3>
+<table>
+  <thead><tr><th style="width:26%">Setting</th><th style="width:30%">Value</th><th>Reason</th></tr></thead>
+  <tbody>
+    <tr><td>Method</td><td>QLoRA via Unsloth</td><td>4-bit base keeps a 16k-token sequence inside 16 GB</td></tr>
+    <tr><td>LoRA rank / alpha</td><td>32 / 64, all linear layers</td><td>Capacity for eight procedural families without full-weight drift</td></tr>
+    <tr><td>Dropout, learning rate</td><td>0.05, 1 × 10<sup>−4</sup>, cosine</td><td>Conservative update size for a small base</td></tr>
+    <tr><td>Epochs</td><td>1</td><td>A second epoch memorised more and generalised less in version 2.2</td></tr>
+    <tr><td>Sequence length</td><td>16,384 tokens, no packing</td><td>No row truncated; packing would break the rectifier order</td></tr>
+    <tr><td>Precision, optimiser</td><td>fp16, 8-bit AdamW</td><td>T4 (Turing) has no bf16 support</td></tr>
+    <tr><td>Regularisation</td><td>NEFTune α = 5 <span class="cite">[3]</span></td><td>Better instruction quality at no inference cost</td></tr>
+    <tr><td>Loss masking</td><td>Assistant tokens only</td><td>The model learns to answer, not to echo the prompt</td></tr>
+    <tr><td>Sampler</td><td>Sequential</td><td>Shuffling would destroy the engineered order</td></tr>
+    <tr><td>Hardware</td><td>Kaggle, 2 × T4, DDP</td><td>Free tier; no paid compute anywhere</td></tr>
+  </tbody>
+</table>
+<p>Training behaved as intended. Validation loss fell monotonically from 0.4413 to 0.2713 over the epoch, and the final
+training loss (0.2710) sits almost exactly on the validation loss (0.2754) — the signature of a model that fitted the
+task without memorising its training traces.</p>
+
+<h3 id="s6-4">6.4 Verified-solver layer</h3>
+<p>The solver turns a 63% model into a 100% system in three stages:</p>
+<ol>
+  <li><strong>Extract.</strong> The question is parsed into typed JSON parameters. Extraction deliberately runs on
+      the <em>untuned</em> base model, which read parameters correctly 84% of the time against 79% for the fine-tuned
+      adapter — the adapter is biased toward solving rather than reading.</li>
+  <li><strong>Ground.</strong> Every extracted number must appear in the question. An invented parameter causes the
+      question to fall back to the model; a missing input produces a clarifying question instead of a guess.</li>
+  <li><strong>Solve and render.</strong> A deterministic simulator computes the result, and the answer is written in
+      the same worked-steps format the model was trained on, so the student sees no seam.</li>
+</ol>
+<p>A separate <strong>fact checker</strong> holds ten canonical corrections for misconceptions observed in real model
+answers — for instance, that LRU never suffers from Belady's anomaly — and rewrites a draft that asserts one.</p>
+
+<h3 id="s6-5">6.5 Serving architecture</h3>
+<table>
+  <thead><tr><th style="width:16%">Layer</th><th>Component</th></tr></thead>
+  <tbody>
+    <tr><td>Weights</td><td>llama.cpp (CUDA), Q8_0 GGUF base with the LoRA adapter applied at runtime</td></tr>
+    <tr><td>Logic</td><td>FastAPI gateway — routing, solver delegation, fact checking, repetition-loop guard</td></tr>
+    <tr><td>Interface</td><td>Open WebUI, running locally with no external calls</td></tr>
+  </tbody>
+</table>
+<p>Six modes are offered to the student:</p>
+<table>
+  <thead><tr><th style="width:22%">Mode</th><th>Behaviour</th></tr></thead>
+  <tbody>
+    <tr><td><code>ostutor</code> (default)</td><td>Auto mode — reads the question and routes it to the right mode below</td></tr>
+    <tr><td><code>solve</code></td><td>Full worked solution, computed by the simulators</td></tr>
+    <tr><td><code>analyze</code></td><td>Open comparison and reasoning, e.g. “why is Round Robin better for interactive work?”</td></tr>
+    <tr><td><code>explain</code></td><td>Concept explanation, fact-checked</td></tr>
+    <tr><td><code>tutor</code></td><td>Socratic guidance on the student's own attempt, never revealing the answer</td></tr>
+    <tr><td><code>shell</code></td><td>Natural language to bash commands</td></tr>
+  </tbody>
+</table>
+<p>On the development laptop (RTX 4060, 8 GB) the model generates at a measured <strong>26.9 tokens per second</strong>,
+faster than a student reads.</p>
+
+<!-- ======================= 7. CONCLUSION ======================= -->
+<h2 id="s7" class="pb"><span class="n">7.</span>Conclusion</h2>
+
+<p>The project has reached a working, deployed system. Its central claim — that a small fine-tuned model can tutor
+operating systems exactly if it delegates computation — is now supported by measurement. One weakness is open, and
+it is reported here in full.</p>
+
+<h3 id="s7-1">7.1 Current status: measured results</h3>
+<p><strong>Procedural accuracy</strong>, on 57 hand-written problems graded by simulator-exact comparison:</p>
+<table>
+  <thead><tr><th>Question type</th><th class="num">Model alone</th><th class="num">With verified solver</th></tr></thead>
+  <tbody>
+    <tr><td>CPU scheduling</td><td class="num">5 / 12</td><td class="num"><strong>12 / 12</strong></td></tr>
+    <tr><td>Page replacement</td><td class="num">5 / 8</td><td class="num"><strong>8 / 8</strong></td></tr>
+    <tr><td>Disk scheduling</td><td class="num">4 / 7</td><td class="num"><strong>7 / 7</strong></td></tr>
+    <tr><td>Banker's safety</td><td class="num">3 / 4</td><td class="num"><strong>4 / 4</strong></td></tr>
+    <tr><td>Free-space management</td><td class="num">0 / 4</td><td class="num"><strong>4 / 4</strong></td></tr>
+    <tr><td>Address translation</td><td class="num">1 / 3</td><td class="num"><strong>3 / 3</strong></td></tr>
+    <tr><td>Clarification required</td><td class="num">3 / 3</td><td class="num"><strong>3 / 3</strong></td></tr>
+    <tr><td>Remaining types (12 kinds)</td><td class="num">15 / 16</td><td class="num"><strong>16 / 16</strong></td></tr>
+    <tr class="total"><td>Total</td><td class="num">36 / 57 (63.2%)</td><td class="num">57 / 57 (100%)</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Catastrophic forgetting</strong>, on 770 identical items scored before and after fine-tuning. Flips are
+reported because an unchanged average can hide many cancelling changes:</p>
+<table>
+  <thead><tr><th>Benchmark</th><th class="num">Base</th><th class="num">Fine-tuned</th><th class="num">Change</th><th class="num">Right → wrong</th><th class="num">Wrong → right</th></tr></thead>
+  <tbody>
+    <tr><td>General MMLU (400)</td><td class="num">80.25%</td><td class="num">79.50%</td><td class="num">−0.75 pp</td><td class="num">13</td><td class="num">10</td></tr>
+    <tr><td>Adjacent CS (300)</td><td class="num">64.67%</td><td class="num">67.33%</td><td class="num">+2.66 pp</td><td class="num">11</td><td class="num">19</td></tr>
+    <tr><td>OS theory (70)</td><td class="num">90.00%</td><td class="num">85.71%</td><td class="num">−4.29 pp</td><td class="num">4</td><td class="num">1</td></tr>
+  </tbody>
+</table>
+
+<p><strong>System verification:</strong> routing 28 / 28 on labelled cases; data-pipeline tests 89 checks passed;
+serving-gateway tests 25 checks passed; dataset release gates 19 / 19.</p>
+
+<h3 id="s7-2">7.2 Findings</h3>
+<ol>
+  <li><strong>The accuracy ceiling was execution, not knowledge.</strong> Delegating computation lifted the suite
+      from 63.2% to 100% with no retraining, and cut a full evaluation from 76 minutes to about 150 seconds.</li>
+  <li><strong>The anti-forgetting design worked on general ability.</strong> General knowledge moved 0.75 points,
+      within scoring noise, and adjacent computer science <em>improved</em>, with 19 items gained against 11 lost.</li>
+  <li><strong>Socratic behaviour is enforceable by architecture.</strong> Routing, not prompting, guarantees that a
+      student's attempt is never met with a computed answer.</li>
+  <li><strong>Procedural skill rose while declarative OS recall dipped.</strong> This was not anticipated: the loss
+      that was feared in general knowledge appeared instead, slightly, in OS theory.</li>
+</ol>
+
+<h3 id="s7-3">7.3 Limitations</h3>
+<ul>
+  <li>The OS theory result rests on 70 questions, where four items decide the difference, and the base model was
+      already near ceiling at 90%. It needs a larger set before it can be called settled.</li>
+  <li>Comparisons of the base model and the previous adapter on the procedural suite are outstanding. An earlier
+      measurement was invalidated by a harness fault and withdrawn rather than reported.</li>
+  <li>The conceptual half of tutoring has no external verifier and no rubric-based measurement yet.</li>
+  <li>The fact checker holds a finite list of corrections and cannot catch an error nobody has written a rule for.</li>
+</ul>
+
+<h3 id="s7-4">7.4 Next steps</h3>
+<table>
+  <thead><tr><th style="width:44%">Next step</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>Zero-shot probe of 2026 base models on OS theory — Qwen3.5-4B and Gemma 4 12B, both Apache-2.0</td><td>Decide whether a newer base improves declarative knowledge before any retraining (about 3 GPU-hours)</td></tr>
+    <tr><td>Expand the OS theory set from 70 to 200 questions</td><td>A stable estimate that does not turn on four items</td></tr>
+    <tr><td>Targeted declarative replay for the regressed topics</td><td>Recover OS theory accuracy to at least the base model's</td></tr>
+    <tr><td>Extend delegation to the 11 formula kinds</td><td>Remove the remaining model-answered procedural items</td></tr>
+    <tr><td>Rubric-scored evaluation of conceptual tutoring</td><td>Measure the one area with no number today</td></tr>
+  </tbody>
+</table>
+
+<div class="callout">
+<p><strong>In summary,</strong> the project set out to test whether a model small enough for a student laptop could
+tutor operating systems exactly. It can, provided the model is never trusted with arithmetic it cannot perform. The
+system is built, deployed and measured; the remaining work is to raise declarative OS knowledge to match the
+procedural accuracy already achieved.</p>
+</div>
+
+<!-- ======================= REFERENCES ======================= -->
+<h2 id="refs" class="pb">References</h2>
+<ol class="refs">
+  <li>E. J. Hu, Y. Shen, P. Wallis, Z. Allen-Zhu, Y. Li, S. Wang, L. Wang, W. Chen. “LoRA: Low-Rank Adaptation of Large Language Models.” <em>ICLR</em>, 2022. arXiv:2106.09685.</li>
+  <li>T. Dettmers, A. Pagnoni, A. Holtzman, L. Zettlemoyer. “QLoRA: Efficient Finetuning of Quantized LLMs.” <em>NeurIPS</em>, 2023. arXiv:2305.14314.</li>
+  <li>N. Jain et al. “NEFTune: Noisy Embeddings Improve Instruction Finetuning.” <em>ICLR</em>, 2024. arXiv:2310.05914.</li>
+  <li>C. Zhou et al. “LIMA: Less Is More for Alignment.” <em>NeurIPS</em>, 2023. arXiv:2305.11206.</li>
+  <li>M. McCloskey, N. J. Cohen. “Catastrophic Interference in Connectionist Networks: The Sequential Learning Problem.” <em>Psychology of Learning and Motivation</em>, vol. 24, 1989.</li>
+  <li>J. Kirkpatrick et al. “Overcoming Catastrophic Forgetting in Neural Networks.” <em>Proceedings of the National Academy of Sciences</em>, 114(13), 2017.</li>
+  <li>D. Biderman et al. “LoRA Learns Less and Forgets Less.” <em>Transactions on Machine Learning Research</em>, 2024. arXiv:2405.09673.</li>
+  <li>Z. Yang et al. “Self-Distillation Bridges Distribution Gap in Language Model Fine-Tuning.” <em>ACL</em>, 2024. arXiv:2402.13669.</li>
+  <li>H. Hazard, Z. Fountas et al. “SuRe: Surprise-Driven Prioritised Replay for Continual LLM Learning.” arXiv:2511.22367, 2025.</li>
+  <li>“FOREVER: Forgetting Curve-Inspired Memory Replay for Language Model Continual Learning.” arXiv:2601.03938, 2026.</li>
+  <li>M. Samiei, M. Mansouri, M. Soleymani Baghshah. “The Illusion of Procedural Reasoning: Measuring Long-Horizon FSM Execution in LLMs.” arXiv:2511.14777, 2025.</li>
+  <li>D. Guo, J. Wu, S. M. Yiu. “The Deterministic Horizon: When Extended Reasoning Fails and Tool Delegation Becomes Necessary.” arXiv:2606.00376, 2026.</li>
+  <li>S. Kambhampati et al. “Position: LLMs Can't Plan, But Can Help Planning in LLM-Modulo Frameworks.” <em>ICML</em>, 2024. arXiv:2402.01817.</li>
+  <li>J. Macina et al. “MathDial: A Dialogue Tutoring Dataset with Rich Pedagogical Properties Grounded in Math Reasoning Problems.” <em>Findings of EMNLP</em>, 2023. arXiv:2305.14536.</li>
+  <li>Qwen Team. “Qwen3 Technical Report.” arXiv:2505.09388, 2025.</li>
+  <li>N. Lambert et al. “Tülu 3: Pushing Frontiers in Open Language Model Post-Training.” arXiv:2411.15124, 2024.</li>
+</ol>
+
+</body>
+</html>

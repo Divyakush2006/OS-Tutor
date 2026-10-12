@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OS Tutor — Design Document</title>
+<style>
+  @page { size: A4; margin: 19mm 17mm 17mm 17mm; }
+
+  :root { --ink:#16181d; --mute:#5d636e; --rule:#d7dae0; --soft:#f6f7f9; }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  body {
+    margin: 0;
+    font-family: "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-size: 10.2pt;
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  /* ---- title block ---- */
+  header { border-bottom: 2px solid var(--ink); padding-bottom: 10px; margin-bottom: 20px; }
+  h1 { font-size: 20pt; font-weight: 650; letter-spacing: -.015em; margin: 0 0 6px; }
+  .meta { font-size: 8.6pt; color: var(--mute); letter-spacing: .02em; }
+  .authors { display: flex; gap: 34px; margin-top: 11px; font-size: 9.4pt; }
+  .authors .n { font-weight: 640; }
+  .authors .r { color: var(--mute); font-family: Consolas, "SF Mono", monospace; font-size: 8.7pt; }
+  .lead { margin: 16px 0 22px; font-size: 10.8pt; line-height: 1.6; }
+
+  /* ---- headings ---- */
+  h2 {
+    font-size: 12.4pt; font-weight: 650; margin: 22px 0 9px;
+    padding-bottom: 5px; border-bottom: 1px solid var(--rule);
+    break-after: avoid; page-break-after: avoid;
+  }
+  h3 {
+    font-size: 10.4pt; font-weight: 650; margin: 15px 0 6px; color: var(--ink);
+    break-after: avoid; page-break-after: avoid;
+  }
+  p { margin: 0 0 9px; }
+  ul, ol { margin: 0 0 10px; padding-left: 19px; }
+  li { margin-bottom: 4px; }
+  strong { font-weight: 640; }
+  code {
+    font-family: Consolas, "SF Mono", monospace; font-size: 8.8pt;
+    background: var(--soft); padding: 1px 4px; border-radius: 2px;
+  }
+
+  /* ---- tables ---- */
+  /* Tables may flow across a page break, but never split a row, and the header
+     repeats on the continuation so a stranded row is still readable. */
+  table {
+    width: 100%; border-collapse: collapse; margin: 10px 0 14px; font-size: 9.3pt;
+  }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; page-break-inside: avoid; }
+  th {
+    text-align: left; font-weight: 640; padding: 6px 9px 6px 0;
+    border-bottom: 1.4px solid var(--ink); vertical-align: bottom;
+  }
+  td { padding: 6px 9px 6px 0; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tbody tr.total td { border-top: 1.4px solid var(--ink); border-bottom: none; font-weight: 640; }
+  td:not(:first-child), th:not(:first-child) { white-space: nowrap; }
+  table.wide td:not(:first-child), table.wide th:not(:first-child) { white-space: normal; }
+
+  /* ---- figure ---- */
+  figure { margin: 12px 0 16px; break-inside: avoid; page-break-inside: avoid; text-align: center; }
+  figure svg { width: 100%; max-width: 386px; height: auto; }
+  figcaption { font-size: 8.4pt; color: var(--mute); margin-top: 7px; }
+
+  .note { font-size: 9.3pt; color: var(--mute); }
+  .pagebreak { break-before: page; page-break-before: always; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>OS Tutor — Design Document</h1>
+  <div class="meta">Operating Systems Tutoring System · Fine-tuned Qwen3-4B-Instruct · 21 September 2026</div>
+  <div class="authors">
+    <span><span class="n">Divyakush Punjabi</span> <span class="r">24BCB0126</span></span>
+  </div>
+</header>
+
+<p class="lead">OS Tutor is a fine-tuned Qwen3-4B-Instruct model that teaches operating systems and solves OS
+numerical problems exactly. It scores <strong>100% (57/57)</strong> on a hand-written problem suite by delegating
+every calculation to verified simulators while the model does the explaining — up from 63.2% when the model
+answers alone.</p>
+
+<h2>1. Problem Statement</h2>
+
+<p>General-purpose language models know the rules of operating systems but cannot reliably execute them, which
+makes them unsafe as tutors for a subject taught through worked numerical problems.</p>
+
+<p>An OS course assesses students on procedures: CPU scheduling, page replacement, disk head movement, the
+Banker's algorithm, address translation, free-space management. Each is a rule applied over many sequential
+steps. A model that states Round Robin correctly and then produces the wrong Gantt chart teaches a student to
+trust a wrong answer.</p>
+
+<p>The failure is architectural, not a gap in knowledge. Three findings frame it:</p>
+
+<table class="wide">
+  <thead><tr><th style="width:42%">Finding</th><th>Evidence</th></tr></thead>
+  <tbody>
+    <tr><td>Rule knowledge and rule execution are separate abilities</td><td>Models that state a rule correctly fail to apply it; frontier-scale models score near 50% on execution</td></tr>
+    <tr><td>Sequential reasoning has a deterministic horizon</td><td>Accuracy collapses after roughly 19–31 dependent steps, and the horizon grows only with the square root of model width</td></tr>
+    <tr><td>Self-verification does not close the gap</td><td>A model checking its own arithmetic is unreliable; correctness requires an external verifier</td></tr>
+  </tbody>
+</table>
+
+<p>Our own measurements reproduced this exactly. On 57 hand-written OS problems, every one of the 7 scheduling
+failures contained <strong>perfect arithmetic paired with the wrong schedule</strong>. Scheduling also had the most
+training data of any category (1,733 rows) and the worst accuracy (42%), while disk scheduling had 990 rows and
+100%. More data on the weak category did not fix it, because the weakness was never a data problem.</p>
+
+<p>Scaling the model is not an available fix either. A larger model buys sequential depth proportional to the
+square root of its width, so a 14B model would extend the horizon by only about 1.4×, while training it is
+constrained by the free-tier hardware this project is built on.</p>
+
+<h2>2. Aim</h2>
+
+<p>Build an offline, locally-served operating-systems tutor that is numerically exact, pedagogically honest, and
+trainable entirely on free hardware. Four commitments define the system:</p>
+
+<ol>
+  <li><strong>Exactness on procedure.</strong> Every answer involving a computable quantity is produced by a
+      deterministic simulator, not by the model's arithmetic. Target: 100% on the procedural suite.</li>
+  <li><strong>Socratic integrity.</strong> A student who shows their own attempt is taught, not handed the answer.
+      This is enforced at the routing layer rather than requested in a prompt.</li>
+  <li><strong>Resistance to catastrophic forgetting.</strong> Fine-tuning on a narrow OS distribution must not
+      degrade the model's general ability, and the claim must be measured with paired item-level flips rather
+      than asserted from a mean.</li>
+  <li><strong>Free-tier reproducibility.</strong> All training runs on Kaggle's free GPU allocation; all inference
+      runs on a single 8 GB laptop GPU. No paid compute anywhere in the pipeline.</li>
+</ol>
+
+<p>The system is explicitly <strong>not</strong> a retrieval-augmented chatbot over a textbook. Retrieval returns
+text that resembles an answer; it cannot certify that a Gantt chart is correct. The aim is verified computation,
+which is a stronger guarantee than relevant retrieval.</p>
+
+<h2>3. Model Architecture</h2>
+
+<p>A fine-tuned 4B model handles language and pedagogy; deterministic simulators handle every number. The two are
+joined by an extraction step that converts a question into typed parameters.</p>
+
+<h3>3.1 Request flow</h3>
+
+<figure>
+<svg viewBox="0 0 620 452" xmlns="http://www.w3.org/2000/svg" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,1 L9,5 L0,9 z" fill="#5d636e"/>
+    </marker>
+  </defs>
+  <g fill="none" stroke="#5d636e" stroke-width="1.2">
+    <line x1="310" y1="44" x2="310" y2="74" marker-end="url(#a)"/>
+    <polyline points="310,112 310,136 95,136 95,154" marker-end="url(#a)"/>
+    <line x1="310" y1="112" x2="310" y2="154" marker-end="url(#a)"/>
+    <polyline points="310,136 525,136 525,154" marker-end="url(#a)"/>
+    <line x1="310" y1="194" x2="310" y2="236" marker-end="url(#a)"/>
+    <line x1="390" y1="177" x2="439" y2="177" marker-end="url(#a)"/>
+    <line x1="525" y1="194" x2="525" y2="236" marker-end="url(#a)"/>
+    <line x1="310" y1="276" x2="310" y2="318" marker-end="url(#a)"/>
+    <polyline points="95,194 95,386 310,386"/>
+    <polyline points="525,276 525,386 310,386"/>
+    <line x1="310" y1="358" x2="310" y2="400" marker-end="url(#a)"/>
+  </g>
+  <g font-size="8.5" fill="#5d636e">
+    <text x="150" y="131" text-anchor="middle">shows an attempt</text>
+    <text x="318" y="131">solvable problem</text>
+    <text x="470" y="131" text-anchor="middle">concept / analysis</text>
+    <text x="318" y="219">grounded</text>
+    <text x="414" y="172" text-anchor="middle">ungrounded</text>
+  </g>
+  <g stroke="#9aa0ab" stroke-width="1" fill="#ffffff">
+    <rect x="235" y="12" width="150" height="32" rx="3"/>
+    <rect x="235" y="80" width="150" height="32" rx="3" fill="#f6f7f9"/>
+    <rect x="15"  y="160" width="160" height="34" rx="3"/>
+    <rect x="230" y="160" width="160" height="34" rx="3"/>
+    <rect x="445" y="160" width="160" height="34" rx="3"/>
+    <rect x="230" y="242" width="160" height="34" rx="3" fill="#f6f7f9"/>
+    <rect x="445" y="242" width="160" height="34" rx="3"/>
+    <rect x="230" y="324" width="160" height="34" rx="3"/>
+    <rect x="245" y="400" width="130" height="32" rx="3" fill="#f6f7f9"/>
+  </g>
+  <g font-size="10" fill="#16181d" text-anchor="middle">
+    <text x="310" y="33">Student question</text>
+    <text x="310" y="101">Auto router</text>
+    <text x="95"  y="182">Tutor mode</text>
+    <text x="310" y="182">Parameter extraction</text>
+    <text x="525" y="182">Fine-tuned model</text>
+    <text x="310" y="264">Verified simulator</text>
+    <text x="525" y="264">Fact checker</text>
+    <text x="310" y="346">Rendered solution</text>
+    <text x="310" y="421">Answer</text>
+  </g>
+</svg>
+<figcaption>Figure 1 — Request flow. Shaded nodes are deterministic; the model is never asked to compute.</figcaption>
+</figure>
+
+<p>The router reads the question first. A shown attempt outranks every other signal and routes to tutoring,
+because handing a computed answer to a student who has already worked the problem defeats the purpose of the
+tutor.</p>
+
+<h3>3.2 Base model and adapter</h3>
+
+<table class="wide">
+  <thead><tr><th style="width:26%">Component</th><th style="width:32%">Choice</th><th>Reason</th></tr></thead>
+  <tbody>
+    <tr><td>Base</td><td>Qwen3-4B-Instruct-2507</td><td>Non-thinking variant; reasoning appears as visible steps a student can follow</td></tr>
+    <tr><td>Method</td><td>QLoRA via Unsloth</td><td>4-bit base keeps a 16k-token sequence inside 16 GB</td></tr>
+    <tr><td>LoRA rank / alpha</td><td>32 / 64</td><td>Capacity for seven procedural families without full-weight drift</td></tr>
+    <tr><td>Dropout, LR, schedule</td><td>0.05, 1e-4, cosine, 1 epoch</td><td>One epoch limits memorisation of the training traces</td></tr>
+    <tr><td>Regularisation</td><td>NEFTune α = 5</td><td>Embedding noise; improves instruction quality at no inference cost</td></tr>
+    <tr><td>Optimiser / precision</td><td>adamw_8bit, fp16</td><td>T4 is Turing, so bf16 is unavailable</td></tr>
+    <tr><td>Sequence length</td><td>16,384 tokens</td><td>Long worked solutions must fit whole, uncut</td></tr>
+    <tr><td>Loss masking</td><td>train_on_responses_only</td><td>Gradient flows through answers, not prompts</td></tr>
+    <tr><td>Sampler</td><td>Sequential</td><td>Preserves the rectifier ordering built into the dataset</td></tr>
+  </tbody>
+</table>
+
+<h3>3.3 Verified-solver layer</h3>
+
+<p>The solver is the component that turns a 63% model into a 100% system. It runs in three stages:</p>
+
+<ol>
+  <li><strong>Extract.</strong> The question is parsed into a typed JSON parameter set across seven solver kinds,
+      plus categories for formula, concept, analysis, shell, incomplete and off-topic. Extraction runs on the
+      <em>untuned</em> base model, measured at 84% against the adapter's 79% — the adapter is biased toward
+      solving rather than reading.</li>
+  <li><strong>Ground.</strong> Every extracted number must appear in the question. Invented parameters are
+      rejected and the item falls back to the model. A question missing a required input (frames, quantum)
+      returns a clarifying question instead of a guess.</li>
+  <li><strong>Solve and render.</strong> A deterministic simulator computes the result, and the answer is written
+      back in the same worked-steps format the model was trained to produce, so the student sees no seam.</li>
+</ol>
+
+<h3>3.4 Serving stack</h3>
+
+<table class="wide">
+  <thead><tr><th style="width:18%">Layer</th><th>Component</th><th style="width:12%">Port</th></tr></thead>
+  <tbody>
+    <tr><td>Weights</td><td>llama.cpp, Q8_0 GGUF base + f16 LoRA applied at runtime</td><td>8081</td></tr>
+    <tr><td>Logic</td><td>FastAPI gateway: routing, solver delegation, fact checker, loop guard</td><td>8090</td></tr>
+    <tr><td>Interface</td><td>Open WebUI</td><td>3000</td></tr>
+  </tbody>
+</table>
+
+<p>Six modes are exposed: <code>ostutor</code> (auto-routing, default), <code>solve</code>, <code>analyze</code>,
+<code>explain</code>, <code>tutor</code> and <code>shell</code>. The untuned base is deliberately not selectable;
+it is still invoked internally at LoRA scale 0 for parameter extraction.</p>
+
+<h2>4. Software Requirements</h2>
+
+<p>Three separate stacks: one for training on Kaggle, one for serving locally, one for evaluation. Nothing in the
+pipeline requires a paid API or an internet connection at inference time.</p>
+
+<table class="wide">
+  <thead><tr><th style="width:24%">Stack</th><th>Components</th></tr></thead>
+  <tbody>
+    <tr><td>Training (Kaggle)</td><td>Python 3.11, PyTorch + CUDA 12.x, Unsloth, PEFT, TRL, bitsandbytes, <code>torchrun</code> for 2-GPU DDP</td></tr>
+    <tr><td>Serving (local)</td><td>llama.cpp build b11050 (CUDA), FastAPI + uvicorn + httpx gateway, Open WebUI 0.11.3</td></tr>
+    <tr><td>Evaluation</td><td>transformers + PEFT for logit scoring, custom simulator-exact grader, MMLU subject sets</td></tr>
+    <tr><td>Data pipeline</td><td>Pure Python: cleaning, deduplication, decontamination, quality scoring, gate checks</td></tr>
+    <tr><td>Platform</td><td>Windows 11, CUDA 12.x driver; the pipeline itself is OS-independent</td></tr>
+  </tbody>
+</table>
+
+<p>The base model is Qwen3-4B-Instruct-2507 under Apache 2.0. Every dataset admitted to training carries a licence
+permitting commercial use; sources with unclear or non-commercial terms are used only as held-out test oracles and
+are never redistributed.</p>
+
+<h2>5. Hardware Requirements</h2>
+
+<p>Training and inference run on entirely separate machines, both free or already owned.</p>
+
+<h3>5.1 Training — Kaggle free tier</h3>
+
+<table class="wide">
+  <thead><tr><th style="width:30%">Item</th><th>Specification</th></tr></thead>
+  <tbody>
+    <tr><td>GPU</td><td>2 × NVIDIA Tesla T4, 16 GB each</td></tr>
+    <tr><td>Parallelism</td><td>DDP via <code>torchrun --nproc_per_node=2</code></td></tr>
+    <tr><td>Precision constraint</td><td>Turing architecture — fp16 only, no bf16</td></tr>
+    <tr><td>Session limit</td><td>12 hours per run, 30 GPU-hours per week</td></tr>
+  </tbody>
+</table>
+
+<p>Because DDP replicates the full model on each card, the second GPU adds throughput but no memory headroom. The
+16,384-token sequence length is what sets the real memory ceiling, and it is why a 4B base was selected over a
+larger one.</p>
+
+<h3>5.2 Inference and evaluation — local workstation</h3>
+
+<table class="wide">
+  <thead><tr><th style="width:20%">Item</th><th style="width:40%">Specification</th><th>Measured usage</th></tr></thead>
+  <tbody>
+    <tr><td>GPU</td><td>RTX 4060 Laptop, 8,188 MiB VRAM</td><td>7.5 GB serving at Q8_0 with 20,480-token context</td></tr>
+    <tr><td>System RAM</td><td>15.6 GB DDR5-5200, single DIMM</td><td>Gateway + WebUI + model server</td></tr>
+    <tr><td>PCIe</td><td>Gen 4 ×8, ~13 GB/s effective</td><td>Not a bottleneck at this model size</td></tr>
+    <tr><td>Storage</td><td>512 GB NVMe SSD</td><td>~4.3 GB base GGUF + 132 MB adapter</td></tr>
+  </tbody>
+</table>
+
+<h3>5.3 Minimum to reproduce</h3>
+
+<p>Inference needs a 6 GB GPU at Q4_K_M quantisation, or CPU-only with 8 GB of RAM at reduced speed. Training needs
+any 16 GB accelerator; the Kaggle configuration is the free option, not a requirement.</p>
+
+<h2>6. What Makes This Pipeline Unique</h2>
+
+<p>Four design decisions separate this system from a fine-tuned chatbot or a textbook RAG assistant. Each was
+adopted to fix a specific measured failure.</p>
+
+<h3>6.1 Verified computation instead of retrieval</h3>
+
+<p>A RAG tutor retrieves passages that resemble an answer. It cannot certify that a Gantt chart is right, because
+the correct chart for a student's specific numbers exists in no document. This system replaces retrieval with
+<strong>execution</strong>: deterministic simulators compute ground truth for the exact parameters asked about.</p>
+
+<p>This is the single highest-impact decision in the project. It lifted the procedural suite from 63.2% to
+<strong>100% (57/57)</strong> with <strong>no retraining</strong>, and cut a full evaluation pass from 76 minutes
+to about 150 seconds.</p>
+
+<p>The delegation is also <em>safe by construction</em>. Extraction is grounded — every parameter must appear in
+the question — so the solver cannot answer a question it misread. Ungrounded extractions fall back to the model
+rather than producing a confident fabrication.</p>
+
+<h3>6.2 Layered anti-forgetting design</h3>
+
+<p>Rather than one technique, the dataset and training configuration combine several, each addressing a different
+mechanism:</p>
+
+<table class="wide">
+  <thead><tr><th style="width:38%">Technique</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>16% replay data on a spaced schedule</td><td>Keeps general-domain gradients present throughout training</td></tr>
+    <tr><td>Surprise-ranked replay</td><td>Prioritises items the model is most at risk of losing</td></tr>
+    <tr><td>Rectifier interleaving</td><td>Orders categories so later skills reinforce earlier ones instead of overwriting them</td></tr>
+    <tr><td>Self-distillation (SDFT)</td><td>Trains on the model's own re-expressed outputs, reducing distribution shift</td></tr>
+    <tr><td>LoRA with a single epoch</td><td>Low-rank updates constrain drift; one epoch limits memorisation</td></tr>
+  </tbody>
+</table>
+
+<p>Section 7.3 reports the measured result, including item-level flips.</p>
+
+<h3>6.3 Socratic integrity enforced structurally</h3>
+
+<p>Most tutoring systems ask the model in a prompt not to give away answers, which fails under pressure. Here it is
+a property of the architecture:</p>
+
+<ul>
+  <li>A shown attempt is detected lexically, and that signal <strong>outranks the intent classifier</strong>.</li>
+  <li>Tutoring mode is denied access to the solver <em>and</em> to the fact checker, so there is no path by which
+      a computed answer can reach a student who is still working.</li>
+  <li>Routing is tested as a component in its own right: <strong>28/28</strong> on labelled cases, with zero
+      misroutes on shown-attempt items.</li>
+</ul>
+
+<h3>6.4 Auditable, reproducible dataset construction</h3>
+
+<p>The training set is 11,760 rows built by a gated pipeline: per-category cleaning, quality scoring, deduplication,
+and decontamination against every evaluation set. Nineteen automated gates must pass before a build is accepted,
+and the build is content-addressed to a reproducible fingerprint (<code>f56a7113e4aa5c0e</code>). A failed gate
+blocks the build rather than emitting a warning.</p>
+
+<h2>7. Outcome (Expected)</h2>
+
+<p>At completion the system is expected to hold 100% on procedural problems, raise OS theory accuracy to 90% or
+above, and retain general ability within 1 percentage point of the base model. The table below states the expected
+outcome for every category alongside the value measured so far, so that projection and result are never confused.</p>
+
+<h3>7.1 Expected outcome at completion</h3>
+
+<table class="wide">
+  <thead><tr><th style="width:23%">Category</th><th style="width:17%">Measured to date</th><th style="width:20%">Expected at completion</th><th>Basis for the expectation</th></tr></thead>
+  <tbody>
+    <tr><td>Procedural accuracy (OS numericals)</td><td>100% (57/57)</td><td><strong>100%</strong> on an expanded 150-item suite</td><td>Simulators are deterministic, so accuracy does not decay with suite size; extending delegation to the 11 formula kinds removes the remaining model-answered items</td></tr>
+    <tr><td>Model-only accuracy (no solver)</td><td>63.2%</td><td><strong>70–75%</strong></td><td>Restoring 6 gold explanations dropped during cleaning, plus additional worked-solution rows for scheduling, the weakest family</td></tr>
+    <tr><td>OS theory MCQ</td><td>85.71% (n = 70)</td><td><strong>≥ 90%</strong> on a 200-item set</td><td>Targeted declarative replay for the regressed items; a 200-item set replaces an estimate currently resting on 70 questions</td></tr>
+    <tr><td>General ability retained</td><td>79.50% (−0.75 pp)</td><td><strong>Within 1 pp</strong> of base</td><td>Already achieved; 16% spaced replay holds it without further work</td></tr>
+    <tr><td>Adjacent CS transfer</td><td>67.33% (+2.66 pp)</td><td><strong>≥ 67%</strong></td><td>Already achieved; no further action required</td></tr>
+    <tr><td>Routing accuracy</td><td>100% (28/28)</td><td><strong>≥ 95%</strong> on 100 labelled cases</td><td>A larger labelled set will contain harder cases than the current 28</td></tr>
+    <tr><td>Conceptual tutoring quality</td><td>Not yet measured</td><td><strong>≥ 80%</strong> rubric-scored</td><td>Requires an evaluation set that does not yet exist; this is the largest open item</td></tr>
+    <tr><td>Training cost</td><td>2 × T4, free tier</td><td><strong>Unchanged</strong></td><td>No step in the remaining plan requires paid compute</td></tr>
+  </tbody>
+</table>
+
+<p class="note">Values in the “Measured to date” column are results obtained on 21 September 2026 and are reported
+in full in sections 7.2–7.5. Values in the “Expected at completion” column are targets, not results.</p>
+
+<h3>7.2 Procedural suite, by question type</h3>
+
+<p>Measured on 57 hand-written problems, graded by simulator-exact comparison.</p>
+
+<table>
+  <thead><tr><th style="width:46%">Question type</th><th>Model alone</th><th>With verified solver</th></tr></thead>
+  <tbody>
+    <tr><td>Scheduling</td><td>5/12</td><td><strong>12/12</strong></td></tr>
+    <tr><td>Paging</td><td>5/8</td><td><strong>8/8</strong></td></tr>
+    <tr><td>Disk scheduling</td><td>4/7</td><td><strong>7/7</strong></td></tr>
+    <tr><td>Banker's safety</td><td>3/4</td><td><strong>4/4</strong></td></tr>
+    <tr><td>Free-space management</td><td>0/4</td><td><strong>4/4</strong></td></tr>
+    <tr><td>Address translation</td><td>1/3</td><td><strong>3/3</strong></td></tr>
+    <tr><td>Clarification required</td><td>3/3</td><td><strong>3/3</strong></td></tr>
+    <tr class="total"><td>Total</td><td>36/57 (63.2%)</td><td>57/57 (100%)</td></tr>
+  </tbody>
+</table>
+
+<h3>7.3 Catastrophic forgetting</h3>
+
+<p>Paired item-level comparison, 770 identical items scored before and after fine-tuning. Flips are reported
+because an unchanged mean can hide large cancelling changes.</p>
+
+<table>
+  <thead><tr><th style="width:32%">Benchmark</th><th>Base</th><th>Fine-tuned</th><th>Change</th><th>Right→wrong</th><th>Wrong→right</th></tr></thead>
+  <tbody>
+    <tr><td>General MMLU (400 items)</td><td>80.25%</td><td>79.50%</td><td>−0.75 pp</td><td>13</td><td>10</td></tr>
+    <tr><td>Adjacent CS (300 items)</td><td>64.67%</td><td><strong>67.33%</strong></td><td><strong>+2.66 pp</strong></td><td>11</td><td>19</td></tr>
+    <tr><td>OS theory (70 items)</td><td>90.00%</td><td>85.71%</td><td>−4.29 pp</td><td>4</td><td>1</td></tr>
+  </tbody>
+</table>
+
+<p><strong>No catastrophic forgetting occurred.</strong> General ability is intact: 13 items lost against 10 gained
+across 400 is within scoring noise. Adjacent computer science <em>improved</em>, and the flip counts confirm genuine
+transfer rather than a favourable average.</p>
+
+<p>One result runs against expectation: <strong>OS declarative theory measured 4.29 points below the base model</strong>,
+losing four items and gaining one. Procedural skill rose sharply while factual recall in the same domain dipped —
+the opposite of the general-knowledge loss that was anticipated. The difference is four questions out of seventy,
+and the base model was already near ceiling at 90%, so the current figure is a signal to investigate rather than a
+settled result.</p>
+
+<p><strong>Expected outcome:</strong> ≥ 90% on a 200-item theory set. Two changes support this. A set of 200
+questions replaces an estimate that presently turns on four items, and targeted declarative replay reinforces the
+factual material that heavy procedural training displaced. Until that larger evaluation exists, the 85.71% figure
+stands as measured.</p>
+
+<h3>7.4 Training behaviour</h3>
+
+<p>Validation loss fell monotonically from 0.4413 to 0.2713 across one epoch, with final training loss 0.2710
+against validation 0.2754. The near-identical values indicate the model fitted the task without memorising the
+training traces.</p>
+
+<h3>7.5 System verification</h3>
+
+<table>
+  <thead><tr><th style="width:52%">Suite</th><th>Result</th></tr></thead>
+  <tbody>
+    <tr><td>Data pipeline tests</td><td>89 checks, all passed</td></tr>
+    <tr><td>Serving gateway tests</td><td>25 checks, all passed</td></tr>
+    <tr><td>Router classification</td><td>28/28</td></tr>
+    <tr><td>Dataset build gates</td><td>19/19</td></tr>
+  </tbody>
+</table>
+
+<h3>7.6 Work remaining to reach the expected outcome</h3>
+
+<table class="wide">
+  <thead><tr><th style="width:38%">Task</th><th style="width:26%">Target it serves</th><th>Effort</th></tr></thead>
+  <tbody>
+    <tr><td>Expand the OS theory MCQ set from 70 to 200 items</td><td>OS theory ≥ 90%</td><td>Authoring, then one evaluation pass</td></tr>
+    <tr><td>Add targeted declarative replay for the regressed topics</td><td>OS theory ≥ 90%</td><td>One dataset rebuild and retrain</td></tr>
+    <tr><td>Extend solver delegation to the 11 formula kinds</td><td>Procedural 100% at larger scale</td><td>Simulator work only, no retraining</td></tr>
+    <tr><td>Build a rubric-scored conceptual tutoring evaluation</td><td>Tutoring quality ≥ 80%</td><td>Largest open item; no set exists yet</td></tr>
+    <tr><td>Measure base and v2.2 on the procedural suite</td><td>Completes the comparison</td><td>~45 minutes of GPU time</td></tr>
+    <tr><td>Grow the routing test set from 28 to 100 labelled cases</td><td>Routing ≥ 95%</td><td>Labelling only</td></tr>
+  </tbody>
+</table>
+
+<h3>7.7 Known limitations</h3>
+
+<ul>
+  <li>The OS theory result in 7.3 rests on 70 items and is not yet explained; the expected recovery to 90% depends
+      on a larger set that has still to be written.</li>
+  <li>Base and previous-version comparisons on the procedural suite are outstanding. An earlier measurement was
+      invalidated by a harness fault and was withdrawn rather than reported.</li>
+  <li>Solver delegation covers seven procedural families. Formula-style questions are answered by the model
+      directly and carry its unaided accuracy.</li>
+  <li>The conceptual half of tutoring has no external verifier. It is the weakest area of the system and the one
+      with no measurement at all.</li>
+</ul>
+
+</body>
+</html>

@@ -1,0 +1,447 @@
+{
+  "model": "D:\\os project\\models\\Qwen3-4B-Instruct-2507",
+  "adapter": "outputs/ostutor-lora",
+  "limit": 20,
+  "four_bit": true,
+  "suites": {
+    "os_solve_indist": {
+      "n": 20,
+      "final_answer_accuracy": 0.65,
+      "step_accuracy": 0.2381,
+      "by_topic": {
+        "banker_request": {
+          "n": 1,
+          "accuracy": 1.0
+        },
+        "banker_safety": {
+          "n": 2,
+          "accuracy": 1.0
+        },
+        "freespace": {
+          "n": 2,
+          "accuracy": 0.5
+        },
+        "paging": {
+          "n": 7,
+          "accuracy": 0.4286
+        },
+        "scheduling": {
+          "n": 4,
+          "accuracy": 0.5
+        },
+        "translate": {
+          "n": 4,
+          "accuracy": 1.0
+        }
+      },
+      "seconds": 1095.5,
+      "max_new_tokens": 3072,
+      "truncation_rate": 0.0,
+      "accuracy_when_finished": 0.65,
+      "items": [
+        {
+          "suite": "os_solve_indist",
+          "index": 0,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 975,
+          "truncated": false,
+          "output": "**Algorithm: Round Robin (q=2)**\n\n**Step 1 - build the schedule**\n- t=1-3: T1 runs, 11 - 2 = 9 left; queue [T2, T1]\n- t=3-5: T2 runs, 12 - 2 = 10 left; queue [T1, T3, T4, T2]\n- t=5-7: T1 runs, 9 - 2 = 7 left; queue [T3, T4, T2, T1]\n- t=7-9: T3 runs, 2 - 2 = 0 left; done at 9; queue [T4, T2, T1]\n- t=9-11: T4 runs, 3 - 2 = 1 left; queue [T2, T1, T4]\n- t=11-13: T2 runs, 10 - 2 = 8 left; queue [T1, T4, T2]\n- t=13-15: T1 runs, 7 - 2 = 5 left; queue [T4, T2, T1]\n- t=15-17: T4 runs, 1 - 1 = 0 left; done at 17; queue [T2, T1]\n- t=17-19: T2 runs, 8 - 2 = 6 left; queue [T1, T2]\n- t=19-21: T1 runs, 5 - 2 = 3 left; queue [T2, T1]\n- t=21-23: T2 runs, 6 - 2 = 4 left; queue [T1, T2]\n- t=23-25: T1 runs, 3 - 2 = 1 left; queue [T2, T1]\n- t=25-27: T2 runs, 4 - 2 = 2 left; queue [T1, T2]\n- t=27-29: T1 runs, 1 - 1 = 0 left; done at 29; queue [T2]\n- t=29-31: T2 runs, 2 - 2 = 0 left; done at 31; queue []\n\n**Step 2 - Gantt chart:** T1[1-3] T2[3-5] T1[5-7] T3[7-9] T4[9-11] T2[11-13] T1[13-15] T4[15-17] T2[17-19] T1[19-21] T2[21-23] T1[23-25] T2[25-27] T1[27-29] T2[29-31]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| T1 | 1 | 11 | 29 | 29 - 1 = 28 | 28 - 11 = 17 |\n| T2 | 4 | 12 | 31 | 31 - 4 = 27 | 27 - 12 = 15 |\n| T3 | 10 | 2 | 9 | 9 - 10 = -1 | -1 - 2 = -3 |\n| T4 | 10 | 3 | 17 | 17 - 10 = 7 | 7 - 3 = 4 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 17 + 15 = 32, 32 + (-3) = 29, 29 + 4 = 33\n- Average waiting time = 33 / 4 = **8.25**\n- Sum of turnaround times: 28 + 27 = 55, 55 + (-1) = 54, 54 + 7 = 61\n- Average turnaround time = 61 / 4 = **15.25**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 1,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 623,
+          "truncated": false,
+          "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- J1: [3, 8, 5] - [0, 2, 3] = [3, 6, 2]\n- J2: [3, 2, 6] - [0, 2, 1] = [3, 0, 5]\n- J3: [7, 2, 4] - [7, 1, 3] = [0, 1, 1]\n- J4: [4, 2, 0] - [3, 0, 0] = [1, 2, 0]\n\n**Step 2 - run the safety algorithm**\n\n- Work = Available = [5, 5, 5]\n- J1: Need [3, 6, 2] vs Work [5, 5, 5]: 3<=5, 6>5, 2<=5 -> cannot run yet\n- J2: Need [3, 0, 5] vs Work [5, 5, 5]: 3<=5, 0<=5, 5<=5 -> all fit, run it. Work = [5, 5, 5] + Allocation [0, 2, 1] = [5, 7, 6]\n- J1: Need [3, 6, 2] vs Work [5, 7, 6]: 3<=5, 6<=7, 2<=6 -> all fit, run it. Work = [5, 7, 6] + Allocation [0, 2, 3] = [5, 9, 9]\n- J3: Need [0, 1, 1] vs Work [5, 9, 9]: 0<=5, 1<=9, 1<=9 -> all fit, run it. Work = [5, 9, 9] + Allocation [7, 1, 3] = [12, 10, 12]\n- J4: Need [1, 2, 0] vs Work [12, 10, 12]: 1<=12, 2<=10, 0<=12 -> all fit, run it. Work = [12, 10, 12] + Allocation [3, 0, 0] = [15, 10, 12]\n\n**Step 3 - conclusion**\n\nAll 4 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< J2, J1, J3, J4 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 2,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 155,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [5, 0, 0, 5] vs Need [5, 1, 2, 6]: 5<=5, 0<=1, 0<=2, 5<=6 -> OK\n- Test 2: Request [5, 0, 0, 5] vs Available [5, 5, 1, 2]: 5<=5, 0<=5, 0<=1, 5>2 -> FAILED\n- Resulting state: unsafe (no safe sequence exists)\n\n**Conclusion: the request is DENIED.** Holding the resource would bring the system to an unsafe state."
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 3,
+          "kind": "scheduling",
+          "final_correct": true,
+          "new_tokens": 508,
+          "truncated": false,
+          "output": "**Algorithm: FCFS**\n\n**Step 1 - build the schedule**\n- t=6: A runs (arrived t=6, burst 10) -> completes at 6 + 10 = 16\n- t=16: B runs (arrived t=12, burst 7) -> completes at 16 + 7 = 23\n- t=23: C runs (arrived t=14, burst 3) -> completes at 23 + 3 = 26\n- t=26: D runs (arrived t=20, burst 4) -> completes at 26 + 4 = 30\n\n**Step 2 - Gantt chart:** A[6-16] B[16-23] C[23-26] D[26-30]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| A | 6 | 10 | 16 | 16 - 6 = 10 | 10 - 10 = 0 |\n| B | 12 | 7 | 23 | 23 - 12 = 11 | 11 - 7 = 4 |\n| C | 14 | 3 | 26 | 26 - 14 = 12 | 12 - 3 = 9 |\n| D | 20 | 4 | 30 | 30 - 20 = 10 | 10 - 4 = 6 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 4 = 4, 4 + 9 = 13, 13 + 6 = 19\n- Average waiting time = 19 / 4 = **4.75**\n- Sum of turnaround times: 10 + 11 = 21, 21 + 12 = 33, 33 + 10 = 43\n- Average turnaround time = 43 / 4 = **10.75**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 4,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 895,
+          "truncated": false,
+          "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C, D)\n\n- alpha: [1, 0, 4, 3] - [1, 0, 3, 0] = [0, 0, 1, 3]\n- beta: [4, 4, 2, 7] - [2, 0, 1, 6] = [2, 4, 1, 1]\n- gamma: [5, 0, 7, 4] - [4, 0, 1, 2] = [1, 0, 6, 2]\n- delta: [3, 1, 5, 5] - [2, 0, 5, 3] = [1, 1, 0, 2]\n- epsilon: [5, 5, 1, 1] - [1, 0, 1, 1] = [4, 5, 0, 0]\n\n**Step 2 - run the safety algorithm**\n\n- Work = Available = [3, 6, 1, 5]\n- alpha: Need [0, 0, 1, 3] vs Work [3, 6, 1, 5]: 0<=3, 0<=6, 1<=1, 3<=5 -> all fit, run it. Work = [3, 6, 1, 5] + Allocation [1, 0, 3, 0] = [4, 6, 4, 5]\n- beta: Need [2, 4, 1, 1] vs Work [4, 6, 4, 5]: 2<=4, 4<=6, 1<=4, 1<=5 -> all fit, run it. Work = [4, 6, 4, 5] + Allocation [2, 0, 1, 6] = [6, 6, 5, 11]\n- gamma: Need [1, 0, 6, 2] vs Work [6, 6, 5, 11]: 1<=6, 0<=6, 6<=5 -> 6>5, cannot run yet\n- delta: Need [1, 1, 0, 2] vs Work [6, 6, 5, 11]: 1<=6, 1<=6, 0<=5, 2<=11 -> all fit, run it. Work = [6, 6, 5, 11] + Allocation [2, 0, 5, 3] = [8, 6, 10, 14]\n- gamma: Need [1, 0, 6, 2] vs Work [8, 6, 10, 14]: 1<=8, 0<=6, 6<=10, 2<=14 -> all fit, run it. Work = [8, 6, 10, 14] + Allocation [4, 0, 1, 2] = [12, 6, 11, 16]\n- epsilon: Need [4, 5, 0, 0] vs Work [12, 6, 11, 16]: 4<=12, 5<=6, 0<=11, 0<=16 -> all fit, run it. Work = [12, 6, 11, 16] + Allocation [1, 0, 1, 1] = [13, 6, 12, 17]\n\n**Step 3 - conclusion**\n\nAll 5 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< alpha, beta, delta, gamma, epsilon >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 5,
+          "kind": "scheduling",
+          "final_correct": true,
+          "new_tokens": 732,
+          "truncated": false,
+          "output": "**Algorithm: FCFS**\n\n**Step 1 - build the schedule**\n- t=0: T1 runs (arrived t=0, burst 11) -> completes at 0 + 11 = 11\n- t=11: T2 runs (arrived t=1, burst 2) -> completes at 11 + 2 = 13\n- t=13: T3 runs (arrived t=2, burst 1) -> completes at 13 + 1 = 14\n- t=14: T4 runs (arrived t=4, burst 7) -> completes at 14 + 7 = 21\n- t=21: T5 runs (arrived t=4, burst 9) -> completes at 21 + 9 = 30\n- t=30: T6 runs (arrived t=4, burst 12) -> completes at 30 + 12 = 42\n\n**Step 2 - Gantt chart:** T1[0-11] T2[11-13] T3[13-14] T4[14-21] T5[21-30] T6[30-42]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| T1 | 0 | 11 | 11 | 11 - 0 = 11 | 11 - 11 = 0 |\n| T2 | 1 | 2 | 13 | 13 - 1 = 12 | 12 - 2 = 10 |\n| T3 | 2 | 1 | 14 | 14 - 2 = 12 | 12 - 1 = 11 |\n| T4 | 4 | 7 | 21 | 21 - 4 = 17 | 17 - 7 = 10 |\n| T5 | 4 | 9 | 30 | 30 - 4 = 26 | 26 - 9 = 17 |\n| T6 | 4 | 12 | 42 | 42 - 4 = 38 | 38 - 12 = 26 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 10 = 10, 10 + 11 = 21, 21 + 10 = 31, 31 + 17 = 48, 48 + 26 = 74\n- Average waiting time = 74 / 6 = **12.33**\n- Sum of turnaround times: 11 + 12 = 23, 23 + 12 = 35, 35 + 17 = 52, 52 + 26 = 78, 78 + 38 = 116\n- Average turnaround time = 116 / 6 = **19.33**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 6,
+          "kind": "freespace",
+          "final_correct": true,
+          "new_tokens": 432,
+          "truncated": false,
+          "output": "**Policy: WORST-fit**\n\n- holes (free KB, by number): hole 0=235, hole 1=58, hole 2=457, hole 3=358, hole 4=425\n- request 342: fitting holes [hole 2=457, hole 4=425] -> largest fitting hole = hole 2; 457 - 342 = 115\n- request 118: fitting holes [hole 0=235, hole 2=115, hole 3=358, hole 4=425] -> largest fitting hole = hole 4; 425 - 118 = 307\n- request 252: fitting holes [hole 3=358, hole 4=307] -> largest fitting hole = hole 3; 358 - 252 = 106\n- request 433: free sizes [235, 58, 115, 106, 307], none >= 433 -> must WAIT\n- request 340: free sizes [235, 58, 115, 106, 307], none >= 340 -> must WAIT\n\n**Placement:** [2, 4, 3, None, None]\n**Remaining free space per hole:** [235, 58, 115, 106, 307]\n- Sum of free space: 235 + 58 = 293, 293 + 115 = 408, 408 + 106 = 514, 514 + 307 = 821\n**Total external fragmentation = 821 KB**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 7,
+          "kind": "paging",
+          "final_correct": true,
+          "new_tokens": 361,
+          "truncated": false,
+          "output": "**Policy: FIFO, 4 frames**\n\n| # | Ref | Result | Evicted | Frames (oldest first) | Faults |\n|---|-----|--------|---------|--------|--------|\n| 1 | 1 | miss | - | 1 | 1 |\n| 2 | 7 | miss | - | 1 7 | 2 |\n| 3 | 4 | miss | - | 1 7 4 | 3 |\n| 4 | 0 | miss | - | 1 7 4 0 | 4 |\n| 5 | 4 | hit | - | 1 7 4 0 | 4 |\n| 6 | 2 | miss | - | 1 7 4 0 2 | 5 |\n| 7 | 0 | hit | - | 1 7 4 0 2 | 5 |\n| 8 | 0 | hit | - | 1 7 4 0 2 | 5 |\n| 9 | 2 | hit | - | 1 7 4 0 2 | 5 |\n| 10 | 7 | hit | - | 1 7 4 0 2 | 5 |\n| 11 | 5 | miss | 1 | 7 4 0 2 5 | 6 |\n| 12 | 2 | hit | - | 7 4 0 2 5 | 6 |\n\n**Total page faults = 6** (hits = 12 - 6 = 6, hit ratio = 6 / 12 = 0.5)"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 8,
+          "kind": "translate",
+          "final_correct": true,
+          "new_tokens": 139,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(1142 / 1024) = 1 (check: 1 x 1024 = 1024 <= 1142 < 2048)\n- page offset = 1142 - 1024 = 118\n- page table[1] = frame 9\n- frame base = 9 x 1024 = 9216\n- physical address = 9216 + 118 = 9334\n\n**Physical address = 9334**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 9,
+          "kind": "paging",
+          "final_correct": false,
+          "new_tokens": 729,
+          "truncated": false,
+          "output": "**Policy: OPT, 4 frames**\n\n| # | Ref | Result | Evicted | Frames (next use shown at each eviction) | Faults |\n|---|-----|--------|---------|--------|--------|\n| 1 | 0 | miss | - | 0 | 1 |\n| 2 | 4 | miss | - | 0 4 | 2 |\n| 3 | 1 | miss | - | 0 4 1 | 3 |\n| 4 | 1 | hit | - | 0 4 1 | 3 |\n| 5 | 1 | hit | - | 0 4 1 | 3 |\n| 6 | 0 | hit | - | 0 4 1 | 3 |\n| 7 | 0 | hit | - | 0 4 1 | 3 |\n| 8 | 1 | hit | - | 0 4 1 | 3 |\n| 9 | 3 | miss | - | 0 4 1 3 | 4 |\n| 10 | 6 | miss | 0 | 6 4 1 3 (next use 0@#17, 4@#12, 1@#13, 3@#14) | 5 |\n| 11 | 4 | hit | - | 6 4 1 3 | 5 |\n| 12 | 1 | hit | - | 6 4 1 3 | 5 |\n| 13 | 6 | hit | - | 6 4 1 3 | 5 |\n| 14 | 3 | hit | - | 6 4 1 3 | 5 |\n| 15 | 5 | miss | 6 | 5 4 1 3 (next use 6@#19, 4@#12, 1@#16, 3@#17) | 6 |\n| 16 | 0 | miss | 5 | 0 4 1 3 (next use 5@#18, 4@#12, 1@#16, 3@#17) | 7 |\n| 17 | 2 | miss | 0 | 2 4 1 3 (next use 0@#18, 4@#12, 1@#16, 3@#17) | 8 |\n| 18 | 7 | miss | 2 | 7 4 1 3 (next use 2@#19, 4@#12, 1@#16, 3@#17) | 9 |\n| 19 | 6 | miss | 7 | 6 4 1 3 (next use 7@#20, 4@#12, 1@#16, 3@#17) | 10 |\n| 20 | 4 | hit | - | 6 4 1 3 | 10 |\n\n**Total page faults = 10** (hits = 20 - 10 = 10, hit ratio = 10 / 20 = 0.5)"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 10,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 953,
+          "truncated": false,
+          "output": "**Algorithm: Round Robin (q=3)**\n\n**Step 1 - build the schedule**\n- t=0-3: T1 runs, 12 - 3 = 9 left; queue [T1, T2, T3, T4, T5]\n- t=3-6: T1 runs, 9 - 3 = 6 left; queue [T2, T3, T4, T5, T1]\n- t=6-7: T2 runs, 1 - 1 = 0 left; done at 7; queue [T3, T4, T5, T1]\n- t=7-11: T3 runs, 4 - 3 = 1 left; queue [T4, T5, T1, T3]\n- t=11-14: T4 runs, 11 - 3 = 8 left; queue [T5, T1, T3, T4]\n- t=14-19: T5 runs, 5 - 3 = 2 left; queue [T1, T3, T4, T5]\n- t=19-22: T1 runs, 6 - 3 = 3 left; queue [T3, T4, T5, T1]\n- t=22-23: T3 runs, 1 - 1 = 0 left; done at 23; queue [T4, T5, T1]\n- t=23-26: T4 runs, 8 - 3 = 5 left; queue [T5, T1, T4]\n- t=26-28: T5 runs, 2 - 2 = 0 left; done at 28; queue [T1, T4]\n- t=28-31: T1 runs, 3 - 3 = 0 left; done at 31; queue [T4]\n- t=31-36: T4 runs, 5 - 5 = 0 left; done at 36; queue []\n\n**Step 2 - Gantt chart:** T1[0-3] T1[3-6] T2[6-7] T3[7-11] T4[11-14] T5[14-19] T1[19-22] T3[22-23] T4[23-26] T5[26-28] T1[28-31] T4[31-36]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| T1 | 2 | 12 | 31 | 31 - 2 = 29 | 29 - 12 = 17 |\n| T2 | 4 | 1 | 7 | 7 - 4 = 3 | 3 - 1 = 2 |\n| T3 | 4 | 4 | 23 | 23 - 4 = 19 | 19 - 4 = 15 |\n| T4 | 5 | 11 | 36 | 36 - 5 = 31 | 31 - 11 = 20 |\n| T5 | 6 | 5 | 28 | 28 - 6 = 22 | 22 - 5 = 17 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 17 + 2 = 19, 19 + 15 = 34, 34 + 20 = 54, 54 + 17 = 71\n- Average waiting time = 71 / 5 = **14.2**\n- Sum of turnaround times: 29 + 3 = 32, 32 + 19 = 51, 51 + 31 = 82, 82 + 22 = 104\n- Average turnaround time = 104 / 5 = **20.8**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 11,
+          "kind": "paging",
+          "final_correct": true,
+          "new_tokens": 460,
+          "truncated": false,
+          "output": "**Policy: LRU, 4 frames**\n\n| # | Ref | Result | Evicted | Frames (least recently used first) | Faults |\n|---|-----|--------|---------|--------|--------|\n| 1 | 5 | miss | - | 5 | 1 |\n| 2 | 8 | miss | - | 5 8 | 2 |\n| 3 | 7 | miss | - | 5 8 7 | 3 |\n| 4 | 1 | miss | - | 5 8 7 1 | 4 |\n| 5 | 0 | miss | 5 | 8 7 1 0 | 5 |\n| 6 | 0 | hit | - | 8 7 1 0 | 5 |\n| 7 | 5 | miss | 8 | 7 1 0 5 | 6 |\n| 8 | 6 | miss | 7 | 1 0 5 6 | 7 |\n| 9 | 7 | miss | 1 | 0 5 6 7 | 8 |\n| 10 | 7 | hit | - | 0 5 6 7 | 8 |\n| 11 | 1 | miss | 0 | 5 6 7 1 | 9 |\n| 12 | 4 | miss | 5 | 6 7 1 4 | 10 |\n| 13 | 0 | miss | 6 | 7 1 4 0 | 11 |\n| 14 | 4 | hit | - | 7 1 0 4 | 11 |\n| 15 | 4 | hit | - | 7 1 0 4 | 11 |\n| 16 | 5 | miss | 7 | 1 0 4 5 | 12 |\n\n**Total page faults = 12** (hits = 16 - 12 = 4, hit ratio = 4 / 16 = 0.25)"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 12,
+          "kind": "paging",
+          "final_correct": true,
+          "new_tokens": 504,
+          "truncated": false,
+          "output": "**Policy: OPT, 4 frames**\n\n| # | Ref | Result | Evicted | Frames (next use shown at each eviction) | Faults |\n|---|-----|--------|---------|--------|--------|\n| 1 | 8 | miss | - | 8 | 1 |\n| 2 | 4 | miss | - | 8 4 | 2 |\n| 3 | 2 | miss | - | 8 4 2 | 3 |\n| 4 | 1 | miss | - | 8 4 2 1 | 4 |\n| 5 | 3 | miss | 8 | 3 4 2 1 (next use 8@never, 4@never, 2@never, 1@#14) | 5 |\n| 6 | 4 | hit | - | 3 4 2 1 | 5 |\n| 7 | 0 | miss | 3 | 0 4 2 1 (next use 3@never, 4@never, 2@never, 1@#14) | 6 |\n| 8 | 1 | hit | - | 0 4 2 1 | 6 |\n| 9 | 0 | hit | - | 0 4 2 1 | 6 |\n| 10 | 5 | miss | 4 | 0 5 2 1 (next use 0@#12, 4@never, 2@never, 1@#14) | 7 |\n| 11 | 0 | hit | - | 0 5 2 1 | 7 |\n| 12 | 0 | hit | - | 0 5 2 1 | 7 |\n| 13 | 0 | hit | - | 0 5 2 1 | 7 |\n| 14 | 1 | hit | - | 0 5 2 1 | 7 |\n| 15 | 5 | hit | - | 0 5 2 1 | 7 |\n\n**Total page faults = 7** (hits = 15 - 7 = 8, hit ratio = 8 / 15 = 0.5333)"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 13,
+          "kind": "paging",
+          "final_correct": false,
+          "new_tokens": 754,
+          "truncated": false,
+          "output": "**Policy: CLOCK, 4 frames**\n\n- t=0: 4 not in memory, evicting 4 (next unused bit is 0, so evict 4) -> fault, evicted page 4, memory[0]=4, faults = 1\n- t=1: 0 not in memory, evicting 0 (next unused bit is 0, so evict 0) -> fault, evicted page 0, memory[0]=0, faults = 2\n- t=2: 5 not in memory, evicting 5 (next unused bit is 0, so evict 5) -> fault, evicted page 5, memory[0]=5, faults = 3\n- t=3: 1 not in memory, evicting 1 (next unused bit is 0, so evict 1) -> fault, evicted page 1, memory[0]=1, faults = 4\n- t=4: 2 not in memory, evicting 2 (next unused bit is 0, so evict 2) -> fault, evicted page 2, memory[0]=2, faults = 5\n- t=5: 1 not in memory, evicting 1 (next unused bit is 0, so evict 1) -> fault, evicted page 1, memory[0]=1, faults = 6\n- t=6: 2 not in memory, evicting 2 (next unused bit is 0, so evict 2) -> fault, evicted page 2, memory[0]=2, faults = 7\n- t=7: 0 not in memory, evicting 0 (next unused bit is 0, so evict 0) -> fault, evicted page 0, memory[0]=0, faults = 8\n- t=8: 3 not in memory, evicting 3 (next unused bit is 0, so evict 3) -> fault, evicted page 3, memory[0]=3, faults = 9\n- t=9: 1 not in memory, evicting 1 (next unused bit is 0, so evict 1) -> fault, evicted page 1, memory[0]=1, faults = 10\n- t=10: 3 not in memory, evicting 3 (next unused bit is 0, so evict 3) -> fault, evicted page 3, memory[0]=3, faults = 11\n- t=11: 1 not in memory, evicting 1 (next unused bit is 0, so evict 1) -> fault, evicted page 1, memory[0]=1, faults = 12\n- t=12: 0 not in memory, evicting 0 (next unused bit is 0, so evict 0) -> fault, evicted page 0, memory[0]=0, faults = 13\n- t=13: 4 not in memory, evicting 4 (next unused bit is 0, so evict 4) -> fault, evicted page 4, memory[0]=4, faults = 14\n\n**Total page faults = 14** (hits = 13, hit ratio = 13 / 14 = 0.9286)"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 14,
+          "kind": "translate",
+          "final_correct": true,
+          "new_tokens": 139,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(4871 / 2048) = 2 (check: 2 x 2048 = 4096 <= 4871 < 6144)\n- page offset = 4871 - 4096 = 775\n- page table[2] = frame 2\n- frame base = 2 x 2048 = 4096\n- physical address = 4096 + 775 = 4871\n\n**Physical address = 4871**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 15,
+          "kind": "paging",
+          "final_correct": false,
+          "new_tokens": 537,
+          "truncated": false,
+          "output": "**Policy: OPT, 3 frames**\n\n| # | Ref | Result | Evicted | Frames (next use shown at each eviction) | Faults |\n|---|-----|--------|---------|--------|--------|\n| 1 | 2 | miss | - | 2 | 1 |\n| 2 | 0 | miss | - | 2 0 | 2 |\n| 3 | 4 | miss | - | 2 0 4 | 3 |\n| 4 | 2 | hit | - | 2 0 4 | 3 |\n| 5 | 3 | miss | 4 | 2 0 3 (next use 2@#7, 0@#13, 4@never) | 4 |\n| 6 | 5 | miss | 2 | 5 0 3 (next use 2@#7, 0@#13, 3@#9) | 5 |\n| 7 | 6 | miss | 5 | 6 0 3 (next use 5@#11, 0@#13, 3@#9) | 6 |\n| 8 | 7 | miss | 6 | 7 0 3 (next use 6@never, 0@#13, 3@#9) | 7 |\n| 9 | 3 | hit | - | 7 0 3 | 7 |\n| 10 | 7 | hit | - | 7 0 3 | 7 |\n| 11 | 5 | miss | 7 | 5 0 3 (next use 7@#12, 0@#13, 3@never) | 8 |\n| 12 | 4 | miss | 5 | 4 0 3 (next use 5@#11, 0@#13, 3@never) | 9 |\n| 13 | 0 | hit | - | 4 0 3 | 9 |\n| 14 | 7 | miss | 4 | 7 0 3 (next use 4@never, 0@never, 3@never) | 10 |\n\n**Total page faults = 10** (hits = 14 - 10 = 4, hit ratio = 4 / 14 = 0.2857)"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 16,
+          "kind": "paging",
+          "final_correct": false,
+          "new_tokens": 751,
+          "truncated": false,
+          "output": "**Policy: OPT, 3 frames**\n\n| # | Ref | Result | Evicted | Frames (next use shown at each eviction) | Faults |\n|---|-----|--------|---------|--------|--------|\n| 1 | 1 | miss | - | 1 | 1 |\n| 2 | 5 | miss | - | 1 5 | 2 |\n| 3 | 1 | hit | - | 1 5 | 2 |\n| 4 | 2 | miss | - | 1 5 2 | 3 |\n| 5 | 3 | miss | 5 | 1 2 3 (next use 1@#15, 5@#11, 2@never) | 4 |\n| 6 | 0 | miss | 2 | 1 0 3 (next use 1@#15, 2@never, 3@#8) | 5 |\n| 7 | 4 | miss | 1 | 4 0 3 (next use 1@#15, 0@never, 3@#8) | 6 |\n| 8 | 3 | hit | - | 4 0 3 | 6 |\n| 9 | 8 | miss | 4 | 8 0 3 (next use 4@#12, 0@never, 3@#17) | 7 |\n| 10 | 5 | miss | 8 | 5 0 3 (next use 8@#13, 0@never, 3@#17) | 8 |\n| 11 | 4 | miss | 5 | 4 0 3 (next use 5@#18, 0@never, 3@#17) | 9 |\n| 12 | 4 | hit | - | 4 0 3 | 9 |\n| 13 | 8 | miss | 4 | 8 0 3 (next use 4@never, 0@never, 3@#17) | 10 |\n| 14 | 1 | miss | 8 | 1 0 3 (next use 8@never, 0@never, 3@#17) | 11 |\n| 15 | 1 | hit | - | 1 0 3 | 11 |\n| 16 | 4 | miss | 1 | 4 0 3 (next use 1@never, 0@never, 3@#17) | 12 |\n| 17 | 5 | miss | 4 | 5 0 3 (next use 4@never, 0@never, 3@never) | 13 |\n| 18 | 6 | miss | 5 | 6 0 3 (next use 5@never, 0@never, 3@never) | 14 |\n| 19 | 1 | miss | 6 | 1 0 3 (next use 6@never, 0@never, 3@never) | 15 |\n\n**Total page faults = 15** (hits = 19 - 15 = 4, hit ratio = 4 / 19 = 0.2105)"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 17,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 372,
+          "truncated": false,
+          "output": "**Policy: FIRST-fit**\n\n- holes (free KB, by number): hole 0=160, hole 1=521, hole 2=544, hole 3=271\n- request 305: fitting holes [hole 1=521, hole 2=544] -> lowest-numbered fitting hole = hole 1; 521 - 305 = 216\n- request 302: fitting holes [hole 2=544] -> lowest-numbered fitting hole = hole 2; 544 - 302 = 242\n- request 187: fitting holes [hole 0=160, hole 1=216, hole 2=242, hole 3=271] -> lowest-numbered fitting hole = hole 0; 160 - 187 = 0 (freeing hole 0)\n- request 216: fitting holes [hole 1=216, hole 2=242, hole 3=271] -> lowest-numbered fitting hole = hole 1; 216 - 216 = 0 (freeing hole 1)\n\n**Placement:** [1, 2, 0, 1]\n**Remaining free space per hole:** [0, 0, 242, 271]\n- Sum of free space: 0 + 0 = 0, 0 + 242 = 242, 242 + 271 = 513\n**Total external fragmentation = 513 KB**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 18,
+          "kind": "translate",
+          "final_correct": true,
+          "new_tokens": 145,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(4604 / 1024) = 4 (check: 4 x 1024 = 4096 <= 4604 < 5120)\n- page offset = 4604 - 4096 = 508\n- page table[4] = frame 25\n- frame base = 25 x 1024 = 25600\n- physical address = 25600 + 508 = 26108\n\n**Physical address = 26108**"
+        },
+        {
+          "suite": "os_solve_indist",
+          "index": 19,
+          "kind": "translate",
+          "final_correct": true,
+          "new_tokens": 122,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(680 / 1024) = 0 (check: 0 x 1024 = 0 <= 680 < 1024)\n- page offset = 680 - 0 = 680\n- page table[0] = frame 0\n- frame base = 0 x 1024 = 0\n- physical address = 0 + 680 = 680\n\n**Physical address = 680**"
+        }
+      ]
+    },
+    "os_solve_ood": {
+      "n": 20,
+      "final_answer_accuracy": 0.5,
+      "step_accuracy": 0.2609,
+      "by_topic": {
+        "banker_request": {
+          "n": 3,
+          "accuracy": 0.6667
+        },
+        "banker_safety": {
+          "n": 6,
+          "accuracy": 0.6667
+        },
+        "disk": {
+          "n": 2,
+          "accuracy": 0.5
+        },
+        "freespace": {
+          "n": 4,
+          "accuracy": 0.0
+        },
+        "paging": {
+          "n": 1,
+          "accuracy": 0.0
+        },
+        "scheduling": {
+          "n": 2,
+          "accuracy": 0.5
+        },
+        "translate": {
+          "n": 2,
+          "accuracy": 1.0
+        }
+      },
+      "seconds": 2621.5,
+      "max_new_tokens": 3072,
+      "truncation_rate": 0.15,
+      "accuracy_when_finished": 0.5882,
+      "items": [
+        {
+          "suite": "os_solve_ood",
+          "index": 0,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 1467,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [0, 0, 0, 0] vs Need [0, 2, 0, 1]: 0<=0, 0<=2, 0<=0, 0<=1 -> OK\n- Test 2: Request [0, 0, 0, 0] vs Available [3, 1, 1, 1]: 0<=3, 0<=1, 0<=1, 0<=1 -> OK\n- Test 3: pretend to grant. Available = [3, 1, 1, 1] - [0, 0, 0, 0] = [3, 1, 1, 1]; Allocation[T6] = [8, 2, 2, 4]. Now run the safety algorithm.\n- Need = Max - Allocation\n- Work = Available = [3, 1, 1, 1]\n- T1: Need [5, 5, 1, 4] vs Work [3, 1, 1, 1]: 5>3, 5>1, 1<=1, 4>1 -> cannot run yet\n- T2: Need [8, 0, 1, 6] vs Work [3, 1, 1, 1]: 8>3, 0<=1, 1>1, 6>1 -> cannot run yet\n- T3: Need [2, 0, 0, 2] vs Work [3, 1, 1, 1]: 2<=3, 0<=1, 0<=1, 2>1 -> cannot run yet\n- T4: Need [2, 0, 4, 1] vs Work [3, 1, 1, 1]: 2<=3, 0<=1, 4>1, 1<=1 -> cannot run yet\n- T5: Need [1, 0, 1, 1] vs Work [3, 1, 1, 1]: 1<=3, 0<=1, 1<=1, 1<=1 -> all fit, run it. Work = [3, 1, 1, 1] + Allocation [0, 0, 5, 5] = [3, 1, 6, 6]\n- T1: Need [5, 5, 1, 4] vs Work [3, 1, 6, 6]: 5>3, 5>1, 1<=6, 4<=6 -> cannot run yet\n- T2: Need [8, 0, 1, 6] vs Work [3, 1, 6, 6]: 8>3, 0<=1, 1<=6, 6<=6 -> cannot run yet\n- T3: Need [2, 0, 0, 2] vs Work [3, 1, 6, 6]: 2<=3, 0<=1, 0<=6, 2<=6 -> all fit, run it. Work = [3, 1, 6, 6] + Allocation [0, 2, 0, 6] = [3, 3, 6, 12]\n- T1: Need [5, 5, 1, 4] vs Work [3, 3, 6, 12]: 5>3, 5>3, 1<=6, 4<=12 -> cannot run yet\n- T2: Need [8, 0, 1, 6] vs Work [3, 3, 6, 12]: 8>3, 0<=3, 1<=6, 6<=12 -> cannot run yet\n- T4: Need [2, 0, 4, 1] vs Work [3, 3, 6, 12]: 2<=3, 0<=3, 4<=6, 1<=12 -> all fit, run it. Work = [3, 3, 6, 12] + Allocation [1, 0, 2, 3] = [4, 3, 8, 15]\n- T1: Need [5, 5, 1, 4] vs Work [4, 3, 8, 15]: 5>4, 5>3, 1<=8, 4<=15 -> cannot run yet\n- T2: Need [8, 0, 1, 6] vs Work [4, 3, 8, 15]: 8>4, 0<=3, 1<=8, 6<=15 -> cannot run yet\n- T6: Need [0, 2, 0, 1] vs Work [4, 3, 8, 15]: 0<=4, 2<=3, 0<=8, 1<=15 -> all fit, run it. Work = [4, 3, 8, 15] + Allocation [8, 2, 2, 4] = [12, 5, 10, 19]\n- T1: Need [5, 5, 1, 4] vs Work [12, 5, 10, 19]: 5<=12, 5<=5, 1<=10, 4<=19 -> all fit, run it. Work = [12, 5, 10, 19] + Allocation [1, 0, 7, 1] = [13, 5, 17, 20]\n- T2: Need [8, 0, 1, 6] vs Work [13, 5, 17, 20]: 8<=13, 0<=5, 1<=17, 6<=20 -> all fit, run it. Work = [13, 5, 17, 20] + Allocation [0, 4, 0, 1] = [13, 9, 17, 21]\n- SAFE. Safe sequence: < T5, T3, T4, T6, T1, T2 >\n- Resulting state is SAFE (sequence < T5, T3, T4, T6, T1, T2 >) -> GRANT the request\n\n**Conclusion: the request is GRANTED.**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 1,
+          "kind": "banker_request",
+          "final_correct": false,
+          "new_tokens": 612,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [1, 0, 1, 0] vs Need [2, 0, 3, 0]: 1<=2, 0<=0, 1<=3, 0<=0 -> OK\n- Test 2: Request [1, 0, 1, 0] vs Available [1, 1, 1, 1]: 1<=1, 0<=1, 1<=1, 0<=1 -> OK\n- Test 3: pretend to grant. Available = [1, 1, 1, 1] - [1, 0, 1, 0] = [0, 1, 0, 1]; Allocation[T2] = [1, 1, 4, 1]. Now run the safety algorithm.\n- Need = Max - Allocation\n- Work = Available = [0, 1, 0, 1]\n- T1: Need [1, 1, 5, 0] vs Work [0, 1, 0, 1]: 0<=0, 1<=1, 5>0, 0<=1 -> cannot run yet\n- T2: Need [1, 7, 2, 0] vs Work [0, 1, 0, 1]: 0<=0, 7>1, 2>0, 0<=1 -> cannot run yet\n- T3: Need [1, 5, 0, 5] vs Work [0, 1, 0, 1]: 0<=0, 5>1, 0<=0, 5>1 -> cannot run yet\n- T4: Need [1, 0, 2, 4] vs Work [0, 1, 0, 1]: 0<=0, 0<=1, 2>0, 4>1 -> cannot run yet\n- T5: Need [1, 0, 1, 0] vs Work [0, 1, 0, 1]: 0<=0, 0<=1, 1>0, 0<=1 -> cannot run yet\n- T6: Need [5, 2, 1, 2] vs Work [0, 1, 0, 1]: 5>0, 2>1, 1>0, 2>1 -> cannot run yet\n- UNSAFE - no safe sequence exists; processes T1, T2, T3, T4, T5, T6 can never finish\n- Resulting state is UNSAFE -> DENY the request; T2 must wait and the old state is restored\n\n**Conclusion: the request is DENIED.**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 2,
+          "kind": "disk",
+          "final_correct": true,
+          "new_tokens": 769,
+          "truncated": false,
+          "output": "**Policy: LOOK**\n\n- sorted requests: [5, 40, 41, 60, 76, 79, 94, 115, 126, 133, 134, 161, 171, 181]; below head 26: [5, 40, 41]; at/above head: [60, 76, 79, 94, 115, 126, 133, 134, 161, 171, 181]\n- LOOK up: like SCAN but reverses at the LAST REQUEST, never travelling to the disk edge\n- 26 -> 60: 60 - 26 = 34; running total 0 + 34 = 34\n- 60 -> 76: 76 - 60 = 16; running total 34 + 16 = 50\n- 76 -> 79: 79 - 76 = 3; running total 50 + 3 = 53\n- 79 -> 94: 94 - 79 = 15; running total 53 + 15 = 68\n- 94 -> 115: 115 - 94 = 21; running total 68 + 21 = 89\n- 115 -> 126: 126 - 115 = 11; running total 89 + 11 = 100\n- 126 -> 133: 133 - 126 = 7; running total 100 + 7 = 107\n- 133 -> 134: 134 - 133 = 1; running total 107 + 1 = 108\n- 134 -> 161: 161 - 134 = 27; running total 108 + 27 = 135\n- 161 -> 171: 171 - 161 = 10; running total 135 + 10 = 145\n- 171 -> 181: 181 - 171 = 10; running total 145 + 10 = 155\n- 181 -> 41: 181 - 41 = 140; running total 155 + 140 = 295\n- 41 -> 40: 41 - 40 = 1; running total 295 + 1 = 296\n- 40 -> 5: 40 - 5 = 35; running total 296 + 35 = 331\n\n**Service order:** 60 -> 76 -> 79 -> 94 -> 115 -> 126 -> 133 -> 134 -> 161 -> 171 -> 181 -> 41 -> 40 -> 5\n**Total head movement = 331 cylinders**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 3,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 866,
+          "truncated": false,
+          "output": "**Policy: WORST-fit**\n\n- holes (free KB, by number): hole 0=519, hole 1=466, hole 2=107, hole 3=271, hole 4=480, hole 5=600\n- request 1000: fitting holes [hole 5=600] -> largest fitting hole = hole 5; 600 - 1000 = -400 (negative -> must WAIT)\n- request 100: fitting holes [hole 0=519, hole 1=466, hole 2=107, hole 3=271, hole 4=480, hole 5=600] -> largest fitting hole = hole 5; 600 - 100 = 500\n- request 200: fitting holes [hole 0=519, hole 1=466, hole 3=271, hole 4=480, hole 5=500] -> largest fitting hole = hole 0; 519 - 200 = 319\n- request 100: fitting holes [hole 1=466, hole 3=271, hole 4=480, hole 5=500] -> largest fitting hole = hole 1; 466 - 100 = 366\n- request 100: fitting holes [hole 3=271, hole 4=480, hole 5=500] -> largest fitting hole = hole 5; 500 - 100 = 400\n- request 100: fitting holes [hole 3=271, hole 4=480, hole 5=400] -> largest fitting hole = hole 4; 480 - 100 = 380\n- request 100: fitting holes [hole 3=271, hole 5=400] -> largest fitting hole = hole 5; 400 - 100 = 300\n- request 100: fitting holes [hole 3=271, hole 5=300] -> largest fitting hole = hole 5; 300 - 100 = 200\n- request 100: fitting holes [hole 3=271, hole 5=200] -> largest fitting hole = hole 3; 271 - 100 = 171\n- request 100: fitting holes [hole 5=200] -> largest fitting hole = hole 5; 200 - 100 = 100\n- request 100: fitting holes [hole 5=100] -> largest fitting hole = hole 5; 100 - 100 = 0\n- request 100: no fitting holes -> must WAIT\n\n**Placement:** [None, 5, 0, 1, 4, 5, 5, 5, 3, 5, 5, None]\n**Remaining free space per hole:** [319, 366, 107, 171, 380, 0]\n- Sum of free space: 319 + 366 = 685, 685 + 107 = 792, 792 + 171 = 963, 963 + 380 = 1343, 1343 + 0 = 1343\n**Total external fragmentation = 1343 KB**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 4,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 1125,
+          "truncated": false,
+          "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C, D)\n\n- 5179: [1, 1, 3, 3] - [1, 1, 2, 2] = [0, 0, 1, 1]\n- 5199: [6, 5, 5, 1] - [6, 2, 1, 1] = [0, 3, 4, 0]\n- 5209: [7, 0, 1, 5] - [0, 0, 0, 5] = [7, 0, 1, 0]\n- 5212: [6, 7, 5, 1] - [3, 1, 1, 0] = [3, 6, 4, 1]\n- 5275: [7, 3, 8, 3] - [7, 0, 5, 1] = [0, 3, 3, 2]\n- 5329: [0, 6, 7, 0] - [0, 1, 0, 0] = [0, 5, 7, 0]\n\n**Step 2 - run the safety algorithm**\n\n- Work = Available = [10, 10, 10, 10]\n- 5179: Need [0, 0, 1, 1] vs Work [10, 10, 10, 10]: 0<=10, 0<=10, 1<=10, 1<=10 -> all fit, run it. Work = [10, 10, 10, 10] + Allocation [1, 1, 2, 2] = [11, 11, 12, 12]\n- 5199: Need [0, 3, 4, 0] vs Work [11, 11, 12, 12]: 0<=11, 3<=11, 4<=12, 0<=12 -> all fit, run it. Work = [11, 11, 12, 12] + Allocation [6, 2, 1, 1] = [17, 13, 13, 13]\n- 5209: Need [7, 0, 1, 0] vs Work [17, 13, 13, 13]: 7<=17, 0<=13, 1<=13, 0<=13 -> all fit, run it. Work = [17, 13, 13, 13] + Allocation [0, 0, 0, 5] = [17, 13, 13, 18]\n- 5212: Need [3, 6, 4, 1] vs Work [17, 13, 13, 18]: 3<=17, 6<=13, 4<=13, 1<=18 -> all fit, run it. Work = [17, 13, 13, 18] + Allocation [3, 1, 1, 0] = [20, 14, 14, 18]\n- 5275: Need [0, 3, 3, 2] vs Work [20, 14, 14, 18]: 0<=20, 3<=14, 3<=14, 2<=18 -> all fit, run it. Work = [20, 14, 14, 18] + Allocation [7, 0, 5, 1] = [27, 14, 19, 19]\n- 5329: Need [0, 5, 7, 0] vs Work [27, 14, 19, 19]: 0<=27, 5<=14, 7<=19, 0<=19 -> all fit, run it. Work = [27, 14, 19, 19] + Allocation [0, 1, 0, 0] = [27, 15, 19, 19]\n\n**Step 3 - conclusion**\n\nAll 6 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< 5179, 5199, 5209, 5212, 5275, 5329 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 5,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 992,
+          "truncated": false,
+          "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- 4711: [3, 8, 0] - [0, 5, 0] = [3, 3, 0]\n- 4730: [1, 0, 3] - [1, 0, 2] = [0, 0, 1]\n- 4721: [5, 5, 1] - [5, 2, 1] = [0, 3, 0]\n- 4729: [2, 0, 0] - [2, 0, 0] = [0, 0, 0]\n- 4775: [4, 5, 2] - [4, 4, 0] = [0, 1, 2]\n- 4731: [7, 0, 2] - [4, 0, 2] = [3, 0, 0]\n\n**Step 2 - run the safety algorithm**\n\n- Work = Available = Max - Sum of Allocation = [10, 10, 10] - [12, 7, 3] = [ -2, 3, 7 ]\n- 4711: Need [3, 3, 0] vs Work [ -2, 3, 7 ] -> 3> -2, 3<= 3, 0<= 7 -> cannot run yet\n- 4730: Need [0, 0, 1] vs Work [ -2, 3, 7 ] -> 0> -2, 0<= 3, 1<= 7 -> all fit, run it. Work = [ -2, 3, 7 ] + Allocation [1, 0, 2] = [ -1, 3, 9 ]\n- 4711: Need [3, 3, 0] vs Work [ -1, 3, 9 ] -> 3> -1, 3<= 3, 0<= 9 -> all fit, run it. Work = [ -1, 3, 9 ] + Allocation [0, 5, 0] = [ -1, 8, 9 ]\n- 4721: Need [0, 3, 0] vs Work [ -1, 8, 9 ] -> 0> -1, 3<= 8, 0<= 9 -> all fit, run it. Work = [ -1, 8, 9 ] + Allocation [5, 2, 1] = [4, 10, 10 ]\n- 4729: Need [0, 0, 0] vs Work [4, 10, 10 ] -> 0<= 4, 0<= 10, 0<= 10 -> all fit, run it. Work = [4, 10, 10 ] + Allocation [2, 0, 0] = [6, 10, 10 ]\n- 4775: Need [0, 1, 2] vs Work [6, 10, 10 ] -> 0<= 6, 1<= 10, 2<= 10 -> all fit, run it. Work = [6, 10, 10 ] + Allocation [4, 4, 0] = [10, 14, 10 ]\n- 4731: Need [3, 0, 0] vs Work [10, 14, 10 ] -> 3<= 10, 0<= 14, 0<= 10 -> all fit, run it. Work = [10, 14, 10 ] + Allocation [4, 0, 2] = [14, 14, 12 ]\n\n**Step 3 - conclusion**\n\nAll 6 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< 4730, 4711, 4721, 4729, 4775, 4731 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 6,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 3072,
+          "truncated": true,
+          "output": "**Policy: FIRST-fit**\n\n- holes (free KB, by number): hole 0=283, hole 1=213, hole 2=177, hole 3=343, hole 4=106\n- request 1000: fitting holes [hole 0=283, hole 1=213, hole 2=177, hole 3=343, hole 4=106] -> lowest-numbered fitting hole = hole 0; 283 - 1000 = -717 -> still free 283\n- request 1000: fitting holes [hole 3=343] -> lowest-numbered fitting hole = hole 3; 343 - 1000 = -657 -> still free 343\n- request 1000: free sizes [283, 213, 177, 343, 106], none >= 1000 -> must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 1000: must WAIT\n- request 100"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 7,
+          "kind": "disk",
+          "final_correct": false,
+          "new_tokens": 779,
+          "truncated": false,
+          "output": "**Policy: SCAN**\n\n- sorted requests: [3, 7, 17, 27, 36, 57, 67, 139, 181, 208, 209, 236, 237]; below head 130: [3, 7, 17, 27, 36, 57, 67, 139]; at/above head: [181, 208, 209, 236, 237]\n- SCAN up: service [181, 208, 209, 236, 237], go to the end of the disk, then reverse\n- 130 -> 181: 181 - 130 = 51; running total 0 + 51 = 51\n- 181 -> 208: 208 - 181 = 27; running total 51 + 27 = 78\n- 208 -> 209: 209 - 208 = 1; running total 78 + 1 = 79\n- 209 -> 236: 236 - 209 = 27; running total 79 + 27 = 106\n- 236 -> 237: 237 - 236 = 1; running total 106 + 1 = 107\n- 237 -> 250: 250 - 237 = 13; running total 107 + 13 = 120\n- 250 -> 139: 250 - 139 = 111; running total 120 + 111 = 231\n- 139 -> 67: 139 - 67 = 72; running total 231 + 72 = 303\n- 67 -> 57: 67 - 57 = 10; running total 303 + 10 = 313\n- 57 -> 36: 57 - 36 = 21; running total 313 + 21 = 334\n- 36 -> 27: 36 - 27 = 9; running total 334 + 9 = 343\n- 27 -> 17: 27 - 17 = 10; running total 343 + 10 = 353\n- 17 -> 7: 17 - 7 = 10; running total 353 + 10 = 363\n- 7 -> 3: 7 - 3 = 4; running total 363 + 4 = 367\n\n**Service order:** 181 -> 208 -> 209 -> 236 -> 237 -> 250 -> 139 -> 67 -> 57 -> 36 -> 27 -> 17 -> 7 -> 3\n**Total head movement = 367 cylinders**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 8,
+          "kind": "banker_safety",
+          "final_correct": false,
+          "new_tokens": 1056,
+          "truncated": false,
+          "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- 3413: [1, 1, 2] - [1, 0, 2] = [0, 1, 0]\n- 3417: [4, 8, 5] - [2, 6, 3] = [2, 2, 2]\n- 3423: [5, 2, 5] - [1, 1, 5] = [4, 1, 0]\n- 3455: [6, 1, 5] - [0, 0, 3] = [6, 1, 2]\n- 3433: [7, 1, 7] - [0, 1, 6] = [7, 0, 1]\n- 3543: [6, 3, 2] - [1, 2, 2] = [5, 1, 0]\n- 3563: [7, 2, 3] - [2, 0, 1] = [5, 2, 2]\n\n**Step 2 - run the safety algorithm**\n\n- Work = Available = [10, 10, 10]\n- 3413: Need [0, 1, 0] vs Work [10, 10, 10]: 0<=10, 1<=10, 0<=10 -> all fit, run it. Work = [10, 10, 10] + Allocation [1, 0, 2] = [11, 10, 12]\n- 3417: Need [2, 2, 2] vs Work [11, 10, 12]: 2<=11, 2<=10, 2<=12 -> all fit, run it. Work = [11, 10, 12] + Allocation [2, 6, 3] = [13, 16, 15]\n- 3423: Need [4, 1, 0] vs Work [13, 16, 15]: 4<=13, 1<=16, 0<=15 -> all fit, run it. Work = [13, 16, 15] + Allocation [1, 1, 5] = [14, 17, 20]\n- 3455: Need [6, 1, 2] vs Work [14, 17, 20]: 6<=14, 1<=17, 2<=20 -> all fit, run it. Work = [14, 17, 20] + Allocation [0, 0, 3] = [14, 17, 23]\n- 3433: Need [7, 0, 1] vs Work [14, 17, 23]: 7<=14, 0<=17, 1<=23 -> all fit, run it. Work = [14, 17, 23] + Allocation [0, 1, 6] = [14, 18, 29]\n- 3543: Need [5, 1, 0] vs Work [14, 18, 29]: 5<=14, 1<=18, 0<=29 -> all fit, run it. Work = [14, 18, 29] + Allocation [1, 2, 2] = [15, 20, 31]\n- 3563: Need [5, 2, 2] vs Work [15, 20, 31]: 5<=15, 2<=20, 2<=31 -> all fit, run it. Work = [15, 20, 31] + Allocation [2, 0, 1] = [17, 20, 32]\n\n**Step 3 - conclusion**\n\nAll 7 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< 3413, 3417, 3423, 3455, 3433, 3543, 3563 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 9,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 1368,
+          "truncated": false,
+          "output": "**Step 1 - compute Need = Max - Allocation, row by row** (resources A, B, C)\n\n- T1: [1, 2, 7] - [0, 0, 7] = [1, 2, 0]\n- T2: [3, 2, 3] - [1, 1, 2] = [2, 1, 1]\n- T3: [7, 3, 4] - [3, 0, 1] = [4, 3, 3]\n- T4: [5, 3, 7] - [5, 1, 1] = [0, 2, 6]\n- T5: [3, 2, 6] - [3, 2, 2] = [0, 0, 4]\n- T6: [0, 1, 3] - [0, 0, 3] = [0, 1, 0]\n- T7: [0, 1, 2] - [0, 0, 1] = [0, 1, 1]\n\n**Step 2 - run the safety algorithm**\n\n- Work = Available = Max - Sum of Allocation = [10, 10, 15] - [10, 3, 13] = [0, 7, 2]\n- T1: Need [1, 2, 0] vs Work [0, 7, 2]: 1>0, 2>7, 0<=2 -> cannot run yet\n- T2: Need [2, 1, 1] vs Work [0, 7, 2]: 2>0, 1<=7, 1<=2 -> cannot run yet\n- T3: Need [4, 3, 3] vs Work [0, 7, 2]: 4>0, 3<=7, 3>2 -> cannot run yet\n- T4: Need [0, 2, 6] vs Work [0, 7, 2]: 0<=0, 2<=7, 6>2 -> cannot run yet\n- T5: Need [0, 0, 4] vs Work [0, 7, 2]: 0<=0, 0<=7, 4>2 -> cannot run yet\n- T6: Need [0, 1, 0] vs Work [0, 7, 2]: 0<=0, 1<=7, 0<=2 -> all fit, run it. Work = [0, 7, 2] + Allocation [0, 0, 3] = [0, 7, 5]\n- T1: Need [1, 2, 0] vs Work [0, 7, 5]: 1>0, 2<=7, 0<=5 -> cannot run yet\n- T2: Need [2, 1, 1] vs Work [0, 7, 5]: 2>0, 1<=7, 1<=5 -> cannot run yet\n- T3: Need [4, 3, 3] vs Work [0, 7, 5]: 4>0, 3<=7, 3<=5 -> cannot run yet\n- T4: Need [0, 2, 6] vs Work [0, 7, 5]: 0<=0, 2<=7, 6>5 -> cannot run yet\n- T5: Need [0, 0, 4] vs Work [0, 7, 5]: 0<=0, 0<=7, 4<=5 -> all fit, run it. Work = [0, 7, 5] + Allocation [3, 2, 2] = [3, 9, 7]\n- T1: Need [1, 2, 0] vs Work [3, 9, 7]: 1<=3, 2<=9, 0<=7 -> all fit, run it. Work = [3, 9, 7] + Allocation [0, 0, 7] = [3, 9, 14]\n- T2: Need [2, 1, 1] vs Work [3, 9, 14]: 2<=3, 1<=9, 1<=14 -> all fit, run it. Work = [3, 9, 14] + Allocation [1, 1, 2] = [4, 10, 16]\n- T3: Need [4, 3, 3] vs Work [4, 10, 16]: 4<=4, 3<=10, 3<=16 -> all fit, run it. Work = [4, 10, 16] + Allocation [3, 0, 1] = [7, 10, 17]\n- T4: Need [0, 2, 6] vs Work [7, 10, 17]: 0<=7, 2<=10, 6<=17 -> all fit, run it. Work = [7, 10, 17] + Allocation [5, 1, 1] = [12, 11, 18]\n- T7: Need [0, 1, 1] vs Work [12, 11, 18]: 0<=12, 1<=11, 1<=18 -> all fit, run it. Work = [12, 11, 18] + Allocation [0, 0, 1] = [12, 11, 19]\n\n**Step 3 - conclusion**\n\nAll 7 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< T6, T5, T1, T2, T3, T4, T7 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 10,
+          "kind": "translate",
+          "final_correct": true,
+          "new_tokens": 153,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(11800 / 2048) = 5 (check: 5 x 2048 = 10240 <= 11800 < 12288)\n- page offset = 11800 - 10240 = 1560\n- page table[5] = frame 27\n- frame base = 27 x 2048 = 55296\n- physical address = 55296 + 1560 = 56856\n\n**Physical address = 56856**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 11,
+          "kind": "translate",
+          "final_correct": true,
+          "new_tokens": 143,
+          "truncated": false,
+          "output": "**Step-by-step translation**\n\n- page number = floor(4114 / 1024) = 4 (check: 4 x 1024 = 4096 <= 4114 < 5120)\n- page offset = 4114 - 4096 = 18\n- page table[4] = frame 18\n- frame base = 18 x 1024 = 18432\n- physical address = 18432 + 18 = 18450\n\n**Physical address = 18450**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 12,
+          "kind": "scheduling",
+          "final_correct": false,
+          "new_tokens": 934,
+          "truncated": false,
+          "output": "**Algorithm: Priority (non-preemptive)**\n\n**Step 1 - build the schedule**\n- t=0: ready alpha(p3) -> run alpha (12 left)\n- t=12: alpha completes\n- t=12: ready delta(p2) eta(p1) -> run delta (9 left)\n- t=21: delta completes\n- t=21: ready eta(p1) -> run eta (10 left)\n- t=31: eta completes\n- t=31: ready epsilon(p5) -> run epsilon (5 left)\n- t=36: epsilon completes\n- t=36: ready zeta(p2) -> run zeta (12 left)\n- t=48: zeta completes\n- t=48: ready theta(p3) iota(p3) -> run theta (1 left)\n- t=49: theta completes\n- t=49: ready iota(p3) -> run iota (1 left)\n- t=50: iota completes\n\n**Step 2 - Gantt chart:** alpha[0-12] delta[12-21] eta[21-31] epsilon[31-36] zeta[36-48] theta[48-49] iota[49-50]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| alpha | 0 | 12 | 12 | 12 - 0 = 12 | 12 - 12 = 0 |\n| beta | 2 | 10 | 50 | 50 - 2 = 48 | 48 - 10 = 38 |\n| delta | 6 | 9 | 21 | 21 - 6 = 15 | 15 - 9 = 6 |\n| epsilon | 7 | 5 | 36 | 36 - 7 = 29 | 29 - 5 = 24 |\n| eta | 10 | 10 | 31 | 31 - 10 = 21 | 21 - 10 = 11 |\n| gamma | 4 | 6 | 50 | 50 - 4 = 46 | 46 - 6 = 40 |\n| iota | 13 | 1 | 50 | 50 - 13 = 37 | 37 - 1 = 36 |\n| theta | 11 | 1 | 49 | 49 - 11 = 38 | 38 - 1 = 37 |\n| zeta | 9 | 12 | 48 | 48 - 9 = 39 | 39 - 12 = 27 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 38 = 38, 38 + 6 = 44, 44 + 24 = 68, 68 + 11 = 79, 79 + 40 = 119, 119 + 36 = 155, 155 + 37 = 192, 192 + 27 = 219\n- Average waiting time = 219 / 9 = **24.33**\n- Sum of turnaround times: 12 + 48 = 60, 60 + 15 = 75, 75 + 29 = 104, 104 + 21 = 125, 125 + 46 = 171, 171 + 37 = 208, 208 + 38 = 246, 246 + 39 = 285\n- Average turnaround time = 285 / 9 = **31.67**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 13,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 3072,
+          "truncated": true,
+          "output": "**Policy: WORST-fit**\n\n- holes (free KB, by number): hole 0=450, hole 1=578, hole 2=97, hole 3=600, hole 4=293, hole 5=72\n- request 1000: free sizes [450, 578, 97, 600, 293, 72], none >= 1000 -> must WAIT\n- request 200: fitting holes [hole 1=578, hole 3=600] -> largest fitting hole = hole 3; 600 - 200 = 400\n- request 100: fitting holes [hole 0=450, hole 1=578, hole 4=293] -> largest fitting hole = hole 1; 578 - 100 = 478\n- request 100: fitting holes [hole 0=450, hole 1=478, hole 4=293] -> largest fitting hole = hole 1; 478 - 100 = 378\n- request 100: fitting holes [hole 0=450, hole 1=378, hole 4=293] -> largest fitting hole = hole 1; 378 - 100 = 278\n- request 100: fitting holes [hole 0=450, hole 1=278, hole 4=293] -> largest fitting hole = hole 4; 293 - 100 = 193\n- request 100: fitting holes [hole 0=450, hole 1=278, hole 4=193] -> largest fitting hole = hole 0; 450 - 100 = 350\n- request 100: fitting holes [hole 0=350, hole 1=278, hole 4=193] -> largest fitting hole = hole 0; 350 - 100 = 250\n- request 100: fitting holes [hole 0=250, hole 1=278, hole 4=193] -> largest fitting hole = hole 1; 278 - 100 = 178\n- request 100: fitting holes [hole 0=250, hole 1=178, hole 4=193] -> largest fitting hole = hole 0; 250 - 100 = 150\n- request 100: fitting holes [hole 0=150, hole 1=178, hole 4=193] -> largest fitting hole = hole 1; 178 - 100 = 78\n- request 100: fitting holes [hole 0=150, hole 1=78, hole 4=193] -> largest fitting hole = hole 4; 193 - 100 = 93\n- request 100: fitting holes [hole 0=150, hole 1=78, hole 4=93] -> largest fitting hole = hole 0; 150 - 100 = 50\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=93] -> largest fitting hole = hole 4; 93 - 100 = -7 -> must WAIT\n- request 100: fitting holes [hole 1=78, hole 4=9"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 14,
+          "kind": "paging",
+          "final_correct": false,
+          "new_tokens": 755,
+          "truncated": false,
+          "output": "**Policy: FIFO, 4 frames**\n\n| # | Ref | Result | Evicted | Frames (oldest first) | Faults |\n|---|-----|--------|---------|--------|--------|\n| 1 | 1 | miss | - | 1 | 1 |\n| 2 | 2 | miss | - | 1 2 | 2 |\n| 3 | 4 | miss | - | 1 2 4 | 3 |\n| 4 | 1 | hit | - | 1 2 4 | 3 |\n| 5 | 3 | miss | - | 1 2 4 3 | 4 |\n| 6 | 8 | miss | 1 | 2 4 3 8 | 5 |\n| 7 | 7 | miss | 2 | 4 3 8 7 | 6 |\n| 8 | 4 | hit | - | 4 3 8 7 | 6 |\n| 9 | 6 | miss | 4 | 3 8 7 6 | 7 |\n| 10 | 0 | miss | 3 | 8 7 6 0 | 8 |\n| 11 | 4 | miss | 8 | 7 6 0 4 | 9 |\n| 12 | 4 | hit | - | 7 6 0 4 | 9 |\n| 13 | 0 | hit | - | 7 6 0 4 | 9 |\n| 14 | 0 | hit | - | 7 6 0 4 | 9 |\n| 15 | 4 | hit | - | 7 6 0 4 | 9 |\n| 16 | 8 | miss | 7 | 6 0 4 8 | 10 |\n| 17 | 0 | hit | - | 6 0 4 8 | 10 |\n| 18 | 3 | miss | 6 | 0 4 8 3 | 11 |\n| 19 | 5 | miss | 0 | 4 8 3 5 | 12 |\n| 20 | 0 | miss | 4 | 8 3 5 0 | 13 |\n| 21 | 5 | hit | - | 8 3 5 0 | 13 |\n| 22 | 1 | miss | 8 | 3 5 0 1 | 14 |\n| 23 | 2 | miss | 3 | 5 0 1 2 | 15 |\n| 24 | 7 | miss | 5 | 0 1 2 7 | 16 |\n| 25 | 2 | hit | - | 0 1 2 7 | 16 |\n| 26 | 3 | miss | 0 | 1 2 7 3 | 17 |\n| 27 | 0 | miss | 1 | 2 7 3 0 | 18 |\n| 28 | 8 | miss | 2 | 7 3 0 8 | 19 |\n\n**Total page faults = 19** (hits = 29, hit ratio = 29 / 30 = 0.9667)"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 15,
+          "kind": "banker_request",
+          "final_correct": true,
+          "new_tokens": 1185,
+          "truncated": false,
+          "output": "**Apply the three tests of the resource-request algorithm.**\n\n- Test 1: Request [1, 1, 0, 1] vs Need [1, 1, 0, 1]: 1<=1, 1<=1, 0<=0, 1<=1 -> OK\n- Test 2: Request [1, 1, 0, 1] vs Available [1, 1, 1, 1]: 1<=1, 1<=1, 0<=1, 1<=1 -> OK\n- Test 3: pretend to grant. Available = [1, 1, 1, 1] - [1, 1, 0, 1] = [0, 0, 1, 0]; Allocation[P4] = [1, 4, 1, 2]. Now run the safety algorithm.\n- Need = Max - Allocation\n- Work = Available = [0, 0, 1, 0]\n- P1: Need [0, 1, 2, 0] vs Work [0, 0, 1, 0]: 0<=0, 1>0, 2>1, 0<=0 -> cannot run yet\n- P2: Need [1, 6, 6, 1] vs Work [0, 0, 1, 0]: 1>0, 6>0, 6>1, 1>0 -> cannot run yet\n- P3: Need [0, 5, 0, 2] vs Work [0, 0, 1, 0]: 0<=0, 5>0, 0<=1, 2>0 -> cannot run yet\n- P4: Need [0, 0, 0, 0] vs Work [0, 0, 1, 0]: 0<=0, 0<=0, 0<=1, 0<=0 -> all fit, run it. Work = [0, 0, 1, 0] + Allocation [1, 4, 1, 2] = [1, 4, 2, 2]\n- P1: Need [0, 1, 2, 0] vs Work [1, 4, 2, 2]: 0<=1, 1<=4, 2<=2, 0<=2 -> all fit, run it. Work = [1, 4, 2, 2] + Allocation [2, 7, 3, 1] = [3, 11, 5, 3]\n- P2: Need [1, 6, 6, 1] vs Work [3, 11, 5, 3]: 1<=3, 6<=11, 6<=5, 1<=3 -> cannot run yet\n- P3: Need [0, 5, 0, 2] vs Work [3, 11, 5, 3]: 0<=3, 5<=11, 0<=5, 2<=3 -> all fit, run it. Work = [3, 11, 5, 3] + Allocation [0, 3, 0, 3] = [3, 14, 5, 6]\n- P2: Need [1, 6, 6, 1] vs Work [3, 14, 5, 6]: 1<=3, 6<=14, 6<=5, 1<=6 -> cannot run yet\n- P5: Need [0, 4, 1, 4] vs Work [3, 14, 5, 6]: 0<=3, 4<=14, 1<=5, 4<=6 -> all fit, run it. Work = [3, 14, 5, 6] + Allocation [7, 3, 3, 2] = [10, 17, 8, 8]\n- P2: Need [1, 6, 6, 1] vs Work [10, 17, 8, 8]: 1<=10, 6<=17, 6<=8, 1<=8 -> all fit, run it. Work = [10, 17, 8, 8] + Allocation [7, 2, 1, 3] = [17, 19, 9, 11]\n- P6: Need [0, 3, 6, 1] vs Work [17, 19, 9, 11]: 0<=17, 3<=19, 6<=9, 1<=11 -> all fit, run it. Work = [17, 19, 9, 11] + Allocation [0, 1, 1, 2] = [17, 20, 10, 13]\n- SAFE. Safe sequence: < P4, P1, P3, P5, P2, P6 >\n- Resulting state is SAFE (sequence < P4, P1, P3, P5, P2, P6 >) -> GRANT the request\n\n**Conclusion: the request is GRANTED.**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 16,
+          "kind": "banker_safety",
+          "final_correct": true,
+          "new_tokens": 1126,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need = Max - Allocation, row by row** (resources A, B, C, D)\n\n- 3194: [5, 7, 4, 5] - [5, 2, 3, 0] = [0, 5, 1, 5]\n- 3205: [3, 8, 2, 7] - [3, 5, 2, 5] = [0, 3, 0, 2]\n- 3218: [2, 1, 3, 1] - [2, 0, 2, 1] = [0, 1, 1, 0]\n- 3212: [5, 3, 1, 4] - [3, 3, 1, 3] = [2, 0, 0, 1]\n- 3306: [3, 0, 3, 6] - [2, 0, 2, 3] = [1, 0, 1, 3]\n- 3234: [0, 4, 3, 0] - [0, 3, 3, 0] = [0, 1, 0, 0]\n\n**Step 2 - run the safety algorithm**\n\n- Work = Available = [10, 10, 10, 10]\n- 3194: Need [0, 5, 1, 5] vs Work [10, 10, 10, 10]: 0<=10, 5<=10, 1<=10, 5<=10 -> all fit, run it. Work = [10, 10, 10, 10] + Allocation [5, 2, 3, 0] = [15, 12, 13, 10]\n- 3205: Need [0, 3, 0, 2] vs Work [15, 12, 13, 10]: 0<=15, 3<=12, 0<=13, 2<=10 -> all fit, run it. Work = [15, 12, 13, 10] + Allocation [3, 5, 2, 5] = [18, 17, 15, 15]\n- 3218: Need [0, 1, 1, 0] vs Work [18, 17, 15, 15]: 0<=18, 1<=17, 1<=15, 0<=15 -> all fit, run it. Work = [18, 17, 15, 15] + Allocation [2, 0, 2, 1] = [20, 17, 17, 16]\n- 3212: Need [2, 0, 0, 1] vs Work [20, 17, 17, 16]: 2<=20, 0<=17, 0<=17, 1<=16 -> all fit, run it. Work = [20, 17, 17, 16] + Allocation [3, 3, 1, 3] = [23, 20, 18, 19]\n- 3306: Need [1, 0, 1, 3] vs Work [23, 20, 18, 19]: 1<=23, 0<=20, 1<=18, 3<=19 -> all fit, run it. Work = [23, 20, 18, 19] + Allocation [2, 0, 2, 3] = [25, 20, 20, 22]\n- 3234: Need [0, 1, 0, 0] vs Work [25, 20, 20, 22]: 0<=25, 1<=20, 0<=20, 0<=22 -> all fit, run it. Work = [25, 20, 20, 22] + Allocation [0, 3, 3, 0] = [25, 23, 23, 22]\n\n**Step 3 - conclusion**\n\nAll 6 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< 3194, 3205, 3218, 3212, 3306, 3234 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 17,
+          "kind": "banker_safety",
+          "final_correct": false,
+          "new_tokens": 979,
+          "truncated": false,
+          "output": "**Step 1 - compute the Need matrix (Max - Allocation)**\n\n- T1: [5, 7, 2] - [4, 0, 1] = [1, 7, 1]\n- T2: [1, 2, 8] - [1, 0, 4] = [0, 2, 4]\n- T3: [6, 4, 6] - [2, 1, 4] = [4, 3, 2]\n- T4: [8, 6, 0] - [6, 6, 0] = [2, 0, 0]\n- T5: [6, 2, 0] - [6, 2, 0] = [0, 0, 0]\n- T6: [0, 0, 2] - [0, 0, 0] = [0, 0, 2]\n- T7: [2, 0, 5] - [0, 0, 4] = [2, 0, 1]\n\n**Step 2 - run the safety algorithm**\n\n- Work = Available = Max - Sum of Allocation = [7, 7, 10] - [4, 0, 1] = [3, 7, 9]\n- T1: Need [1, 7, 1] vs Work [3, 7, 9]: 1<=3, 7<=7, 1<=9 -> all fit, run it. Work = [3, 7, 9] + Allocation [4, 0, 1] = [7, 7, 10]\n- T2: Need [0, 2, 4] vs Work [7, 7, 10]: 0<=7, 2<=7, 4<=10 -> all fit, run it. Work = [7, 7, 10] + Allocation [1, 0, 4] = [8, 7, 14]\n- T3: Need [4, 3, 2] vs Work [8, 7, 14]: 4<=8, 3<=7, 2<=14 -> all fit, run it. Work = [8, 7, 14] + Allocation [2, 1, 4] = [10, 8, 18]\n- T4: Need [2, 0, 0] vs Work [10, 8, 18]: 2<=10, 0<=8, 0<=18 -> all fit, run it. Work = [10, 8, 18] + Allocation [6, 6, 0] = [16, 14, 18]\n- T5: Need [0, 0, 0] vs Work [16, 14, 18]: 0<=16, 0<=14, 0<=18 -> all fit, run it. Work = [16, 14, 18] + Allocation [6, 2, 0] = [22, 16, 18]\n- T6: Need [0, 0, 2] vs Work [22, 16, 18]: 0<=22, 0<=16, 2<=18 -> all fit, run it. Work = [22, 16, 18] + Allocation [0, 0, 0] = [22, 16, 18]\n- T7: Need [2, 0, 1] vs Work [22, 16, 18]: 2<=22, 0<=16, 1<=18 -> all fit, run it. Work = [22, 16, 18] + Allocation [0, 0, 4] = [22, 16, 22]\n\n**Step 3 - conclusion**\n\nAll 7 processes can complete, so the system is in a **SAFE state**.\nA safe sequence is **< T1, T2, T3, T4, T5, T6, T7 >**.\n\n_Safe sequences are not unique: any ordering in which each process's Need is met by the running Work vector is equally correct._"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 18,
+          "kind": "scheduling",
+          "final_correct": true,
+          "new_tokens": 958,
+          "truncated": false,
+          "output": "**Algorithm: FCFS**\n\n**Step 1 - build the schedule**\n- t=1: T1 runs (arrived t=1, burst 12) -> completes at 1 + 12 = 13\n- t=13: T2 runs (arrived t=3, burst 3) -> completes at 13 + 3 = 16\n- t=16: T3 runs (arrived t=5, burst 3) -> completes at 16 + 3 = 19\n- t=19: T4 runs (arrived t=8, burst 11) -> completes at 19 + 11 = 30\n- t=30: T5 runs (arrived t=11, burst 8) -> completes at 30 + 8 = 38\n- t=38: T6 runs (arrived t=15, burst 7) -> completes at 38 + 7 = 45\n- t=45: T7 runs (arrived t=19, burst 4) -> completes at 45 + 4 = 49\n- t=49: T8 runs (arrived t=23, burst 5) -> completes at 49 + 5 = 54\n\n**Step 2 - Gantt chart:** T1[1-13] T2[13-16] T3[16-19] T4[19-30] T5[30-38] T6[38-45] T7[45-49] T8[49-54]\n\n**Step 3 - per-process times** (Turnaround = Completion - Arrival; Waiting = Turnaround - Burst)\n\n| Process | Arrival | Burst | Completion | Turnaround | Waiting |\n|---------|---------|-------|------------|-------------|--------------|\n| T1 | 1 | 12 | 13 | 13 - 1 = 12 | 12 - 12 = 0 |\n| T2 | 3 | 3 | 16 | 16 - 3 = 13 | 13 - 3 = 10 |\n| T3 | 5 | 3 | 19 | 19 - 5 = 14 | 14 - 3 = 11 |\n| T4 | 8 | 11 | 30 | 30 - 8 = 22 | 22 - 11 = 11 |\n| T5 | 11 | 8 | 38 | 38 - 11 = 27 | 27 - 8 = 19 |\n| T6 | 15 | 7 | 45 | 45 - 15 = 30 | 30 - 7 = 23 |\n| T7 | 19 | 4 | 49 | 49 - 19 = 30 | 30 - 4 = 26 |\n| T8 | 23 | 5 | 54 | 54 - 23 = 31 | 31 - 5 = 26 |\n\n**Step 4 - averages**\n\n- Sum of waiting times: 0 + 10 = 10, 10 + 11 = 21, 21 + 11 = 32, 32 + 19 = 51, 51 + 23 = 74, 74 + 26 = 100, 100 + 26 = 126\n- Average waiting time = 126 / 8 = **15.75**\n- Sum of turnaround times: 12 + 13 = 25, 25 + 14 = 39, 39 + 22 = 61, 61 + 27 = 88, 88 + 30 = 118, 118 + 30 = 148, 148 + 31 = 179\n- Average turnaround time = 179 / 8 = **22.38**"
+        },
+        {
+          "suite": "os_solve_ood",
+          "index": 19,
+          "kind": "freespace",
+          "final_correct": false,
+          "new_tokens": 3072,
+          "truncated": true,
+          "output": "**Policy: WORST-fit**\n\n- holes (free KB, by number): hole 0=165, hole 1=222, hole 2=360, hole 3=227, hole 4=356\n- request 1000: fitting holes [hole 2=360, hole 4=356] -> largest fitting hole = hole 2; 360 - 1000 = -640 (negative -> must WAIT)\n- request 200: fitting holes [hole 1=222, hole 3=227, hole 4=356] -> largest fitting hole = hole 4; 356 - 200 = 156\n- request 100: fitting holes [hole 1=222, hole 3=227, hole 4=156] -> largest fitting hole = hole 1; 222 - 100 = 122\n- request 100: fitting holes [hole 3=227, hole 4=156] -> largest fitting hole = hole 3; 227 - 100 = 127\n- request 100: fitting holes [hole 3=127, hole 4=156] -> largest fitting hole = hole 4; 156 - 100 = 56\n- request 100: fitting holes [hole 3=127] -> largest fitting hole = hole 3; 127 - 100 = 27\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165, 122, -640, 27, 56], none >= 100 -> must WAIT\n- request 100: free sizes [165,"
+        }
+      ]
+    }
+  },
+  "generalisation_gap": 0.15
+}

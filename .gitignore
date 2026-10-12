@@ -1,0 +1,36 @@
+# Version control covers code, docs, reports and evaluation sets (~8 MB).
+# Everything below is either large, reproducible from tracked code, licence-restricted,
+# or secret. See docs/DECISIONS.md (D-001).
+
+# --- large or reproducible artefacts -------------------------------------------------
+models/
+outputs/
+data/raw/
+data/build/
+serve/llama.cpp/
+serve/.venv-webui/
+serve/webui-data/
+serve/logs/
+serve/_dl/
+dist/
+_archive/
+ostutor-lora/
+*.zip
+*.gguf
+*.safetensors
+*.bin
+
+# --- licensing: OSTEP homework is an offline test oracle, never redistributed ---------
+oracle/
+
+# --- secrets ---------------------------------------------------------------------------
+.webui_secret_key
+kaggle.json
+*.key
+.env
+
+# --- tooling / scratch -----------------------------------------------------------------
+__pycache__/
+*.pyc
+.vscode/
+docs/_case_study_*

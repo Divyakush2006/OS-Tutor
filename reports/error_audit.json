@@ -1,0 +1,1170 @@
+{
+ "summary": {
+  "by_cause": {
+   "arithmetic": 36,
+   "procedure": 32,
+   "counting": 8,
+   "other": 5,
+   "truncated": 1
+  },
+  "operators": {
+   "multi-term sum/avg": 22,
+   "vector-compare": 22,
+   "+": 13,
+   "mod": 10
+  },
+  "by_kind": {
+   "scheduling": {
+    "arithmetic": 13,
+    "procedure": 3,
+    "truncated": 1
+   },
+   "banker_safety": {
+    "arithmetic": 10,
+    "other": 2
+   },
+   "freespace": {
+    "procedure": 17
+   },
+   "paging": {
+    "counting": 8,
+    "procedure": 4
+   },
+   "translate": {
+    "arithmetic": 13
+   },
+   "disk": {
+    "procedure": 8
+   },
+   "banker_request": {
+    "other": 3
+   }
+  }
+ },
+ "items": [
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 0,
+   "kind": "scheduling",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(23 + 19 + 3 + 4) / 4 = **12.0"
+    }
+   ],
+   "ops_checked": 2,
+   "divergence": "state: T1 completion 35, correct 25"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 4,
+   "kind": "banker_safety",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "vector-compare",
+     "expr": "Need [1, 0, 6, 2] <= Work [6, 6, 5, 11]"
+    }
+   ],
+   "ops_checked": 10,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 5,
+   "kind": "scheduling",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(0 + 10 + 11 + 10 + 17 + 26) / 6 = **12.0"
+    },
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(11 + 12 + 12 + 17 + 26 + 38) / 6 = **18.67"
+    }
+   ],
+   "ops_checked": 2,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 6,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 252 placed in hole 2, correct 3"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 7,
+   "kind": "paging",
+   "cause": "counting",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "count: table shows 6 faults, stated total 7"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 8,
+   "kind": "translate",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "+",
+     "expr": "1024 + 118 = 9374"
+    }
+   ],
+   "ops_checked": 3,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 10,
+   "kind": "scheduling",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 2,
+   "divergence": "state: T1 completion 34, correct 33"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 11,
+   "kind": "paging",
+   "cause": "counting",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "count: table shows 12 faults, stated total 11"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 13,
+   "kind": "paging",
+   "cause": "counting",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "count: table shows 7 faults, stated total 8"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 15,
+   "kind": "paging",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: reference #8 evicted 3, correct 6"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 16,
+   "kind": "paging",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: reference #5 evicted 1, correct 2"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 17,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 187 placed in hole 0, correct 1"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 18,
+   "kind": "translate",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "mod",
+     "expr": "4604 mod 1024 = 524"
+    },
+    {
+     "op": "+",
+     "expr": "1024 + 524 = 26124"
+    }
+   ],
+   "ops_checked": 3,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 20,
+   "kind": "scheduling",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(0 + 8 + 18 + 27 + 41 + 38) / 6 = **22.33"
+    },
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(8 + 18 + 27 + 38 + 50 + 41) / 6 = **31.33"
+    }
+   ],
+   "ops_checked": 2,
+   "divergence": "copy: 3901 arrival/burst 3928/3939, actual 0/8"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 21,
+   "kind": "banker_safety",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "vector-compare",
+     "expr": "Need [2, 0, 2] <= Work [5, 1, 1]"
+    },
+    {
+     "op": "vector-compare",
+     "expr": "Need [1, 4, 3] <= Work [15, 3, 5]"
+    },
+    {
+     "op": "vector-compare",
+     "expr": "Need [3, 7, 1] > Work [18, 12, 5]"
+    }
+   ],
+   "ops_checked": 11,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 22,
+   "kind": "scheduling",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(0 + 8 + 41 + 4 + 12 + 19) / 6 = **14.67"
+    },
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(8 + 16 + 52 + 13 + 22 + 31) / 6 = **23.33"
+    }
+   ],
+   "ops_checked": 2,
+   "divergence": "state: C completion 61, correct 49"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 23,
+   "kind": "translate",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "mod",
+     "expr": "4342 mod 1024 = 274"
+    },
+    {
+     "op": "+",
+     "expr": "1024 + 274 = 27982"
+    }
+   ],
+   "ops_checked": 3,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 24,
+   "kind": "translate",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "mod",
+     "expr": "8601 mod 2048 = 357"
+    },
+    {
+     "op": "+",
+     "expr": "2048 + 357 = 43325"
+    }
+   ],
+   "ops_checked": 3,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 25,
+   "kind": "translate",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "mod",
+     "expr": "18159 mod 4096 = 2271"
+    },
+    {
+     "op": "+",
+     "expr": "4096 + 2271 = 38937"
+    }
+   ],
+   "ops_checked": 3,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 26,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 382 placed in hole 1, correct 2"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 27,
+   "kind": "scheduling",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 2,
+   "divergence": "state: A completion 18, correct 12"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 31,
+   "kind": "scheduling",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(0 + 25 + 1 + 16 + 1 + 1) / 6 = **8.5"
+    },
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(8 + 34 + 9 + 17 + 2 + 12) / 6 = **14.0"
+    }
+   ],
+   "ops_checked": 2,
+   "divergence": "state: B completion 38, correct 37"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 32,
+   "kind": "disk",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: service step 1 went to 49, correct 102"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 33,
+   "kind": "scheduling",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(3 + 9 + 29 + 16 + 24) / 5 = **14.2"
+    }
+   ],
+   "ops_checked": 2,
+   "divergence": "state: J1 completion 5, correct 2"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 35,
+   "kind": "translate",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "+",
+     "expr": "2048 + 1462 = 43998"
+    }
+   ],
+   "ops_checked": 3,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 36,
+   "kind": "banker_safety",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "vector-compare",
+     "expr": "Need [0, 0, 8] <= Work [1, 2, 2]"
+    }
+   ],
+   "ops_checked": 12,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_indist",
+   "index": 37,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 145 placed in hole 1, correct 0"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 2,
+   "kind": "disk",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: service step 3 went to 5, correct 60"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 3,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 466 placed in hole 5, correct 0"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 6,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 180 placed in hole 1, correct 3"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 7,
+   "kind": "disk",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: service step 1 went to 208, correct 139"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 8,
+   "kind": "banker_safety",
+   "cause": "other",
+   "arithmetic": [],
+   "ops_checked": 14,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 10,
+   "kind": "translate",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "mod",
+     "expr": "11800 mod 2048 = 1504"
+    },
+    {
+     "op": "+",
+     "expr": "2048 + 1504 = 56384"
+    }
+   ],
+   "ops_checked": 3,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 11,
+   "kind": "translate",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "mod",
+     "expr": "4114 mod 1024 = 14"
+    },
+    {
+     "op": "+",
+     "expr": "1024 + 14 = 18466"
+    }
+   ],
+   "ops_checked": 3,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 12,
+   "kind": "scheduling",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(0 + 10 + 22 + 30 + 41 + 18 + 49 + 50 + 30) / 9 = **26.44"
+    },
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(12 + 20 + 31 + 35 + 51 + 24 + 50 + 51 + 50) / 9 = **33.78"
+    }
+   ],
+   "ops_checked": 2,
+   "divergence": "state: beta completion 22, correct 53"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 13,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 200 placed in hole 3, correct 1"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 14,
+   "kind": "paging",
+   "cause": "counting",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "count: table shows 20 faults, stated total 18"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 15,
+   "kind": "banker_request",
+   "cause": "other",
+   "arithmetic": [],
+   "ops_checked": 7,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 16,
+   "kind": "banker_safety",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "vector-compare",
+     "expr": "Need [0, 5, 1, 5] <= Work [5, 2, 3, 0]"
+    },
+    {
+     "op": "vector-compare",
+     "expr": "Need [0, 3, 0, 2] <= Work [5, 2, 3, 0]"
+    },
+    {
+     "op": "vector-compare",
+     "expr": "Need [2, 0, 0, 1] <= Work [5, 2, 3, 0]"
+    },
+    {
+     "op": "vector-compare",
+     "expr": "Need [1, 0, 1, 3] <= Work [5, 2, 3, 0]"
+    }
+   ],
+   "ops_checked": 6,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 17,
+   "kind": "banker_safety",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "vector-compare",
+     "expr": "Need [1, 7, 1] > Work [7, 7, 7]"
+    },
+    {
+     "op": "vector-compare",
+     "expr": "Need [1, 7, 1] > Work [8, 7, 11]"
+    }
+   ],
+   "ops_checked": 16,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 18,
+   "kind": "scheduling",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(0 + 10 + 11 + 11 + 19 + 23 + 26 + 26) / 8 = **16.5"
+    },
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(12 + 13 + 14 + 22 + 27 + 30 + 30 + 31) / 8 = **22.5"
+    }
+   ],
+   "ops_checked": 2,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 19,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 120 placed in hole 3, correct 2"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 20,
+   "kind": "disk",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: service step 1 went to 56, correct 43"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 21,
+   "kind": "banker_safety",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "vector-compare",
+     "expr": "Need [2, 2, 5, 0] <= Work [6, 6, 1, 0]"
+    },
+    {
+     "op": "vector-compare",
+     "expr": "Need [6, 2, 3, 3] <= Work [6, 11, 1, 8]"
+    }
+   ],
+   "ops_checked": 13,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 24,
+   "kind": "disk",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: service step 7 went to 3, correct 37"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 25,
+   "kind": "disk",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: service step 1 went to 88, correct 61"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 26,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 200 placed in hole 2, correct 1"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 28,
+   "kind": "scheduling",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(28 + 14 + 17 + 33 + 32 + 0 + 0 + 32 + 0 + 35) / 10 = **20.8"
+    }
+   ],
+   "ops_checked": 2,
+   "divergence": "state: T1 completion 36, correct 8"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 30,
+   "kind": "banker_safety",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "vector-compare",
+     "expr": "Need [0, 0, 4, 1] <= Work [1, 1, 2, 2]"
+    },
+    {
+     "op": "vector-compare",
+     "expr": "Need [0, 1, 4, 1] <= Work [2, 1, 2, 4]"
+    }
+   ],
+   "ops_checked": 17,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 34,
+   "kind": "scheduling",
+   "cause": "truncated",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "copy: 6358 arrival/burst 6376/6384, actual 5/3"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 36,
+   "kind": "banker_request",
+   "cause": "other",
+   "arithmetic": [],
+   "ops_checked": 1,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 37,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 200 placed in hole 1, correct 0"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 38,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 120 placed in hole 2, correct 1"
+  },
+  {
+   "report": "eval_finetuned_v2.0.json",
+   "suite": "os_solve_ood",
+   "index": 39,
+   "kind": "translate",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "mod",
+     "expr": "17842 mod 4096 = 1250"
+    },
+    {
+     "op": "+",
+     "expr": "4096 + 1250 = 34338"
+    }
+   ],
+   "ops_checked": 3,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_indist",
+   "index": 0,
+   "kind": "scheduling",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(23 + 19 + 3 + 4) / 4 = **12.0"
+    }
+   ],
+   "ops_checked": 2,
+   "divergence": "state: T1 completion 35, correct 25"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_indist",
+   "index": 4,
+   "kind": "banker_safety",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "vector-compare",
+     "expr": "Need [1, 0, 6, 2] <= Work [6, 6, 5, 11]"
+    }
+   ],
+   "ops_checked": 10,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_indist",
+   "index": 5,
+   "kind": "scheduling",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(0 + 10 + 11 + 10 + 17 + 26) / 6 = **12.0"
+    },
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(11 + 12 + 12 + 17 + 26 + 38) / 6 = **18.67"
+    }
+   ],
+   "ops_checked": 2,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_indist",
+   "index": 6,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 252 placed in hole 2, correct 3"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_indist",
+   "index": 7,
+   "kind": "paging",
+   "cause": "counting",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "count: table shows 6 faults, stated total 7"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_indist",
+   "index": 8,
+   "kind": "translate",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "+",
+     "expr": "1024 + 118 = 9374"
+    }
+   ],
+   "ops_checked": 3,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_indist",
+   "index": 10,
+   "kind": "scheduling",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 2,
+   "divergence": "state: T1 completion 34, correct 33"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_indist",
+   "index": 11,
+   "kind": "paging",
+   "cause": "counting",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "count: table shows 12 faults, stated total 11"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_indist",
+   "index": 13,
+   "kind": "paging",
+   "cause": "counting",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "count: table shows 7 faults, stated total 8"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_indist",
+   "index": 15,
+   "kind": "paging",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: reference #8 evicted 3, correct 6"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_indist",
+   "index": 16,
+   "kind": "paging",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: reference #5 evicted 1, correct 2"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_indist",
+   "index": 17,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 187 placed in hole 0, correct 1"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_indist",
+   "index": 18,
+   "kind": "translate",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "mod",
+     "expr": "4604 mod 1024 = 524"
+    },
+    {
+     "op": "+",
+     "expr": "1024 + 524 = 26124"
+    }
+   ],
+   "ops_checked": 3,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 2,
+   "kind": "disk",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: service step 3 went to 5, correct 60"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 3,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 466 placed in hole 5, correct 0"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 6,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 180 placed in hole 1, correct 3"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 7,
+   "kind": "disk",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: service step 1 went to 208, correct 139"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 8,
+   "kind": "banker_safety",
+   "cause": "other",
+   "arithmetic": [],
+   "ops_checked": 14,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 10,
+   "kind": "translate",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "mod",
+     "expr": "11800 mod 2048 = 1504"
+    },
+    {
+     "op": "+",
+     "expr": "2048 + 1504 = 56384"
+    }
+   ],
+   "ops_checked": 3,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 11,
+   "kind": "translate",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "mod",
+     "expr": "4114 mod 1024 = 14"
+    },
+    {
+     "op": "+",
+     "expr": "1024 + 14 = 18466"
+    }
+   ],
+   "ops_checked": 3,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 12,
+   "kind": "scheduling",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(0 + 10 + 22 + 30 + 41 + 18 + 49 + 50 + 30) / 9 = **26.44"
+    },
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(12 + 20 + 31 + 35 + 51 + 24 + 50 + 51 + 50) / 9 = **33.78"
+    }
+   ],
+   "ops_checked": 2,
+   "divergence": "state: beta completion 22, correct 53"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 13,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 200 placed in hole 3, correct 1"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 14,
+   "kind": "paging",
+   "cause": "counting",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "count: table shows 20 faults, stated total 18"
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 15,
+   "kind": "banker_request",
+   "cause": "other",
+   "arithmetic": [],
+   "ops_checked": 7,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 16,
+   "kind": "banker_safety",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "vector-compare",
+     "expr": "Need [0, 5, 1, 5] <= Work [5, 2, 3, 0]"
+    },
+    {
+     "op": "vector-compare",
+     "expr": "Need [0, 3, 0, 2] <= Work [5, 2, 3, 0]"
+    },
+    {
+     "op": "vector-compare",
+     "expr": "Need [2, 0, 0, 1] <= Work [5, 2, 3, 0]"
+    },
+    {
+     "op": "vector-compare",
+     "expr": "Need [1, 0, 1, 3] <= Work [5, 2, 3, 0]"
+    }
+   ],
+   "ops_checked": 6,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 17,
+   "kind": "banker_safety",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "vector-compare",
+     "expr": "Need [1, 7, 1] > Work [7, 7, 7]"
+    },
+    {
+     "op": "vector-compare",
+     "expr": "Need [1, 7, 1] > Work [8, 7, 11]"
+    }
+   ],
+   "ops_checked": 16,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 18,
+   "kind": "scheduling",
+   "cause": "arithmetic",
+   "arithmetic": [
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(0 + 10 + 11 + 11 + 19 + 23 + 26 + 26) / 8 = **16.5"
+    },
+    {
+     "op": "multi-term sum/avg",
+     "expr": "(12 + 13 + 14 + 22 + 27 + 30 + 30 + 31) / 8 = **22.5"
+    }
+   ],
+   "ops_checked": 2,
+   "divergence": null
+  },
+  {
+   "report": "eval_finetuned_v2.0_long.json",
+   "suite": "os_solve_ood",
+   "index": 19,
+   "kind": "freespace",
+   "cause": "procedure",
+   "arithmetic": [],
+   "ops_checked": 0,
+   "divergence": "choice: request 120 placed in hole 3, correct 2"
+  }
+ ]
+}

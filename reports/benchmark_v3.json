@@ -1,0 +1,350 @@
+[
+ {
+  "label": "base",
+  "n": 57,
+  "correct": 24,
+  "accuracy": 0.4211,
+  "delegated": 0,
+  "truncated": 4,
+  "seconds": 1710.9,
+  "by_kind": {
+   "scheduling": {
+    "correct": 5,
+    "n": 12
+   },
+   "paging": {
+    "correct": 3,
+    "n": 8
+   },
+   "banker_safety": {
+    "correct": 1,
+    "n": 4
+   },
+   "banker_request": {
+    "correct": 1,
+    "n": 2
+   },
+   "disk": {
+    "correct": 1,
+    "n": 7
+   },
+   "translate": {
+    "correct": 2,
+    "n": 3
+   },
+   "freespace": {
+    "correct": 0,
+    "n": 4
+   },
+   "eat_tlb": {
+    "correct": 0,
+    "n": 2
+   },
+   "eat_pagefault": {
+    "correct": 1,
+    "n": 1
+   },
+   "paging_bits": {
+    "correct": 0,
+    "n": 1
+   },
+   "multilevel_paging": {
+    "correct": 1,
+    "n": 1
+   },
+   "disk_access": {
+    "correct": 1,
+    "n": 1
+   },
+   "deadlock_min": {
+    "correct": 0,
+    "n": 2
+   },
+   "fork_count": {
+    "correct": 2,
+    "n": 2
+   },
+   "semaphore": {
+    "correct": 1,
+    "n": 1
+   },
+   "internal_frag": {
+    "correct": 1,
+    "n": 1
+   },
+   "cpu_util": {
+    "correct": 0,
+    "n": 1
+   },
+   "cache_eat": {
+    "correct": 1,
+    "n": 1
+   },
+   "clarify": {
+    "correct": 3,
+    "n": 3
+   }
+  }
+ },
+ {
+  "label": "v2.2",
+  "n": 57,
+  "correct": 15,
+  "accuracy": 0.2632,
+  "delegated": 0,
+  "truncated": 3,
+  "seconds": 788.0,
+  "by_kind": {
+   "scheduling": {
+    "correct": 1,
+    "n": 12
+   },
+   "paging": {
+    "correct": 2,
+    "n": 8
+   },
+   "banker_safety": {
+    "correct": 2,
+    "n": 4
+   },
+   "banker_request": {
+    "correct": 1,
+    "n": 2
+   },
+   "disk": {
+    "correct": 3,
+    "n": 7
+   },
+   "translate": {
+    "correct": 1,
+    "n": 3
+   },
+   "freespace": {
+    "correct": 0,
+    "n": 4
+   },
+   "eat_tlb": {
+    "correct": 1,
+    "n": 2
+   },
+   "eat_pagefault": {
+    "correct": 0,
+    "n": 1
+   },
+   "paging_bits": {
+    "correct": 0,
+    "n": 1
+   },
+   "multilevel_paging": {
+    "correct": 0,
+    "n": 1
+   },
+   "disk_access": {
+    "correct": 0,
+    "n": 1
+   },
+   "deadlock_min": {
+    "correct": 1,
+    "n": 2
+   },
+   "fork_count": {
+    "correct": 0,
+    "n": 2
+   },
+   "semaphore": {
+    "correct": 1,
+    "n": 1
+   },
+   "internal_frag": {
+    "correct": 1,
+    "n": 1
+   },
+   "cpu_util": {
+    "correct": 0,
+    "n": 1
+   },
+   "cache_eat": {
+    "correct": 1,
+    "n": 1
+   },
+   "clarify": {
+    "correct": 0,
+    "n": 3
+   }
+  }
+ },
+ {
+  "label": "v3",
+  "n": 57,
+  "correct": 17,
+  "accuracy": 0.2982,
+  "delegated": 0,
+  "truncated": 2,
+  "seconds": 806.0,
+  "by_kind": {
+   "scheduling": {
+    "correct": 3,
+    "n": 12
+   },
+   "paging": {
+    "correct": 0,
+    "n": 8
+   },
+   "banker_safety": {
+    "correct": 2,
+    "n": 4
+   },
+   "banker_request": {
+    "correct": 1,
+    "n": 2
+   },
+   "disk": {
+    "correct": 3,
+    "n": 7
+   },
+   "translate": {
+    "correct": 1,
+    "n": 3
+   },
+   "freespace": {
+    "correct": 0,
+    "n": 4
+   },
+   "eat_tlb": {
+    "correct": 1,
+    "n": 2
+   },
+   "eat_pagefault": {
+    "correct": 0,
+    "n": 1
+   },
+   "paging_bits": {
+    "correct": 0,
+    "n": 1
+   },
+   "multilevel_paging": {
+    "correct": 1,
+    "n": 1
+   },
+   "disk_access": {
+    "correct": 0,
+    "n": 1
+   },
+   "deadlock_min": {
+    "correct": 0,
+    "n": 2
+   },
+   "fork_count": {
+    "correct": 2,
+    "n": 2
+   },
+   "semaphore": {
+    "correct": 1,
+    "n": 1
+   },
+   "internal_frag": {
+    "correct": 1,
+    "n": 1
+   },
+   "cpu_util": {
+    "correct": 0,
+    "n": 1
+   },
+   "cache_eat": {
+    "correct": 1,
+    "n": 1
+   },
+   "clarify": {
+    "correct": 0,
+    "n": 3
+   }
+  }
+ },
+ {
+  "label": "v3+solver",
+  "n": 57,
+  "correct": 47,
+  "accuracy": 0.8246,
+  "delegated": 38,
+  "truncated": 0,
+  "seconds": 147.4,
+  "by_kind": {
+   "scheduling": {
+    "correct": 12,
+    "n": 12
+   },
+   "paging": {
+    "correct": 7,
+    "n": 8
+   },
+   "banker_safety": {
+    "correct": 4,
+    "n": 4
+   },
+   "banker_request": {
+    "correct": 2,
+    "n": 2
+   },
+   "disk": {
+    "correct": 7,
+    "n": 7
+   },
+   "translate": {
+    "correct": 3,
+    "n": 3
+   },
+   "freespace": {
+    "correct": 4,
+    "n": 4
+   },
+   "eat_tlb": {
+    "correct": 1,
+    "n": 2
+   },
+   "eat_pagefault": {
+    "correct": 0,
+    "n": 1
+   },
+   "paging_bits": {
+    "correct": 0,
+    "n": 1
+   },
+   "multilevel_paging": {
+    "correct": 1,
+    "n": 1
+   },
+   "disk_access": {
+    "correct": 0,
+    "n": 1
+   },
+   "deadlock_min": {
+    "correct": 1,
+    "n": 2
+   },
+   "fork_count": {
+    "correct": 2,
+    "n": 2
+   },
+   "semaphore": {
+    "correct": 1,
+    "n": 1
+   },
+   "internal_frag": {
+    "correct": 1,
+    "n": 1
+   },
+   "cpu_util": {
+    "correct": 0,
+    "n": 1
+   },
+   "cache_eat": {
+    "correct": 1,
+    "n": 1
+   },
+   "clarify": {
+    "correct": 0,
+    "n": 3
+   }
+  }
+ }
+]

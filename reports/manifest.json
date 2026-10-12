@@ -1,0 +1,653 @@
+{
+  "dataset": "ostutor-sft",
+  "pipeline_version": "3.0.0",
+  "built_utc": "2026-09-20T08:02:07+00:00",
+  "python": "3.13.3",
+  "seed": 42,
+  "config_sha256": "9911d5b564141e53507805b47fcddcecca1c05998122aae0959371933d6d9914",
+  "stages": {
+    "ingest": {
+      "teacher_moves": {
+        "probing": 3300,
+        "generic": 3566,
+        "telling": 2493,
+        "focus": 5549
+      },
+      "by_category": {
+        "procedural": 16720,
+        "conceptual": 1485,
+        "tutoring": 3633,
+        "shell": 21066,
+        "replay": 37828
+      },
+      "excluded_sources": {
+        "AnishJoshi/nl2bash-custom": "no declared licence; superseded by MIT TellinaTool data/bash",
+        "ostep-homework": "no declared licence; offline test oracle only, never ingested",
+        "ceval/ceval-exam": "CC BY-NC-SA: evaluation only, never training"
+      }
+    },
+    "analysis": {
+      "procedural": {
+        "rows": 16720,
+        "actionable_defects": {
+          "no_visible_steps": 278,
+          "no_final_answer_marker": 434
+        },
+        "rejected_rules": [],
+        "distinct_answer_ratio": 0.9006
+      },
+      "conceptual": {
+        "rows": 1485,
+        "actionable_defects": {
+          "too_short": 3,
+          "unstructured_wall": 1
+        },
+        "rejected_rules": [],
+        "distinct_answer_ratio": 1.0
+      },
+      "tutoring": {
+        "rows": 3633,
+        "actionable_defects": {
+          "non_alternating_roles": 283,
+          "dead_tail": 262,
+          "never_asks_question": 212,
+          "leaks_answer_first_turn": 31,
+          "mostly_degenerate": 1
+        },
+        "rejected_rules": [
+          "answer_shorter_than_question"
+        ],
+        "distinct_answer_ratio": 0.8252
+      },
+      "shell": {
+        "rows": 21066,
+        "actionable_defects": {
+          "editor_keystrokes": 70,
+          "bash_syntax_error": 126,
+          "instruction_too_vague": 181,
+          "absurd_length": 1
+        },
+        "rejected_rules": [
+          "answer_ends_midsentence",
+          "brace_placeholder"
+        ],
+        "distinct_answer_ratio": 0.8959
+      },
+      "replay": {
+        "rows": 37828,
+        "actionable_defects": {
+          "non_latin_script": 1498,
+          "answer_tiny": 3900,
+          "answer_wall": 434,
+          "model_self_reference": 117,
+          "refusal": 936
+        },
+        "rejected_rules": [],
+        "distinct_answer_ratio": 0.9527
+      }
+    },
+    "clean": {
+      "input": 80732,
+      "kept": 70170,
+      "dropped": {
+        "degenerate_repetition": 1320,
+        "conceptual_too_short": 3,
+        "conceptual_unstructured_wall": 1,
+        "tutoring_never_asks_question": 212,
+        "tutoring_leaks_answer_turn1": 30,
+        "assistant_too_short": 1515,
+        "shell_instruction_vague": 171,
+        "secret_material": 54,
+        "shell_editor_keystrokes": 43,
+        "shell_bash_syntax_error": 126,
+        "shell_absurd_length": 1,
+        "refusal": 1214,
+        "replay_non_latin_script": 1494,
+        "replay_answer_tiny": 3617,
+        "over_char_budget": 135,
+        "model_self_reference": 132,
+        "replay_answer_wall": 412,
+        "user_too_short": 67,
+        "empty_after_normalise": 13,
+        "no_assistant_turn": 2
+      },
+      "repaired": {
+        "trimmed_dead_tail": 261,
+        "merged_same_role_turns": 261
+      },
+      "pii_redactions": {
+        "cc": 377,
+        "email": 180,
+        "phone": 149,
+        "ssn": 1
+      }
+    },
+    "dedup": {
+      "exact_removed": 656,
+      "lexical_removed": 1133,
+      "lexical_by_category": {
+        "procedural": 791,
+        "replay": 11,
+        "shell": 331
+      }
+    },
+    "decontaminate": {
+      "ngram_n": 13,
+      "eval_items": 4836,
+      "eval_ngrams": 205851,
+      "shared_ngrams": 11876,
+      "boilerplate_ngrams": 93,
+      "boilerplate_df_threshold": 5,
+      "eval_fingerprints": 1956,
+      "fingerprint_matches": 15,
+      "removed": {
+        "procedural": 15,
+        "shell": 102,
+        "tutoring": 491,
+        "replay": 35
+      },
+      "removed_total": 643
+    },
+    "score": {
+      "conceptual": 0.6924,
+      "procedural": 0.8334,
+      "replay": 0.7675,
+      "shell": 0.7278,
+      "tutoring": 0.8042
+    },
+    "gold_selection": {
+      "procedural": {
+        "raw_pool": 15420,
+        "quality_floor": 0.6,
+        "after_gate": 15420,
+        "distinct_supply": 15092,
+        "semdup_removed": 328,
+        "family_allocation": {
+          "cpu_scheduling": 1761,
+          "deadlock_bankers": 1093,
+          "contiguous_allocation": 545,
+          "page_replacement": 1014,
+          "disk_scheduling": 1014,
+          "address_translation": 390,
+          "formula": 1561,
+          "clarify": 302
+        },
+        "quota": 7680,
+        "selected": 7680,
+        "cap_backfilled": 0,
+        "mean_quality": 0.845,
+        "subcategories": {
+          "address_translation": 390,
+          "clarify_banker_avail": 66,
+          "clarify_fit_reqs": 73,
+          "clarify_page_size": 71,
+          "clarify_paging_frames": 48,
+          "clarify_priorities": 7,
+          "clarify_request_vector": 4,
+          "clarify_rr_quantum": 33,
+          "contiguous_allocation_best": 182,
+          "contiguous_allocation_first": 182,
+          "contiguous_allocation_worst": 181,
+          "cpu_scheduling_fcfs": 272,
+          "cpu_scheduling_hrrn": 242,
+          "cpu_scheduling_priority": 262,
+          "cpu_scheduling_priority_p": 248,
+          "cpu_scheduling_rr": 245,
+          "cpu_scheduling_sjf": 265,
+          "cpu_scheduling_srtf": 227,
+          "deadlock_bankers_request": 547,
+          "deadlock_bankers_safety": 546,
+          "disk_scheduling_clook": 169,
+          "disk_scheduling_cscan": 169,
+          "disk_scheduling_fcfs": 169,
+          "disk_scheduling_look": 169,
+          "disk_scheduling_scan": 169,
+          "disk_scheduling_sstf": 169,
+          "formula_cache_eat": 115,
+          "formula_cpu_util": 69,
+          "formula_deadlock_min": 190,
+          "formula_disk_access": 189,
+          "formula_eat_pagefault": 173,
+          "formula_eat_tlb": 188,
+          "formula_fork_count": 22,
+          "formula_internal_frag": 188,
+          "formula_multilevel_paging": 52,
+          "formula_paging_bits": 188,
+          "formula_semaphore": 187,
+          "page_replacement_clock": 254,
+          "page_replacement_fifo": 254,
+          "page_replacement_lru": 253,
+          "page_replacement_opt": 253
+        },
+        "status": "OK"
+      },
+      "conceptual": {
+        "raw_pool": 1342,
+        "quality_floor": 0.6016,
+        "after_gate": 1274,
+        "distinct_supply": 1039,
+        "semdup_removed": 235,
+        "quota": 720,
+        "selected": 720,
+        "cap_backfilled": 0,
+        "mean_quality": 0.7254,
+        "subcategories": {
+          "sdft_threads": 42,
+          "sdft_filesystems": 58,
+          "sdft_security": 40,
+          "sdft_scheduling": 50,
+          "sdft_storage": 30,
+          "sdft_overview": 55,
+          "sdft_memory": 73,
+          "sdft_synchronization": 57,
+          "sdft_exam_short": 39,
+          "sdft_linux_practical": 26,
+          "sdft_deadlock": 29,
+          "sdft_virtual_memory": 60,
+          "sdft_processes": 64,
+          "sdft_io": 21,
+          "gold_explanation": 28,
+          "sdft_comparisons": 48
+        },
+        "status": "OK"
+      },
+      "tutoring": {
+        "raw_pool": 2836,
+        "quality_floor": 0.8092,
+        "after_gate": 1705,
+        "distinct_supply": 1152,
+        "semdup_removed": 553,
+        "domain_allocation": {
+          "math": 384,
+          "os": 576
+        },
+        "quota": 960,
+        "selected": 960,
+        "cap_backfilled": 48,
+        "mean_quality": 0.8615,
+        "subcategories": {
+          "mathdial_dialogue": 384,
+          "os_scheduling": 289,
+          "os_paging": 175,
+          "os_freespace": 112
+        },
+        "status": "OK"
+      },
+      "shell": {
+        "raw_pool": 18710,
+        "quality_floor": 0.7,
+        "after_gate": 13543,
+        "distinct_supply": 11606,
+        "semdup_removed": 1937,
+        "quota": 720,
+        "selected": 720,
+        "cap_backfilled": 267,
+        "mean_quality": 0.7418,
+        "subcategories": {
+          "intercode_curated": 6,
+          "tldr": 518,
+          "nl2bash": 196
+        },
+        "status": "OK"
+      },
+      "replay": {
+        "raw_pool": 29233,
+        "quality_floor": 0.7658,
+        "after_gate": 17544,
+        "distinct_supply": 17349,
+        "semdup_removed": 195,
+        "surprise_pool": 5760,
+        "surprise_mean_selected": 3.498,
+        "surprise_mean_pool": 2.356,
+        "quota": 1920,
+        "selected": 1920,
+        "cap_backfilled": 0,
+        "mean_quality": 0.8672,
+        "subcategories": {
+          "ai2-adapt-dev/flan_v2_converted": 284,
+          "ai2-adapt-dev/tulu_v3.9_aya_100k": 102,
+          "ai2-adapt-dev/tulu_v3.9_wildjailbreak_decontaminated_50k": 50,
+          "OpenHermes_2.5_no_think": 672,
+          "tulu_3_sft_personas_instruction_following_no_think": 176,
+          "ai2-adapt-dev/oasst1_converted": 19,
+          "smoltalk_smollm3_systemchats_30k_no_think": 79,
+          "ai2-adapt-dev/tulu_v3.9_wildchat_100k": 113,
+          "ai2-adapt-dev/personahub_ifdata_manual_seed_v3_29980": 23,
+          "ai2-adapt-dev/tulu_v3.9_sciriff_10k": 9,
+          "ai2-adapt-dev/tulu_v3.9_synthetic_finalresp_wildguardmixtrain_decontaminated_50k": 172,
+          "ai2-adapt-dev/evol_codealpaca_heval_decontaminated": 155,
+          "ai2-adapt-dev/coconot_converted": 45,
+          "smoltalk_smollm3_smol_magpie_ultra_no_think": 13,
+          "ai2-adapt-dev/personahub_code_v2_34999": 6,
+          "ai2-adapt-dev/tulu_v3.9_open_math_2_gsm8k_50k": 1,
+          "ai2-adapt-dev/tulu_hard_coded_repeated_10": 1
+        },
+        "status": "OK"
+      },
+      "_sizing": {
+        "target_ceiling": 12000,
+        "achievable_total": 12000,
+        "binding_category": "tutoring",
+        "per_category_limit": {
+          "procedural": 23581,
+          "conceptual": 17316,
+          "tutoring": 14400,
+          "shell": 193433,
+          "replay": 108431
+        },
+        "note": "total is bound by the category with the least distinct supply relative to its designed share"
+      }
+    },
+    "diversity": {
+      "procedural": 0.599,
+      "conceptual": 0.7083,
+      "tutoring": 0.6936,
+      "shell": 0.9443,
+      "replay": 0.9581
+    },
+    "render": {
+      "rendered": 12000,
+      "dropped": {},
+      "total_tokens": 8270468,
+      "mean": 689.2,
+      "p50": 603,
+      "p90": 1397,
+      "p99": 2753,
+      "max": 11648,
+      "fits_2048": 97.4,
+      "fits_4096": 99.8
+    },
+    "split": {
+      "train": 11760,
+      "val": 240,
+      "ood": 600,
+      "ood_from_holdout_file": 600,
+      "train_tokens": 8108094,
+      "train_by_category": {
+        "procedural": 7526,
+        "replay": 1884,
+        "tutoring": 938,
+        "shell": 707,
+        "conceptual": 705
+      }
+    },
+    "rectifier": {
+      "rows": 11760,
+      "longest_same_category_run": 4,
+      "max_run_allowed": 4,
+      "longest_same_source_run": 1,
+      "max_source_run_allowed": 3,
+      "n_sources": 81,
+      "max_gap_between_replay_anchors": 11,
+      "replay_gap_early": 4,
+      "replay_gap_late": 14,
+      "spaced_replay": true,
+      "worst_spacing_violation": 0,
+      "category_counts": {
+        "procedural": 7526,
+        "replay": 1884,
+        "tutoring": 938,
+        "shell": 707,
+        "conceptual": 705
+      },
+      "arrangement_feasible": true,
+      "feasibility": {
+        "majority": "procedural",
+        "majority_count": 7526,
+        "separators": 4234,
+        "max_allowed": 16940,
+        "cap": 4
+      },
+      "ok": true
+    }
+  },
+  "source_files": {
+    "ceval_operating_system_dev.jsonl": {
+      "sha256": "2d12f1dabd8cfbdc91a84f23b0476ae56eb7cacc6ef3ee23fc07258221410948",
+      "bytes": 2885
+    },
+    "ceval_operating_system_val.jsonl": {
+      "sha256": "87be7e932d988c2b8efed8c9e07adbecebb9dd858e018e6cb9b54d54c8fb95e1",
+      "bytes": 4524
+    },
+    "conceptual_misconceptions.jsonl": {
+      "sha256": "5112d990ddf2249256f6571cb78e964c8a7ac13d98257adb24950cf48ec00f0e",
+      "bytes": 1703125
+    },
+    "intercode_nl2bash_curated.jsonl": {
+      "sha256": "9208cf733e990b8071ea711d9b59c2e74fa95f0f8711a460d8c16959bfbb7e71",
+      "bytes": 34830
+    },
+    "mathdial_test.jsonl": {
+      "sha256": "eb59ed8936102a302a8201149fa98cc3cd1c2278bfa60dee33e00edf877397f8",
+      "bytes": 1858145
+    },
+    "mathdial_train.jsonl": {
+      "sha256": "8b2c2278f9b1936d7da33f32a67776c4a000d794f27adda9aee88477f59dd98d",
+      "bytes": 7181777
+    },
+    "mmlu_college_computer_science.jsonl": {
+      "sha256": "ab84b2e50220b0c09b7fa0fbb341f2b597da7f57e6be3961acf1b22f2c4ea79a",
+      "bytes": 49463
+    },
+    "mmlu_computer_security.jsonl": {
+      "sha256": "ced0a00acb40b17b71b64f860150a842d968e839f0962ffbd27b476c46739d20",
+      "bytes": 33160
+    },
+    "mmlu_machine_learning.jsonl": {
+      "sha256": "fba3cbcf358e1e52c1876a40508b4666a3d73de3e83e3b5d7a0e1974e83ee890",
+      "bytes": 40564
+    },
+    "mmlu_pro_computer_science.jsonl": {
+      "sha256": "0dca86515720eb6a38d6668a71e2594401cf409bd8cf0f9d7dd1ca72ed5f6194",
+      "bytes": 304996
+    },
+    "nl2bash_custom_test.jsonl": {
+      "sha256": "3ee32226e03aefe0b6c85762cf0681098d4efd8505b111542acbb6cba6da5cc5",
+      "bytes": 459896
+    },
+    "nl2bash_custom_train.jsonl": {
+      "sha256": "f7b547404744fdd05d6bfd4d4250ad69327150ab67a715064635d63c29bc8bd8",
+      "bytes": 3650403
+    },
+    "nl2bash_custom_validation.jsonl": {
+      "sha256": "fd9e013f71170ca17239ada763078846749d178ca02f85a7ce44aa2357d0618f",
+      "bytes": 456113
+    },
+    "nl2bash_official_mit.jsonl": {
+      "sha256": "c7fa36cc53c5b6c610dcd5c36eae0d75debb66e7f92181b5536e1e8997bdbdc4",
+      "bytes": 1912216
+    },
+    "nl2sh_alfa_test_train.jsonl": {
+      "sha256": "12234886432a55c9473bd0f2d92d9a5e25cfc786e9999e04e0f0fd7ee8fa8679",
+      "bytes": 63939
+    },
+    "nl2sh_alfa_train_train.jsonl": {
+      "sha256": "e6149438627a82cc69450aa229756a0943f4e201cc7491b1d0d03a1ed0e66a21",
+      "bytes": 5778117
+    },
+    "procedural_ood_holdout.jsonl": {
+      "sha256": "01a535de2b510c666a0402207cfe34200483cbd6b02115af8b10fb877276c0d9",
+      "bytes": 1129867
+    },
+    "procedural_simulated.jsonl": {
+      "sha256": "72dfa614b543cdbc42355cd4d1d936426dbbd7f75c79b5bdd56d18ea3171abf2",
+      "bytes": 15322598
+    },
+    "procedural_simulated_large.jsonl": {
+      "sha256": "7ccfb59b6dec7a4fa5d74a77ea60d9f0d8215d8f1f8bfec9355f84ce944bb01a",
+      "bytes": 3333353
+    },
+    "procedural_v3_holdout.jsonl": {
+      "sha256": "af3b925c353ae1d0ec2573c32ca115781ba87c70198c784a17764eeda87456d4",
+      "bytes": 1666180
+    },
+    "procedural_v3_pool.jsonl": {
+      "sha256": "be0010cbe0a9586d6ddd37e8f806218c95e5ec191f27fe2bfff8fa7be0f53d57",
+      "bytes": 31519914
+    },
+    "smoltalk2_no_think_replay.jsonl": {
+      "sha256": "b086981092fb357c270af550e8d65ef2378a5cce8ee13a1937c1edfd8c5cfd76",
+      "bytes": 65926479
+    },
+    "theory_sdft.jsonl": {
+      "sha256": "7407796b870d2b9e01e4ca264df8949c20f9c4ecf11c134d037fee4a4bcf0b90",
+      "bytes": 5612335
+    },
+    "tldr_dev.jsonl": {
+      "sha256": "31a24d5aeb1b2fd7dc246b71dec027327bcd885241fa57369257370af67c9dca",
+      "bytes": 1284787
+    },
+    "tldr_docs.jsonl": {
+      "sha256": "baca7dc3af518f6b1fd1a8f81fafea26b0ac6c581abc15fa508f909e1fe93cd2",
+      "bytes": 106276554
+    },
+    "tldr_test.jsonl": {
+      "sha256": "c5e48fcc55704f7b5bf62a0ae1286022f4ac3a89580997942766e045bab06f47",
+      "bytes": 525872
+    },
+    "tldr_train.jsonl": {
+      "sha256": "af692298855f39b4095093e780474ca55c862bd14d4e46a923418c81fedf5a14",
+      "bytes": 4762709
+    },
+    "tulu3_sft_sample20k.jsonl": {
+      "sha256": "e486092fa375fdbcdb8e1eff7986b48284d0d04ff8fc6e1363f3250b3f5cd9f4",
+      "bytes": 64037164
+    },
+    "tulu3_sft_sample20k_commercial_safe.jsonl": {
+      "sha256": "cf7a62c22e66b3be8acbd3991e4341145cda378b7da6b107adc1eb716f5fc508",
+      "bytes": 63799183
+    },
+    "tutor_sdft.jsonl": {
+      "sha256": "c84d79fcbe48fad2515a99b0bd797896e06c6b6176b09cd2692dcfa92c226ab7",
+      "bytes": 7601695
+    },
+    "tutoring_os_dialogues.jsonl": {
+      "sha256": "4531c71a4576057a99c62af1a5a7ceea0ebfb9f5b4e9a96700f3246387d28a51",
+      "bytes": 728621
+    }
+  },
+  "shell_syntax_failures": 126,
+  "gates": [
+    {
+      "gate": "secrets_zero",
+      "passed": true,
+      "detail": "0 rows with credential material (limit 0)"
+    },
+    {
+      "gate": "no_think_blocks",
+      "passed": true,
+      "detail": "0 rows contain <think>"
+    },
+    {
+      "gate": "licence_commercial",
+      "passed": true,
+      "detail": "0 non-commercial rows"
+    },
+    {
+      "gate": "schema_valid",
+      "passed": true,
+      "detail": "0 rows fail schema"
+    },
+    {
+      "gate": "defect_rate",
+      "passed": true,
+      "detail": "0 known defects = 0.000% (limit 0.000%)"
+    },
+    {
+      "gate": "non_latin_rate",
+      "passed": true,
+      "detail": "0 non-Latin-script rows"
+    },
+    {
+      "gate": "token_p99",
+      "passed": true,
+      "detail": "p99 token length 2753 (limit 16384)"
+    },
+    {
+      "gate": "rectifier_invariants",
+      "passed": true,
+      "detail": "category run 4/4, worst spacing violation 0"
+    },
+    {
+      "gate": "source_run_bounded",
+      "passed": true,
+      "detail": "longest single-dataset run 1 across 81 sources (max 3)"
+    },
+    {
+      "gate": "mixture_drift",
+      "passed": true,
+      "detail": "worst drift +0.02pp (limit 2.0pp) {'procedural': -0.0, 'conceptual': -0.01, 'tutoring': -0.02, 'shell': 0.01, 'replay': 0.02}"
+    },
+    {
+      "gate": "distinct_answers",
+      "passed": true,
+      "detail": "lowest distinct-answer ratio 0.988 in \"procedural\" (min 0.9)"
+    },
+    {
+      "gate": "template_share",
+      "passed": true,
+      "detail": "largest template share 0.099 in \"conceptual\" (max 0.25)"
+    },
+    {
+      "gate": "pairwise_diversity",
+      "passed": true,
+      "detail": "lowest diversity 0.599 in \"procedural\" (min 0.3)"
+    },
+    {
+      "gate": "min_rows_per_category",
+      "passed": true,
+      "detail": "smallest category 705 rows (min 50)"
+    },
+    {
+      "gate": "min_total_rows",
+      "passed": true,
+      "detail": "11760 train rows (min 2000)"
+    },
+    {
+      "gate": "ood_holdout_present",
+      "passed": true,
+      "detail": "600 genuinely out-of-distribution rows in the holdout (600 total ood)"
+    },
+    {
+      "gate": "procedural_inputs_complete",
+      "passed": true,
+      "detail": "0 procedural questions omit an input they need (train sources, OOD holdout, eval suites)"
+    },
+    {
+      "gate": "os_tutoring_present",
+      "passed": true,
+      "detail": "563 OS-domain tutoring rows (min 300, 938 tutoring rows in total)"
+    },
+    {
+      "gate": "family_weights_honoured",
+      "passed": true,
+      "detail": "0 procedural families below half their designed share "
+    }
+  ],
+  "gates_passed": true,
+  "gate_metrics": {
+    "mixture_drift_pp": {
+      "procedural": -0.0,
+      "conceptual": -0.01,
+      "tutoring": -0.02,
+      "shell": 0.01,
+      "replay": 0.02
+    },
+    "worst_distinct_answer_ratio": 0.9883,
+    "worst_template_share": 0.0993,
+    "diversity_by_category": {
+      "procedural": 0.599,
+      "conceptual": 0.7083,
+      "tutoring": 0.6936,
+      "shell": 0.9443,
+      "replay": 0.9581
+    }
+  },
+  "artifacts": {
+    "train.jsonl": "f56a7113e4aa5c0e4ccde8dfeb91128f7bc50a78aba39e980ed74283af19477d",
+    "val.jsonl": "353a02c3195938c837663e40a703372a07543f1332f100aa2add0b14213afeb8",
+    "ood.jsonl": "520d29cf3b7b93212609577fce3bb6d0ac68a200ae67e5116c625948f8e4b5e6"
+  },
+  "duration_sec": 356.3
+}

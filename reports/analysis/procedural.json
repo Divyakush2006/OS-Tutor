@@ -1,0 +1,108 @@
+{
+  "category": "procedural",
+  "rows": 16720,
+  "distributions": {
+    "user_chars": {
+      "p10": 154,
+      "p50": 240,
+      "p90": 556,
+      "mean": 296.3
+    },
+    "assistant_chars": {
+      "p10": 296,
+      "p50": 1230,
+      "p90": 2264,
+      "mean": 1233.9
+    },
+    "turns": {
+      "p50": 2,
+      "p90": 2
+    },
+    "type_token_ratio": {
+      "p10": 0.159,
+      "p50": 0.3
+    },
+    "sources": {
+      "deadlock_bankers_request": 1798,
+      "deadlock_bankers_safety": 1791,
+      "address_translation": 1747,
+      "contiguous_allocation_first": 634,
+      "contiguous_allocation_worst": 634,
+      "contiguous_allocation_best": 618,
+      "page_replacement_clock": 480,
+      "page_replacement_opt": 475
+    }
+  },
+  "redundancy": {
+    "distinct_answers": 15058,
+    "rows": 16720,
+    "distinct_ratio": 0.9006,
+    "rows_with_duplicated_answer": 2146,
+    "worst": [
+      [
+        "i can't give a correct answer from what is stated: **the request vecto",
+        75
+      ],
+      [
+        "i can't give a correct answer from what is stated: **the priority of e",
+        72
+      ],
+      [
+        "**this question is missing an input, so it cannot be solved yet.**\n\n- ",
+        65
+      ]
+    ]
+  },
+  "probes": {
+    "no_visible_steps": {
+      "hits": 278,
+      "rate": 0.0166,
+      "verdict": "defect",
+      "note": "answer-only target defeats the auditable-steps design",
+      "samples": [
+        "I can't give a correct answer from what is stated: **the page size** is not given.\n\nWhat the question provides",
+        "I can't give a correct answer from what is stated: **the request vector itself, plus the Allocation and Max (o",
+        "I can't give a correct answer from what is stated: **the Available vector (or the total number of instances of"
+      ]
+    },
+    "no_final_answer_marker": {
+      "hits": 434,
+      "rate": 0.026,
+      "verdict": "defect",
+      "note": "no parseable final answer to grade against",
+      "samples": [
+        "**This question is missing an input, so it cannot be solved yet.**\n\n- Given: the arrival and burst times.\n- Mi",
+        "**This question is missing an input, so it cannot be solved yet.**\n\n- Given: the arrival and burst times.\n- Mi",
+        "Before solving, one input is missing.\n\n| | |\n|---|---|\n| Given | the page table [25, 26, 0, 18] and the logica"
+      ]
+    },
+    "unverified": {
+      "hits": 0,
+      "rate": 0.0,
+      "verdict": "defect",
+      "note": "every procedural row must be simulator-verified",
+      "samples": []
+    },
+    "has_state_table": {
+      "hits": 3687,
+      "rate": 0.2205,
+      "verdict": "diagnostic",
+      "note": "intermediate state shown - desirable, informs quality score",
+      "samples": [
+        "**Algorithm: Priority (non-preemptive)**\n\n**Step 1 - build the schedule**\n\n_Rule: whenever the CPU is free, ru",
+        "**Policy: FIFO, 3 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, evict the page lo",
+        "**Policy: CLOCK, 3 frames** (all empty at the start)\n\n_Rule: on a fault with all frames full, advance the hand"
+      ]
+    }
+  },
+  "derived_thresholds": {
+    "min_assistant_chars": 148,
+    "max_assistant_chars": 6792,
+    "min_visible_steps": 2
+  },
+  "actionable_defects": {
+    "no_visible_steps": 278,
+    "no_final_answer_marker": 434
+  },
+  "rejected_rules": {}
+}
