@@ -133,8 +133,11 @@ def stop_server(proc: subprocess.Popen) -> None:
 
 
 def chat(system: str, user: str, max_tokens: int, scale: float | None) -> dict:
+    # cache_prompt=False: the prompt cache reuses the KV of a shared prefix from whatever
+    # request came before, which changes batching and so the logits; with it on, greedy
+    # decoding is NOT reproducible across runs (tools/g0_diagnostics.py: 5/6 differ).
     body = dict(messages=[dict(role="system", content=system), dict(role="user", content=user)],
-                temperature=0, max_tokens=max_tokens)
+                temperature=0, max_tokens=max_tokens, cache_prompt=False)
     if scale is not None:
         body["lora"] = [dict(id=0, scale=scale)]
     req = urllib.request.Request(SERVER + "/v1/chat/completions", data=json.dumps(body).encode(),
@@ -176,7 +179,8 @@ def provenance(out: Path) -> dict:
         models_sha256=models, dataset_train_sha256=manifest["artifacts"]["train.jsonl"],
         llama_cpp=(version.stdout + version.stderr).strip().splitlines()[:2],
         server_args=SERVER_ARGS, decoding=dict(temperature=0, answer_tokens=ANSWER_TOKENS,
-                                               extract_tokens=EXTRACT_TOKENS),
+                                               extract_tokens=EXTRACT_TOKENS,
+                                               cache_prompt=False),
         prompts_sha256_16=dict(extract=prompt(EXTRACT_PROMPT),
                                solve=prompt(C.system_for("solve", "os")),
                                explain=prompt(C.system_for("explain", "os"))),

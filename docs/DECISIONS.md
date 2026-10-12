@@ -38,6 +38,55 @@ CRLF to LF on disk in `b7521be`; it stays LF (Python is indifferent to line endi
 
 ---
 
+## D-005 — Evaluation requests disable llama-server's prompt cache
+
+**Date:** 2026-10-12 · **Decided by:** engineer (evaluation only; serving unchanged)
+
+**Decision.** Every request from `tools/g0_ablation.py` sends `cache_prompt: false`, and
+the run's provenance records it. The student-facing gateway keeps the cache on.
+
+**Alternatives.** (a) Keep the cache and report several runs as a noise band. (b) Fix
+the request order so cache states repeat. (c) Disable the cache in serving too.
+
+**Reason.** With the cache on, greedy decoding is not reproducible. The cache reuses the
+KV of a shared prefix (the system prompt) left by whatever request came before, which
+changes how the prompt is batched and so the logits; a greedy decode then diverges.
+v3 alone scored 36/57 on 2026-09-21 and 34/57 on 2026-10-12 with identical weights and
+only 23/57 identical outputs — purely because the two runs issued requests in different
+orders. (a) makes every number a sample, (b) is brittle, (c) costs students latency for
+a reproducibility property they do not need: the cache changes *which* plausible answer
+is sampled, not the distribution.
+
+**Evidence.** `tools/g0_diagnostics.py` (results in `reports/g0/20261012-1429/
+diagnostics.json`): with the cache off, repeating a request with an unrelated request
+in between gave byte-identical output **6/6**; with the cache warmed by a different
+prompt, **5/6** differed.
+
+---
+
+## D-004 — Grader: read an explicit final-answer marker first (paging, disk, translate)
+
+**Date:** 2026-10-12 · **Decided by:** engineer (alters no existing measured number — verified)
+
+**Decision.** For the one-quantity kinds, `grade()` first reads the number under the
+last explicit final-answer marker ("Final Answer", "**Answer"), on that line or the next;
+the keyword search remains the fallback. Hex in the marker is decoded.
+
+**Reason.** The G0 grader audit (`tools/g0_grader_audit.py`) found five base-model
+answers that were right and graded wrong. The base model ends with "### ✅ Final
+Answer:" and the bare number on the next line ("**236**"), with no keyword, so the
+keyword search fell back to a line of working ("Total: 53 + 183 = 236" read as 53).
+The fine-tuned model's trained format is unaffected, so the bug again biased base-vs-
+adapter comparisons toward the adapter.
+
+**Evidence.** Old vs new grader over every saved output: **0** verdict changes in 799
+historical outputs; in the G0 run exactly the **5** hand-audited items flip
+(`lru_4f`, `scan_down`, `fcfs_disk`, `sstf_2`, `translate_4k`), nothing else in any
+configuration. Eight regression cases in `tools/test_g0.py`, including a marker with a
+wrong value (stays wrong) and the unchanged trained format.
+
+---
+
 ## D-003 — Grader: a quantity's answer ends at a LaTeX separator or the next quantity
 
 **Date:** 2026-10-12 · **Decided by:** engineer (alters no existing measured number — verified)
