@@ -226,6 +226,11 @@ check("wikitext: templates and references removed, link text kept",
 check("wikitext: content sections and subsections are kept", "## Use" in wmd and "### Detail" in wmd and "TLB." in wmd, wmd)
 check("wikitext: See also and External links sections are dropped",
       "Segmentation" not in wmd and "See also" not in wmd and "Site" not in wmd, wmd)
+ca = rag_e2e.contains_amended
+check("amended grading: hyphen equals space, a bare number reply counts",
+      ca("q094", "Page-fault trap", ["page fault"]) and ca("q018", "0 [S1]", ["0", "zero"]))
+check("amended grading: still strict on wrong answers",
+      not ca("q018", "10", ["0", "zero"]) and not ca("q110", "Elevator algorithm", ["SCAN"]))
 check("letter share counts letters only", abs(pool.alpha_share("ab 12") - 0.5) < 1e-9)
 check("C code lines are counted as code", pool.code_share("int x;\nThe text.\nreturn 0;") == 2 / 3)
 qa = [json.loads(l) for l in open(rag_compare.QA, encoding="utf-8")]

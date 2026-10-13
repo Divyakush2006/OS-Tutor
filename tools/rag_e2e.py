@@ -144,6 +144,27 @@ def contains(text: str, answers: list[str]) -> bool:
                for a in answers if len(a) >= 3 and not a.isdigit())
 
 
+# Secondary grading, reported NEXT TO the pre-registered rule above, never instead of it.
+# Fixed after reading the base model's misses only (before any v3 short answer was read)
+# and applied identically to every arm: grader false negatives, not new answers.
+AMEND_ALIASES = {
+    "q008": ["execve", "execv", "execvp", "execvpe", "execl", "execlp", "execle"],   # "family of exec calls"
+    "q015": ["context switching"],
+    "q091": ["segmented"],            # "segmented memory management"
+    "q133": ["proc"],                 # the question gives the three-letter path itself
+}
+
+
+def contains_amended(qid: str, text: str, answers: list[str]) -> bool:
+    """Hyphen = space; a bare-number answer counts when the reply is exactly that number."""
+    answers = answers + AMEND_ALIASES.get(qid, [])
+    flat = lambda t: re.sub(r"[-\u2010-\u2013]", " ", t)                          # noqa: E731
+    if contains(flat(text), [flat(a) for a in answers]):
+        return True
+    bare = re.sub(r"\[S\d+\]|[^\w]", "", text).lower()
+    return any(a.isdigit() and bare == a for a in answers)
+
+
 def run_short(out: Path, r: Retriever) -> None:
     items = [json.loads(l) for l in open(SHORT_QA, encoding="utf-8")]
     store = Partial(out / "short.partial.jsonl")
@@ -248,20 +269,22 @@ def summarise(out: Path, meta: dict) -> None:
         res["mcq_items_with_notes"] = sum(1 for r in mcq if r["server"] == "v3" and r["arm"] == "on" and r["notes"])
     sh = list(Partial(out / "short.partial.jsonl").rows.values())
     if sh:
-        res["short"] = {}
-        for split in ("test", "all"):
-            by = {}
-            for row in sh:
-                if split == "all" or row["split"] == split:
-                    by.setdefault(f"{row['server']}+{'rag' if row['arm'] == 'on' else 'norag'}", {})[row["id"]] = row["correct"]
-            pairs = [("v3+rag", "v3+norag"), ("base+rag", "base+norag"), ("v3+rag", "base+norag"),
-                     ("v3+norag", "base+norag")]
-            res["short"][split] = dict(
-                accuracy={k: dict(correct=sum(v.values()), n=len(v), accuracy=round(sum(v.values()) / len(v), 4))
-                          for k, v in by.items()},
-                paired={f"{b} -> {a}": paired(by[b], by[a], b, a) for a, b in pairs if a in by and b in by},
-                answer_in_notes=sum(1 for row in sh if row["server"] == "v3" and row["arm"] == "on"
-                                    and (split == "all" or row["split"] == split) and row["answer_in_notes"]))
+        for grading, field in (("short", None), ("short_amended", "amended")):
+            res[grading] = {}
+            for split in ("test", "all"):
+                by = {}
+                for row in sh:
+                    if split == "all" or row["split"] == split:
+                        ok = row["correct"] if field is None else contains_amended(row["id"], row["text"], row["answers"])
+                        by.setdefault(f"{row['server']}+{'rag' if row['arm'] == 'on' else 'norag'}", {})[row["id"]] = ok
+                pairs = [("v3+rag", "v3+norag"), ("base+rag", "base+norag"), ("v3+rag", "base+norag"),
+                         ("v3+norag", "base+norag")]
+                res[grading][split] = dict(
+                    accuracy={k: dict(correct=sum(v.values()), n=len(v), accuracy=round(sum(v.values()) / len(v), 4))
+                              for k, v in by.items()},
+                    paired={f"{b} -> {a}": paired(by[b], by[a], b, a) for a, b in pairs if a in by and b in by},
+                    answer_in_notes=sum(1 for row in sh if row["server"] == "v3" and row["arm"] == "on"
+                                        and (split == "all" or row["split"] == split) and row["answer_in_notes"]))
     ex = list(Partial(out / "explain.partial.jsonl").rows.values())
     if ex:
         given = [x for x in ex if x["notes"]]
@@ -307,10 +330,10 @@ def summarise(out: Path, meta: dict) -> None:
                for k, p in res["mcq_paired"].items()]
         md += ["", f"Items given notes by the gate: {res['mcq_items_with_notes']}/200. "
                f"Correct on the 130 new (unreviewed) items only: {res['mcq_new_items_only']}"]
-    if "short" in res:
-        for split, x in res["short"].items():
+    for grading, label in (("short", "pre-registered grading"), ("short_amended", "amended grading, secondary")):
+        for split, x in res.get(grading, {}).items():
             n = next(iter(x["accuracy"].values()))["n"]
-            md += ["", f"## Short-answer questions, {split} ({n} items; correct = an accepted answer in the reply)", "",
+            md += ["", f"## Short-answer questions, {split} ({n} items; {label})", "",
                    "| Configuration | Correct | Accuracy |", "|---|---|---|"]
             md += [f"| {k} | {v['correct']}/{v['n']} | {v['accuracy']:.2%} |" for k, v in sorted(x["accuracy"].items())]
             md += ["", "| Comparison | Right→wrong | Wrong→right | exact McNemar p |", "|---|---|---|---|"]
