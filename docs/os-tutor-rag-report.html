@@ -75,6 +75,7 @@
 <h2>Abstract</h2>
 <p>This report describes OS Tutor, a tutor for Operating Systems built on Qwen3-4B-Instruct-2507 and fine-tuned with QLoRA on 11,760 curated training rows. The model is surrounded by three supporting components. Verified simulators compute the answer to every numerical problem, a retrieval (RAG) layer grounds concept explanations in course notes and cites them, and a fact checker corrects known misconceptions. On a 57-item hand-written problem suite the complete system scores 57/57, compared with 30/57 for the untuned model, and on a 600-item out-of-distribution holdout it scores 98.8%.</p>
 <p>The RAG layer is built and connected to the tutor, and runs over a corpus of 105 documents: our professor's 42 course documents (lecture slides, assigned textbook chapters, handouts and lab material) plus openly licensed OS texts (Hailperin's <em>Operating Systems and Middleware</em> and 55 Wikipedia articles). On 124 labelled questions the correct passage is in the top five results 79.0% of the time, and retrieval takes 8.3 ms (95th percentile) on the CPU. Answers cite their sources and say so when the course materials do not cover a question. On a 200-question theory test, retrieval did not change accuracy (92.0% with it, 93.0% without).</p>
+<p>We then built a second knowledge base from openly licensed text only, with no course material. We gathered a pool of 3,291 documents: two open OS textbooks, 1,176 Wikipedia articles, a Wikibook and 2,019 Stack Exchange questions with their answers. From it we kept 2,970 documents, after measuring every passage for quality, relevance to the syllabus and duplication. This knowledge base retrieves a passage containing the answer for 83.3% of 144 short-answer questions, against 74.3% for the course corpus (p = 0.024). With either knowledge base, the fine-tuned model's short-answer accuracy rose from about 71% to about 85% (p ≤ 0.001 over all 144 questions). The open knowledge base, however, did not lead to more correct answers than the course one: 123 against 124 of 144.</p>
 <p>The report follows the order of the work: the datasets, how they were preprocessed, the implementation with code screenshots, the measured results, the problems we ran into, and what we would do differently.</p>
 </section>
 
@@ -87,11 +88,13 @@
     <li class="subi"><span class="t">1.1 Training dataset</span><span class="dots"></span><span class="pg" data-for="s1-1">0</span></li>
     <li class="subi"><span class="t">1.2 Evaluation datasets</span><span class="dots"></span><span class="pg" data-for="s1-2">0</span></li>
     <li class="subi"><span class="t">1.3 Retrieval knowledge base</span><span class="dots"></span><span class="pg" data-for="s1-3">0</span></li>
+    <li class="subi"><span class="t">1.4 Open retrieval corpus</span><span class="dots"></span><span class="pg" data-for="s1-4">0</span></li>
     <li class="main"><span class="t">2&nbsp;&nbsp;Dataset Preprocessing</span><span class="dots"></span><span class="pg" data-for="s2">0</span></li>
     <li class="subi"><span class="t">2.1 The eleven-stage build</span><span class="dots"></span><span class="pg" data-for="s2-1">0</span></li>
     <li class="subi"><span class="t">2.2 Cleaning, deduplication and decontamination</span><span class="dots"></span><span class="pg" data-for="s2-2">0</span></li>
     <li class="subi"><span class="t">2.3 Selection, rendering, ordering and release gates</span><span class="dots"></span><span class="pg" data-for="s2-3">0</span></li>
     <li class="subi"><span class="t">2.4 Preprocessing for retrieval</span><span class="dots"></span><span class="pg" data-for="s2-4">0</span></li>
+    <li class="subi"><span class="t">2.5 Analysis and compilation of the open corpus</span><span class="dots"></span><span class="pg" data-for="s2-5">0</span></li>
     <li class="main"><span class="t">3&nbsp;&nbsp;Code Implementation</span><span class="dots"></span><span class="pg" data-for="s3">0</span></li>
     <li class="subi"><span class="t">3.1 System architecture</span><span class="dots"></span><span class="pg" data-for="s3-1">0</span></li>
     <li class="subi"><span class="t">3.2 Data pipeline</span><span class="dots"></span><span class="pg" data-for="s3-2">0</span></li>
@@ -122,7 +125,7 @@
 <h2>Note on the Results</h2>
 <p>Every number in this report was produced by a script in the project repository; Appendix B lists the file each one comes from. Three points need to be kept in mind when reading them.</p>
 <ul>
-  <li><strong>Who wrote the evaluation sets.</strong> The 164 retrieval questions and the 130 new theory MCQ items were written by the project team and have not yet been reviewed by the course instructor. They are marked <code>unreviewed</code> in the data files.</li>
+  <li><strong>Who wrote the evaluation sets.</strong> The 164 retrieval questions, the 144 short-answer questions and the 130 new theory MCQ items were written by the project team and have not yet been reviewed by the course instructor. They are marked <code>unreviewed</code> in the data files.</li>
   <li><strong>The faithfulness judge.</strong> Whether a cited sentence is supported by its passage was judged by the untuned base model. We checked a sample of 40 of its verdicts by hand and found it lenient (Section 4.8). The required human check by the instructor is still open.</li>
   <li><strong>Targets.</strong> Section 4.10 lists the targets set before the measurement next to what was measured. A target that was missed is reported as missed.</li>
 </ul>
@@ -166,9 +169,10 @@
     <tr><td>OS theory MCQ, expanded</td><td class="num">200</td><td>The 70 above plus 130 new items on topics they miss (IPC, real-time scheduling, allocators, SSDs, file systems, protection, virtualisation)</td><td>Generated letter; used for the RAG experiment (Section 4.8)</td></tr>
     <tr><td>Fact-checker probes</td><td class="num">10</td><td>One question per misconception rule</td><td>Manual read of each answer (status <code>unreviewed</code>)</td></tr>
     <tr><td>Retrieval questions</td><td class="num">164</td><td>124 questions labelled with the document and an evidence phrase from the answering passage (75 answered by course material, 49 by online texts) and 40 questions the corpus does not cover; split in half into dev and test</td><td>Recall@k, MRR, abstention</td></tr>
+    <tr><td>Short-answer questions</td><td class="num">144</td><td>Short factual questions over 12 OS topics, each with its accepted answers (for example "kernel mode", "supervisor mode", "ring 0"); half dev, half test. A script checks that no question contains its own answer</td><td>An accepted answer, as a whole word, in the retrieved passages (answer recall) or in the model's reply (accuracy)</td></tr>
   </tbody>
 </table>
-<p>Every training row was decontaminated against all 4,836 evaluation items before selection (Section 2.2).</p>
+<p>Every training row was decontaminated against all 4,836 evaluation items before selection (Section 2.2). The 144 short-answer questions were written after training and were not part of that check. They test short factual recall, which the training set does not target.</p>
 
 <h3>1.3 Retrieval knowledge base</h3>
 <p>The knowledge base is the directory <code>data/rag/corpus/</code>. Its <code>manifest.json</code> records, for every document, the source, the owner, the licence or permission, the date it was added and a SHA-256 checksum. Ingestion refuses the whole corpus if any of this is missing, if a file has changed since it was recorded, or if a file is present without a manifest entry.</p>
@@ -183,6 +187,22 @@
 </table>
 <p class="caption">Source: <code>data/rag/corpus/manifest.json</code>; per-document chunk counts from <code>python -m ostutor.rag.ingest data/rag/corpus</code>.</p>
 <p>The professor's material came as one archive of 54 files. Twelve were left out, each with its reason recorded in the manifest: three byte-identical copies, four diagram images with no text, an Office lock file, the assignment brief, two PDF versions of handouts that were also supplied as Word files, and one legacy Word file that Office could not convert automatically. The online texts were added because the course material leaves gaps, for example file-system implementation and disk scheduling. Only text whose licence allows reuse with attribution was used. OSTEP is free to read but not openly licensed, so only the chapters the professor supplied are included. Each online document is fixed to an exact version: a git commit for the book and a revision number for each Wikipedia article.</p>
+
+<h3>1.4 Open retrieval corpus</h3>
+<p>The course material is narrow in places and cannot be shared outside the course. We therefore built a second knowledge base, <code>data/rag/open/</code>, with no course material in it at all. We first gathered a large pool of openly licensed operating-systems text, then measured every passage in it and kept only what passed (Section 2.5).</p>
+<table>
+  <thead><tr><th>Source</th><th class="num">Pool</th><th class="num">Kept</th><th>How it was selected</th><th>Licence</th></tr></thead>
+  <tbody>
+    <tr><td>Hailperin, <em>Operating Systems and Middleware</em></td><td class="num">8</td><td class="num">8</td><td>The eight OS chapters, as in 1.3</td><td>CC BY-SA 3.0</td></tr>
+    <tr><td>Wienand, <em>Computer Science from the Bottom Up</em></td><td class="num">9</td><td class="num">9</td><td>All nine chapters (Unix and C, architecture, the OS, the process, virtual memory, the toolchain, linking), from the book's DocBook source at a fixed commit</td><td>CC BY-SA 3.0</td></tr>
+    <tr><td>Wikipedia</td><td class="num">1,176</td><td class="num">1,054</td><td>Every article in 24 OS categories (process scheduling, memory management, concurrency control, file systems, interrupts, virtualisation and others) plus a core list, each at a recorded revision</td><td>CC BY-SA 4.0</td></tr>
+    <tr><td>Wikibooks, <em>Operating System Design</em></td><td class="num">79</td><td class="num">51</td><td>Every page of the book</td><td>CC BY-SA 4.0</td></tr>
+    <tr><td>Stack Exchange (Computer Science, Unix &amp; Linux)</td><td class="num">2,019</td><td class="num">1,848</td><td>Questions under 30 OS tags (scheduling, deadlocks, paging, semaphores, fork, inode, signals, …) with a score of at least 3, and up to two answers with a score of at least 3. Votes are the quality signal</td><td>CC BY-SA 2.5, 3.0 or 4.0 by post date; authors named per document</td></tr>
+    <tr class="total"><td>Total</td><td class="num">3,291</td><td class="num">2,970</td><td colspan="2">18,515 chunks</td></tr>
+  </tbody>
+</table>
+<p class="caption">Source: <code>reports/rag/open_pool_analysis.md</code>, <code>data/rag/open/manifest.json</code>. Fetched by <code>tools/fetch_rag_pool.py</code>.</p>
+<p>Several well-known sources were left out on licence grounds. The OSDev wiki mixes licences, LibreTexts sets a licence per page that we could not verify, the xv6 book's licence is unclear, OSTEP is free to read but not openly licensed, and several lecture-note collections carry a non-commercial clause. We also considered the OS questions in MMLU-Pro, but only about 14 of them are genuinely about operating systems.</p>
 </section>
 
 <!-- ======================= 2 PREPROCESSING ======================= -->
@@ -241,6 +261,41 @@
   </tbody>
 </table>
 <p>The 105 documents give 2,783 chunks (median 180 words). A full build takes about 46 s on the CPU, and reloading an unchanged corpus takes about 7 s, most of it loading the embedding model.</p>
+
+<h3>2.5 Analysis and compilation of the open corpus</h3>
+<p>The pool was cut into the same chunks the retriever uses (21,740 chunks after dropping 164 stub documents) and every chunk was measured. The rules below were written down before any retrieval or end-to-end measurement (<code>tools/analyze_rag_pool.py</code>).</p>
+<table>
+  <thead><tr><th style="width:22%">Measurement</th><th>Rule</th><th style="width:34%">Why</th></tr></thead>
+  <tbody>
+    <tr><td>Document length</td><td>Documents under 120 words are dropped whole</td><td>Wikipedia stubs and one-line answers give a passage with nothing to cite</td></tr>
+    <tr><td>Letter share</td><td>A chunk is dropped if fewer than 60% of its characters are letters</td><td>Tables of numbers, hex dumps and command output</td></tr>
+    <tr><td>Code share</td><td>A chunk is dropped if more than half its lines look like code</td><td>Long code listings answer no conceptual question and crowd out prose</td></tr>
+    <tr><td>Relevance to the syllabus</td><td>Cosine (MiniLM) to the nearest of 40 OS topics, each described in one sentence after the ACM CS2013 OS knowledge area. The floor is the 5th percentile of the two textbooks' chunks: <strong>0.307</strong></td><td>The textbooks are known to be on topic, so the floor keeps 95% of them and is not a number we picked</td></tr>
+    <tr><td>Near-duplicates</td><td>MinHash over word 5-shingles, Jaccard ≥ 0.7. Of two copies, the one from the higher source is kept (textbook &gt; Wikipedia &gt; Wikibooks &gt; Stack Exchange)</td><td>Wikibooks copies Wikipedia text; a duplicate wastes one of the four retrieved slots</td></tr>
+    <tr><td>Answer coverage</td><td>For each source, the dev short-answer questions for which some kept chunk contains an accepted answer</td><td>The ceiling for retrieval: a question no chunk answers cannot be retrieved</td></tr>
+  </tbody>
+</table>
+<figure><img src="shots/pool_relevance.svg" alt="relevance by source">
+<figcaption>Figure 1: Distribution of chunk relevance by source, with the floor at 0.307. The textbooks and Wikibooks sit to the right; Wikipedia and Stack Exchange have long tails of off-topic text.</figcaption></figure>
+<table>
+  <thead><tr><th>Source</th><th class="num">Chunks</th><th class="num">Kept</th><th class="num">Median relevance</th><th>Main reasons for dropping</th></tr></thead>
+  <tbody>
+    <tr><td>Hailperin</td><td class="num">882</td><td class="num">800</td><td class="num">0.537</td><td>mostly code 45, off-syllabus 36</td></tr>
+    <tr><td>CSBU</td><td class="num">471</td><td class="num">433</td><td class="num">0.484</td><td>off-syllabus 27, low letter share 8</td></tr>
+    <tr><td>Wikipedia</td><td class="num">11,395</td><td class="num">9,386</td><td class="num">0.432</td><td>off-syllabus 1,679, mostly code 236, low letter share 89</td></tr>
+    <tr><td>Wikibooks</td><td class="num">243</td><td class="num">177</td><td class="num">0.544</td><td>duplicate of Wikipedia 63</td></tr>
+    <tr><td>Stack Exchange</td><td class="num">8,749</td><td class="num">6,624</td><td class="num">0.407</td><td>off-syllabus 1,602, mostly code 281, low letter share 242</td></tr>
+    <tr class="total"><td>Total</td><td class="num">21,740</td><td class="num">17,420</td><td colspan="2"></td></tr>
+  </tbody>
+</table>
+<p class="caption">Source: <code>reports/rag/open_pool_analysis.md</code>.</p>
+<ul>
+  <li><strong>Coverage.</strong> The kept chunks contain an answer to 71 of the 72 dev questions; the course corpus covers 65. Wikipedia alone covers 70, and Stack Exchange 63. Hailperin covers 45 and CSBU 30: they are deep but not broad.</li>
+  <li><strong>Topics.</strong> Every one of the 40 syllabus topics has kept chunks. The thinnest are segmentation (14), RAID (39), paging (67) and page replacement (75). The largest are virtual memory and file-system implementation, both with well over a thousand.</li>
+  <li><strong>Compiling.</strong> The kept chunks are regrouped into their sections and written out as documents, each with a manifest entry naming its source, revision, authors and licence. A section is kept whole if any of its chunks passed, so that a citation points at a coherent section. That is why ingestion gives 18,515 chunks rather than 17,420.</li>
+  <li><strong>A control.</strong> The same pool with no filtering (21,715 chunks, <code>data/rag/open_all/</code>) was built as well, to measure what the filters are worth (Section 4.7).</li>
+</ul>
+<p>The analysis also found a defect in our own conversion. In the first build, 1,137 of the chunks (5.8%) were Wikipedia "See also" lists, "External links" and reference lists. The rule meant to remove those sections compared heading levels off by one. It was fixed and covered by tests, the corpus was rebuilt, and 39 such chunks remain (subsection-level "Notes"). Every number in this report is from the rebuilt corpus.</p>
 </section>
 
 <!-- ======================= 3 CODE ======================= -->
@@ -289,7 +344,7 @@
     <text x="424" y="28" text-anchor="middle">grounded</text>
   </g>
 </svg>
-<figcaption>Figure 1: Request flow. The router picks a path. Solvable problems are computed by a simulator. Concept and analysis questions are grounded in retrieved course notes, answered by the fine-tuned model and fact-checked. A shown attempt goes to the Socratic tutor, which never receives a computed answer or a retrieved passage.</figcaption>
+<figcaption>Figure 2: Request flow. The router picks a path. Solvable problems are computed by a simulator. Concept and analysis questions are grounded in retrieved course notes, answered by the fine-tuned model and fact-checked. A shown attempt goes to the Socratic tutor, which never receives a computed answer or a retrieved passage.</figcaption>
 </figure>
 <table>
   <thead><tr><th>Layer</th><th>Component</th><th>Runs on</th></tr></thead>
@@ -304,9 +359,9 @@
 <h3>3.2 Data pipeline</h3>
 <p>Stages 3–5 of the build. Each stage writes its statistics into the manifest and prints what it removed, so a regression shows up as a changed count.</p>
 <figure><img src="shots/code_build_stages.png" alt="build.py stages 3 to 5">
-<figcaption>Figure 2: <code>ostutor/build.py</code>: cleaning, deduplication and decontamination stages.</figcaption></figure>
+<figcaption>Figure 3: <code>ostutor/build.py</code>: cleaning, deduplication and decontamination stages.</figcaption></figure>
 <figure><img src="shots/code_decontaminate.png" alt="decontamination core">
-<figcaption>Figure 3: The core of decontamination. Generated rows are judged by exact parameter fingerprint, prose rows by <em>distinctive</em> shared 13-grams only.</figcaption></figure>
+<figcaption>Figure 4: The core of decontamination. Generated rows are judged by exact parameter fingerprint, prose rows by <em>distinctive</em> shared 13-grams only.</figcaption></figure>
 
 <h3>3.3 Fine-tuning</h3>
 <p>QLoRA via Unsloth on Kaggle's free tier: 2 × Tesla T4 with DDP (<code>torchrun --nproc_per_node=2</code>), 735 optimiser steps, 3.5 hours. The settings and the reason for each:</p>
@@ -323,47 +378,47 @@
   </tbody>
 </table>
 <figure><img src="shots/code_lora.png" alt="LoRA configuration">
-<figcaption>Figure 4: <code>train/kaggle_train.py</code>: the 4-bit base and the LoRA adapter on all seven projection matrices.</figcaption></figure>
+<figcaption>Figure 5: <code>train/kaggle_train.py</code>: the 4-bit base and the LoRA adapter on all seven projection matrices.</figcaption></figure>
 <figure><img src="shots/code_sftconfig.png" alt="trainer configuration">
-<figcaption>Figure 5: The trainer configuration: no packing, fp16, 8-bit AdamW, NEFTune, step-wise validation with best-checkpoint restore.</figcaption></figure>
+<figcaption>Figure 6: The trainer configuration: no packing, fp16, 8-bit AdamW, NEFTune, step-wise validation with best-checkpoint restore.</figcaption></figure>
 
 <h3>3.4 Verified solver</h3>
 <p>The model never carries out a procedure. It <em>reads</em> the question into typed JSON. This step runs on the untuned base at LoRA scale 0, which reads more reliably: 84% extraction accuracy against 79% for the adapter. Every extracted number must then appear in the question. Grounded parameters go to a simulator, which computes the answer; anything ungrounded falls back to the model.</p>
 <figure><img src="shots/code_grounding.png" alt="grounding check">
-<figcaption>Figure 6: <code>ostutor/solver.py</code>: the grounding check, which makes delegation trustworthy. It caught an invented Banker's <em>Available</em> vector [10, 5, 7] for a problem stating [3, 3, 2].</figcaption></figure>
+<figcaption>Figure 7: <code>ostutor/solver.py</code>: the grounding check, which makes delegation trustworthy. It caught an invented Banker's <em>Available</em> vector [10, 5, 7] for a problem stating [3, 3, 2].</figcaption></figure>
 
 <h3>3.5 RAG pipeline</h3>
 <p>The pipeline has four files. <code>extract.py</code> turns PDF, PPTX, DOCX, Markdown and text into Markdown whose headings are the citation anchors. <code>corpus.py</code> validates the manifest and cuts the documents into citable chunks. <code>retrieve.py</code> ranks the chunks, decides whether any of them are relevant, and builds the prompt. <code>ingest.py</code> is the command the course staff use to add material (<code>add</code>) and rebuild the index.</p>
 <figure><img src="shots/code_corpus.png" alt="manifest validation">
-<figcaption>Figure 7: <code>ostutor/rag/corpus.py</code>: manifest validation. A missing field, a changed checksum or an unlisted file refuses the whole corpus.</figcaption></figure>
+<figcaption>Figure 8: <code>ostutor/rag/corpus.py</code>: manifest validation. A missing field, a changed checksum or an unlisted file refuses the whole corpus.</figcaption></figure>
 <figure><img src="shots/code_extract_pdf.png" alt="running header removal">
-<figcaption>Figure 8: <code>ostutor/rag/extract.py</code>: lines repeated on a third of a PDF's pages are running headers and are dropped.</figcaption></figure>
+<figcaption>Figure 9: <code>ostutor/rag/extract.py</code>: lines repeated on a third of a PDF's pages are running headers and are dropped.</figcaption></figure>
 <figure><img src="shots/code_retrieve.png" alt="hybrid retrieval">
-<figcaption>Figure 9: <code>ostutor/rag/retrieve.py</code>: BM25 and dense rankings, the abstain gate, and reciprocal-rank fusion (k = 60; Cormack et al., SIGIR 2009).</figcaption></figure>
-<p><strong>The abstain gate.</strong> A passage that is only the least-bad match is worse than no passage, because the model would cite it as support. The gate keeps the passages if <em>either</em> signal is strong: the best dense similarity, or the best BM25 score. BM25 scores grow with the size of the corpus, so the two thresholds are fitted for each corpus. For the course corpus they are cosine ≥ 0.59 or BM25 ≥ 18.5, fitted on the dev half of the questions only (Figure 14).</p>
+<figcaption>Figure 10: <code>ostutor/rag/retrieve.py</code>: BM25 and dense rankings, the abstain gate, and reciprocal-rank fusion (k = 60; Cormack et al., SIGIR 2009).</figcaption></figure>
+<p><strong>The abstain gate.</strong> A passage that is only the least-bad match is worse than no passage, because the model would cite it as support. The gate keeps the passages if <em>either</em> signal is strong: the best dense similarity, or the best BM25 score. BM25 scores grow with the size of the corpus, so the two thresholds are fitted for each corpus. For the course corpus they are cosine ≥ 0.59 or BM25 ≥ 18.5, fitted on the dev half of the questions only (Figure 15).</p>
 <figure><img src="shots/code_augment.png" alt="prompt construction">
-<figcaption>Figure 10: The prompt keeps the <em>trained</em> system prompt word for word at the start, so the adapter still sees the prompt it learned the mode under. The notes follow, labelled [S1]…[S4], with an instruction never to invent a citation.</figcaption></figure>
+<figcaption>Figure 11: The prompt keeps the <em>trained</em> system prompt word for word at the start, so the adapter still sees the prompt it learned the mode under. The notes follow, labelled [S1]…[S4], with an instruction never to invent a citation.</figcaption></figure>
 
 <h3>3.6 Gateway integration</h3>
 <p>Retrieval is layer 2 of the gateway. It runs after the simulator layer, so a solvable problem is still computed and retrieval is not even consulted for it (a gateway test checks this). It runs before the fact checker, which checks the grounded draft. Only <code>explain</code> and <code>analyze</code> retrieve. Tutor mode never does, because a passage could state the answer the student is working towards. Retrieval is switched on by <code>OSTUTOR_RAG=data/rag/corpus</code>; a gateway started without it behaves exactly as before. Answers end with a "Sources from your course notes" list. When the gate abstains, they end instead with "Not found in the course materials", so general knowledge is never passed off as course content.</p>
 <figure><img src="shots/code_gateway_layers.png" alt="gateway layers">
-<figcaption>Figure 11: <code>serve/gateway.py</code>: layer 1 is the simulator, layer 2 retrieval, layer 3 the fact checker.</figcaption></figure>
+<figcaption>Figure 12: <code>serve/gateway.py</code>: layer 1 is the simulator, layer 2 retrieval, layer 3 the fact checker.</figcaption></figure>
 <figure><img src="shots/code_gateway_notfound.png" alt="not found notice">
-<figcaption>Figure 12: <code>serve/gateway.py</code>: the prompt and footer for a question, including the notice when the course materials do not cover it.</figcaption></figure>
+<figcaption>Figure 13: <code>serve/gateway.py</code>: the prompt and footer for a question, including the notice when the course materials do not cover it.</figcaption></figure>
 
 <h3>3.7 Evaluation and tests</h3>
 <p>Every comparison in the project is <em>paired</em>: the same items are scored under two configurations. The right test for a paired yes/no outcome is McNemar's, and with 5–30 discordant items the exact binomial form is needed.</p>
 <figure><img src="shots/code_mcnemar.png" alt="exact McNemar">
-<figcaption>Figure 13: <code>ostutor/evaluation/stats.py</code>: the exact two-sided McNemar test used for every p-value in Section 4.</figcaption></figure>
+<figcaption>Figure 14: <code>ostutor/evaluation/stats.py</code>: the exact two-sided McNemar test used for every p-value in Section 4.</figcaption></figure>
 <figure><img src="shots/code_calibrate.png" alt="gate calibration">
-<figcaption>Figure 14: <code>tools/rag_eval.py</code>: the gate is fitted on the dev questions only. It must keep notes for at least 95% of in-scope questions, and among those settings it withholds notes from the most off-topic ones. It is then reported on the test half.</figcaption></figure>
+<figcaption>Figure 15: <code>tools/rag_eval.py</code>: the gate is fitted on the dev questions only. It must keep notes for at least 95% of in-scope questions, and among those settings it withholds notes from the most off-topic ones. It is then reported on the test half.</figcaption></figure>
 <figure><img src="shots/term_ingest.png" alt="ingesting the corpus">
-<figcaption>Figure 15: The end of <code>python -m ostutor.rag.ingest data\rag\corpus</code>: chunks per document, then the corpus total.</figcaption></figure>
-<p>Four test suites need no GPU: <code>tools/test_pipeline.py</code> (data pipeline), <code>tools/test_router.py</code> (28 labelled routing cases, 0 misroutes allowed on shown attempts), <code>tools/test_g0.py</code> (55 checks on statistics, extraction scoring, grader regressions and the one-adapter guard), and <code>tools/test_rag.py</code> (46 checks). The gateway suite grew from 28 to 37 checks.</p>
+<figcaption>Figure 16: The end of <code>python -m ostutor.rag.ingest data\rag\corpus</code>: chunks per document, then the corpus total.</figcaption></figure>
+<p>Four test suites need no GPU: <code>tools/test_pipeline.py</code> (data pipeline), <code>tools/test_router.py</code> (28 labelled routing cases, 0 misroutes allowed on shown attempts), <code>tools/test_g0.py</code> (55 checks on statistics, extraction scoring, grader regressions and the one-adapter guard), and <code>tools/test_rag.py</code> (65 checks). The gateway suite grew from 28 to 37 checks.</p>
 <figure><img src="shots/term_test_rag.png" alt="RAG tests">
-<figcaption>Figure 16: <code>tools/test_rag.py</code>: 46/46 checks, covering the manifest rules, checksum and unlisted-file refusal, extraction of slides, Word and PDF, retrieval, the gate, the prompt and citations.</figcaption></figure>
+<figcaption>Figure 17: <code>tools/test_rag.py</code>: 65/65 checks, covering the manifest rules, checksum and unlisted-file refusal, extraction of slides, Word and PDF, retrieval, the gate, the prompt and citations, and the open-corpus tools (answer grading, wikitext conversion, how passages are labelled).</figcaption></figure>
 <figure><img src="shots/term_test_gateway.png" alt="gateway tests">
-<figcaption>Figure 17: <code>serve/test_gateway.py</code> (last lines): the retrieval checks. Every earlier check is unchanged with retrieval off.</figcaption></figure>
+<figcaption>Figure 18: <code>serve/test_gateway.py</code> (last lines): the retrieval checks. Every earlier check is unchanged with retrieval off.</figcaption></figure>
 </section>
 
 <!-- ======================= 4 METRICS ======================= -->
@@ -390,7 +445,7 @@
 
 <h3>4.2 Training loss</h3>
 <figure><img class="chart" src="shots/loss_curve.svg" alt="loss curves">
-<figcaption>Figure 18: v3 training run, from the trainer's own log (<code>outputs/ostutor-lora-v3/ostutor-lora/train_metrics.json</code>).</figcaption></figure>
+<figcaption>Figure 19: v3 training run, from the trainer's own log (<code>outputs/ostutor-lora-v3/ostutor-lora/train_metrics.json</code>).</figcaption></figure>
 <table>
   <thead><tr><th>Quantity</th><th class="num">Start (step 59)</th><th class="num">End (step 735)</th></tr></thead>
   <tbody>
@@ -462,7 +517,7 @@
 
 <h3>4.7 RAG: retrieval quality and latency</h3>
 <figure><img src="shots/term_rag_eval.png" alt="retrieval evaluation">
-<figcaption>Figure 19: <code>tools/rag_eval.py</code> over the course corpus: 124 in-scope and 40 out-of-scope questions, 5 timed passes each (the first discarded).</figcaption></figure>
+<figcaption>Figure 20: <code>tools/rag_eval.py</code> over the course corpus: 124 in-scope and 40 out-of-scope questions, 5 timed passes each (the first discarded).</figcaption></figure>
 <table>
   <thead><tr><th>Retrieval</th><th class="num">Recall@1</th><th class="num">Recall@5</th><th class="num">Document recall@5</th><th class="num">MRR@10</th><th class="num">p95 latency</th></tr></thead>
   <tbody>
@@ -484,6 +539,27 @@
   <li><strong>A larger embedding model did not help significantly.</strong> multilingual-e5-base raised hybrid recall@5 to 81.5%. Paired, MiniLM missed 11 questions that e5 found and e5 missed 8 that MiniLM found (exact McNemar p = 0.65). e5 also costs three times the latency (25 ms p95), a 5.5-minute index build and about 1 GB more memory, so MiniLM was kept (<code>reports/rag/corpus_multilingual-e5-base_eval.md</code>).</li>
   <li><strong>The gate generalises to the held-out half.</strong> It withheld notes from 18 of 20 off-topic questions and gave them to 59 of 62 in-scope ones. The thresholds had to be refitted for this corpus: the value fitted earlier on our 12 test notes (BM25 ≥ 6.0) would have given notes to 37 of the 40 off-topic questions, because BM25 scores are larger on a larger corpus.</li>
   <li><strong>Latency is far inside the 500 ms budget</strong> at 8.3 ms.</li>
+</ul>
+<p><strong>Open corpus against the course corpus.</strong> The two corpora have no labelled passages in common, so they were compared by <em>answer recall</em>: a top-k chunk contains an accepted answer to one of the 144 short-answer questions. The selection rule was fixed in advance: the compiled corpus is changed only if some variant beats it on the dev half with p &lt; 0.05. No variant did, so the test half was used once, for reporting.</p>
+<table>
+  <thead><tr><th>Corpus</th><th class="num">Chunks</th><th class="num">Recall@5, dev</th><th class="num">Recall@5, test</th><th class="num">Recall@10, test</th><th class="num">Recall@5, all 144</th></tr></thead>
+  <tbody>
+    <tr><td>Course corpus</td><td class="num">2,783</td><td class="num">75.0%</td><td class="num">73.6%</td><td class="num">76.4%</td><td class="num">74.3%</td></tr>
+    <tr><td>Open pool, unfiltered (control)</td><td class="num">21,715</td><td class="num">83.3%</td><td class="num">81.9%</td><td class="num">94.4%</td><td class="num">82.6%</td></tr>
+    <tr class="total"><td>Open corpus, compiled (served)</td><td class="num">18,515</td><td class="num">83.3%</td><td class="num">83.3%</td><td class="num">94.4%</td><td class="num">83.3%</td></tr>
+    <tr><td>&nbsp;&nbsp;without Wikipedia</td><td class="num">8,628</td><td class="num">65.3%</td><td class="num">65.3%</td><td class="num">79.2%</td><td class="num">65.3%</td></tr>
+    <tr><td>&nbsp;&nbsp;without Stack Exchange</td><td class="num">11,346</td><td class="num">79.2%</td><td class="num">84.7%</td><td class="num">93.1%</td><td class="num">81.9%</td></tr>
+    <tr><td>&nbsp;&nbsp;without Hailperin</td><td class="num">17,688</td><td class="num">87.5%</td><td class="num">81.9%</td><td class="num">93.1%</td><td class="num">84.7%</td></tr>
+  </tbody>
+</table>
+<p class="caption">Source: <code>reports/rag/compare_dev.md</code>, <code>compare_test.md</code>, <code>compare_all.md</code> (<code>tools/rag_compare.py</code>). Hybrid retrieval, no gate.</p>
+<ul>
+  <li><strong>The open corpus retrieves the answer more often.</strong> On the test half it gained 12 questions and lost 5 against the course corpus (83.3% against 73.6%, p = 0.143, not significant at n = 72). Over all 144 questions it gained 21 and lost 8 (p = 0.024). At recall@10 the gap is wider: 94.4% against 76.4% on the test half.</li>
+  <li><strong>Wikipedia does most of the work.</strong> Without it recall@5 falls to 65.3% (p = 0.002 on the test half). No other source's removal makes a significant difference.</li>
+  <li><strong>The filters cost nothing.</strong> The unfiltered pool scores the same within one question while being 17% larger. The filters remove text, not answers.</li>
+  <li><strong>A tempting change that did not hold.</strong> On the dev half, removing Hailperin's book scored best (87.5%). It was not significant (p = 0.25), so the rule kept the book, and on the test half the variant scored 81.9%, below the compiled corpus.</li>
+  <li><strong>The gate abstains less.</strong> Refitted on the dev half (cosine ≥ 0.52 or BM25 ≥ 24.0), it gave notes for 72 of 72 in-scope test questions but withheld them for only 14 of 20 off-topic ones (course corpus: 18 of 20). The six that leaked are on neighbouring subjects the wider corpus touches: B-trees, the CAP theorem, database normalisation, HTTP/2, monads and polymorphism (<code>reports/rag/open_gate.json</code>).</li>
+  <li><strong>Latency</strong> is 26 ms at the 95th percentile on the CPU, against 8 ms for the course corpus: still far inside the budget.</li>
 </ul>
 
 <h3>4.8 RAG: end to end on the served model</h3>
@@ -532,7 +608,7 @@
   </tbody>
 </table>
 <figure><img src="shots/term_rag_e2e.png" alt="end-to-end summary">
-<figcaption>Figure 20: The run's own summary file, <code>reports/rag/e2e-20261012-2239/summary.md</code>.</figcaption></figure>
+<figcaption>Figure 21: The run's own summary file, <code>reports/rag/e2e-20261012-2239/summary.md</code>.</figcaption></figure>
 <p><strong>Reading the results.</strong></p>
 <ul>
   <li><strong>The MCQ target was not met, and retrieval made no measurable difference.</strong> The target was "v3 with retrieval ≥ base"; it scored 184 against 185, and the difference is one question (p = 1.0). All four configurations are within two questions of each other. The base model already answers 92.5% of these questions correctly without notes, so there is little left for notes to fix. On this larger set the fine-tuned model is also no worse than the base, unlike the 70-item log-likelihood result.</li>
@@ -540,12 +616,45 @@
   <li><strong>About 60% of cited sentences are fully supported</strong> on our strict reading: everything the sentence says must be in the cited passage. The usual failure is a correct quotation followed by the model's own elaboration in the same sentence, or an example the passage does not contain. One answer quoted a passage accurately and then added a worked address example with wrong arithmetic. The base-model judge is too lenient: where we disagreed with it, it had said "supported" 8 times and we had said so 3 times. So its 81.8% overstates faithfulness.</li>
   <li><strong>Speed is unaffected.</strong> A median prompt of 816 tokens, most of it retrieved notes, did not slow decoding (42.9 tok/s against the 20 tok/s floor). These are server-reported decode rates and exclude prompt processing, which is why they differ from the 26.9 tok/s wall-clock figure measured earlier through the full stack.</li>
 </ul>
+<p><strong>D. Short answers, with each corpus.</strong> The 144 short-answer questions were put to the base model and to v3, with retrieval off and on, under the explain-mode prompt and the instruction to answer in a few words. An answer is correct when it contains an accepted answer as a whole word. The course-corpus and open-corpus runs gave identical replies on all 288 retrieval-off items, so the two runs compare like for like.</p>
+<table>
+  <thead><tr><th>Configuration</th><th class="num">Test half (72)</th><th class="num">All 144</th></tr></thead>
+  <tbody>
+    <tr><td>Base model, no retrieval</td><td class="num">48 (66.7%)</td><td class="num">100 (69.4%)</td></tr>
+    <tr><td>Base model + course corpus</td><td class="num">59 (81.9%)</td><td class="num">122 (84.7%)</td></tr>
+    <tr><td>Base model + open corpus</td><td class="num">62 (86.1%)</td><td class="num">124 (86.1%)</td></tr>
+    <tr><td>Fine-tuned v3, no retrieval</td><td class="num">49 (68.1%)</td><td class="num">102 (70.8%)</td></tr>
+    <tr><td>Fine-tuned v3 + course corpus</td><td class="num">59 (81.9%)</td><td class="num">124 (86.1%)</td></tr>
+    <tr class="total"><td>Fine-tuned v3 + open corpus</td><td class="num">62 (86.1%)</td><td class="num">123 (85.4%)</td></tr>
+  </tbody>
+</table>
+<table>
+  <thead><tr><th>Comparison (v3)</th><th class="num">Right→wrong</th><th class="num">Wrong→right</th><th class="num">exact McNemar p</th></tr></thead>
+  <tbody>
+    <tr><td>No retrieval → open corpus, test half</td><td class="num">4</td><td class="num">17</td><td class="num">0.0072</td></tr>
+    <tr><td>No retrieval → open corpus, all 144</td><td class="num">9</td><td class="num">30</td><td class="num">0.0011</td></tr>
+    <tr><td>No retrieval → course corpus, test half</td><td class="num">4</td><td class="num">14</td><td class="num">0.0309</td></tr>
+    <tr><td>Course corpus → open corpus, test half</td><td class="num">4</td><td class="num">7</td><td class="num">0.549</td></tr>
+    <tr><td>Course corpus → open corpus, all 144</td><td class="num">11</td><td class="num">10</td><td class="num">1.000</td></tr>
+  </tbody>
+</table>
+<p class="caption">Source: <code>reports/rag/e2e-20261013-1339/summary.md</code>, <code>reports/rag/e2e-short-course/summary.md</code>, <code>reports/rag/short_e2e-short-course_vs_e2e-20261013-1339.md</code>.</p>
+<figure><img src="shots/term_rag_short_compare.png" alt="course vs open short answers">
+<figcaption>Figure 22: <code>tools/rag_e2e_compare.py</code>: the course corpus (A) against the open corpus (B), item by item, under both gradings.</figcaption></figure>
+<p><strong>E. The open corpus on the other measures.</strong> On the 200 MCQ items v3 scored 186 with and without the open corpus, and the base model 185 without and 184 with it (all p = 1.0). For explain answers, the 72 test-half short-answer questions were asked again for a full explanation. <strong>69 of 72 answers cited at least one passage</strong>, none cited a passage that does not exist, and the decode speed was 42 tok/s (slowest 39). The judge rated 110 of 138 cited sentences supported (79.7%). Our strict check of a random 40 found 25 of 38 claims fully supported (two lines were bare "Reference: [S2]" lists and were not counted), close to the 24 of 40 for the course corpus. The judge was again lenient: 8 disagreements in its favour and 1 against.</p>
+<p><strong>Reading these results.</strong></p>
+<ul>
+  <li><strong>Retrieval clearly raises short-answer accuracy</strong>: by 13 to 14 questions out of 72 on the test half, significant for both corpora. This is the measurable accuracy gain the MCQ could not show. On short answers the model must produce the term itself and cannot recognise it among four options.</li>
+  <li><strong>The better corpus did not give better answers.</strong> v3 answered 62 and 59 test questions with the open and course corpora, and 123 and 124 of all 144. The difference is nowhere near significant. The reason shows when each answer is split by whether its passages contained the answer. Retrieval rescued a wrong answer 26 times with the open corpus and 25 times with the course corpus. Most of the open corpus's extra hits were for questions the model already answered correctly without help (85 against 66). And off-target passages turned a right answer wrong 7 times with the open corpus, against 3 with the course corpus.</li>
+  <li><strong>The open corpus meets the citation target</strong> (69/72, against a target of 90%). The course-corpus figure of 50/59 was measured on a different question set, so the two rates are not directly comparable.</li>
+</ul>
 
 <h3>4.9 Discussion</h3>
 <ul>
   <li><strong>Each layer guards a different failure.</strong> The simulator guards procedures: a 4B model cannot execute a long schedule reliably, but it can read one. Retrieval ties declarative claims to passages the student can check. The fact checker guards a known list of misconceptions. Tutor mode is shielded from all three, because its job is to <em>withhold</em> the answer.</li>
   <li><strong>Fine-tuning's measured value is narrower than first claimed.</strong> With the solver, the adapter adds 8 significant items. Without it, there is no significant gain over the untuned base on the problem suite, and none on the 200-item theory set. Its other contributions are the trained output formats, the Socratic behaviour and the shell mode, and none of these is yet measured by a number (G3).</li>
-  <li><strong>Retrieval's value is traceability, not accuracy, so far.</strong> It did not raise MCQ accuracy, which was already near its ceiling. What it adds is an answer tied to the course's own slides and readings, with the source named, and an explicit warning when the course does not cover the question. Whether that helps students learn is not measured yet.</li>
+  <li><strong>Retrieval's value is accuracy on recall questions, plus traceability.</strong> It did not raise MCQ accuracy, which was already near its ceiling. It did raise short-answer accuracy by about 15 points, with either knowledge base (p ≤ 0.001 over all 144 questions). It also ties each answer to a named source and warns when nothing relevant was found. Whether that helps students learn is not measured yet.</li>
+  <li><strong>More and better data stopped paying off at the model.</strong> The open corpus was built with care and retrieves the answer more often (83% against 74%). But the model already knows most of what the extra passages contain, and the wider corpus brings more distracting passages. So the choice between the two corpora is about what the student should see, not about accuracy. The course corpus cites the course's own slides and says "not covered" more often. The open corpus covers more ground and can be shared.</li>
   <li><strong>Measurement found more errors than the model did.</strong> Two grader blind spots, a non-deterministic cache, a void benchmark, two unsupported claims and a lenient faithfulness judge all biased the numbers in the project's favour. Each was found by auditing the evaluation rather than the model (Section 5).</li>
 </ul>
 
@@ -566,6 +675,20 @@
     <tr><td>Procedural suite, full system</td><td class="num">57/57</td><td class="num">unchanged: retrieval never runs for solvable problems</td><td>Yes (by design; tested)</td></tr>
   </tbody>
 </table>
+<p>The same targets for the open corpus (the recall measure here is answer recall on the short-answer test half, not passage recall):</p>
+<table>
+  <thead><tr><th>Measure</th><th class="num">Target</th><th class="num">Measured</th><th>Met?</th></tr></thead>
+  <tbody>
+    <tr><td>Retrieval p95 latency</td><td class="num">≤ 500 ms</td><td class="num">26 ms</td><td>Yes</td></tr>
+    <tr><td>Recall@5 (answer recall, test half)</td><td class="num">≥ 85%</td><td class="num">83.3%</td><td>No</td></tr>
+    <tr><td>Off-topic questions given no notes (test half)</td><td class="num">≥ 90%</td><td class="num">14/20 = 70%</td><td>No</td></tr>
+    <tr><td>Answers citing a passage, when given passages</td><td class="num">≥ 90%</td><td class="num">69/72 = 95.8%</td><td>Yes</td></tr>
+    <tr><td>Invented citations</td><td class="num">0</td><td class="num">0</td><td>Yes</td></tr>
+    <tr><td>Theory MCQ (200 items), v3 with retrieval</td><td class="num">≥ base</td><td class="num">93.0% vs 92.5%</td><td>Yes, numerically (p = 1.0)</td></tr>
+    <tr><td>Short answers, v3 with retrieval vs without (test half)</td><td class="num">better</td><td class="num">86.1% vs 68.1%</td><td>Yes (p = 0.007)</td></tr>
+    <tr><td>Generation speed with passages in the prompt</td><td class="num">≥ 20 tok/s</td><td class="num">39.2 tok/s slowest</td><td>Yes</td></tr>
+  </tbody>
+</table>
 </section>
 
 <!-- ======================= 5 WRONG ======================= -->
@@ -582,6 +705,7 @@
     <tr><td><strong>Grader blind spots</strong> (D-003, D-004): LaTeX <code>\quad</code> separators, and a "Final Answer" line with a bare number</td><td>5 correct base-model answers were graded wrong. That inflated the adapter's apparent no-solver gain from p = 0.557 to p = 0.136</td><td>Fixed with regression tests. Re-grading 799 historical outputs changed 0 verdicts. Base-model failures are now hand-audited</td></tr>
     <tr><td><strong>Prompt cache made greedy decoding non-deterministic</strong> (D-005)</td><td>Same weights scored 36/57 and 34/57; only 23/57 outputs were identical</td><td>Evaluation sends <code>cache_prompt: false</code> (6/6 byte-identical repeats); serving keeps the cache. The deterministic rerun of G0 was interrupted and is still pending</td></tr>
     <tr><td><strong>Teacher-forced loss read as correctness</strong></td><td>A low OOD loss (0.0139) was taken as evidence of generalisation</td><td>Loss is reported only as a training-health signal (Section 4.2)</td></tr>
+    <tr><td><strong>Short-answer grading too literal</strong></td><td>"execve" did not match "exec", "Context switching" did not match "context switch", and the answer "0" to "what does fork() return in the child" could never be graded correct, because bare digits are ignored</td><td>The pre-registered grading is reported as the result. A second grading is reported next to it: a hyphen counts as a space, an exact numeric reply counts, and four aliases are added. It was fixed from the base model's misses before any v3 answer was read, and applied to every configuration. It adds 2–4 answers to each and changes no conclusion</td></tr>
   </tbody>
 </table>
 
@@ -598,6 +722,8 @@
     <tr><td><strong>OSTEP running headers inside passages</strong></td><td>"OPERATING SYSTEMS [VERSION 1.01] WWW.OSTEP.ORG" appeared mid-sentence in 11 of the 27 sampled OSTEP passages</td><td>Lines repeated on a third of the pages are dropped</td></tr>
     <tr><td><strong>Ligatures in typeset PDFs</strong></td><td>"ﬁle" never matched a query for "file"</td><td>NFKC normalisation</td></tr>
     <tr><td><strong>Sparse citations and a lenient judge</strong></td><td>Only 132 of 446 answer sentences cite a note; the base-model judge rates 81.8% supported where our strict check finds about 60%</td><td>Not fixed. Proposed in Section 6.4</td></tr>
+    <tr><td><strong>Wikipedia reference sections kept</strong> in the first open-corpus build</td><td>1,137 of 19,674 chunks were "See also", link and reference lists, and they appeared in answers' sources</td><td>A heading-level off-by-one; fixed, tested and rebuilt (Section 2.5)</td></tr>
+    <tr><td><strong>Open-corpus passages labelled "course notes"</strong></td><td>A student would have been told that Wikipedia and Stack Exchange text came from their course notes</td><td>Each corpus now names its passages in its manifest. The open corpus shows "Sources (openly licensed references, not your course notes)"; the course corpus wording is unchanged and tested word for word</td></tr>
     <tr><td><strong>One legacy Word file could not be converted</strong></td><td>Word automation waited on an invisible dialog; the lab handout is missing from the corpus</td><td>Recorded as excluded; it can be added by saving it as .docx</td></tr>
   </tbody>
 </table>
@@ -621,6 +747,7 @@
   <li><strong>A benchmark chain waited an hour polling itself.</strong> <code>busy("benchmark.py")</code> matched <code>run_full_benchmark.py</code>. Polling for a free GPU between jobs also raced and crashed the next job. Fixed: match the full path, and require several consecutive clear polls.</li>
   <li><strong>Git normalised 57 CRLF files to LF.</strong> The repository was staged before line-ending conversion was disabled, which would have silently changed bytes the dataset manifest hashes. Fixed and verified file by file (D-001).</li>
   <li><strong>The evaluation questions are ours.</strong> The retrieval questions and the new MCQ items were written by the team, not by the instructor, and were written while looking at the passages. We tried to phrase them as students would, but they are likely easier than real student questions.</li>
+  <li><strong>The GPU is shared.</strong> Another training job on the same machine started four minutes after our end-to-end run and took most of the card's memory, and our model server crashed out of memory halfway through. The run resumed from its saved rows once the card was free. We now wait for ten idle minutes before starting, and stop if the other job reappears.</li>
   <li><strong>Wikipedia article identifiers lost characters.</strong> "Bélády's anomaly" became <code>wiki-b-l-dy-s-anomaly</code> and "Producer–consumer" lost its dash, which broke two question labels. Titles are now transliterated before the identifier is made.</li>
 </ul>
 </section>
@@ -660,6 +787,9 @@
   <li><strong>A re-ranker rather than a bigger embedder.</strong> A larger embedder bought 2.5 points of recall that were not significant. A small cross-encoder that re-scores the top 20 attacks the actual weakness, which is ranking the right passage first (recall@1 is 46%).</li>
   <li><strong>Learned or calibrated abstention.</strong> Use a logistic model over (max cosine, max BM25, margin between the top two) instead of hand-set thresholds, with precision and recall reported on held-out data.</li>
   <li><strong>Grounding checks on the answer, not just the prompt.</strong> Verify that each cited sentence is supported by the cited passage (entailment, or overlap as a first step). The fact checker becomes a check against the notes instead of a fixed rule list.</li>
+  <li><strong>Spend the effort where retrieval fails, not on more text.</strong> A larger, cleaner corpus raised answer recall but not answer accuracy (Section 4.8). Of v3's 21 wrong answers with the open corpus, 16 came with four passages that did not contain the answer, although the corpus holds an answer to nearly every question. That is a ranking problem. In the other 5 the answer was in front of the model and it chose a near miss: "dirty bit" for "reference bit", "Access Control List" for "capability list". A re-ranker, and a check that the answer is actually stated in a cited passage, address both.</li>
+  <li><strong>Treat Stack Exchange questions differently from answers.</strong> A question body often states the asker's misconception. It helps matching, because students phrase questions the same way, but it should not be offered to the model as a source to cite. Indexing questions for search and citing only answers would keep the benefit without the risk.</li>
+  <li><strong>A gate per source.</strong> The open corpus lets more off-topic questions through (14/20 withheld against 18/20) because Stack Exchange covers neighbouring subjects such as networking and databases. Separate thresholds for the textbook, encyclopedia and forum parts would tighten it.</li>
   <li><strong>Retrieval for tutor hints, but behind a leak filter.</strong> Passages could make Socratic hints more accurate, but only if a filter guarantees no passage states the final answer. That needs its own answer-leak measurement first (G3).</li>
 </ul>
 
@@ -703,8 +833,12 @@
     <tr><td>RAG retrieval and the gate</td><td><code>reports/rag/corpus_eval.md</code>, <code>data/rag/corpus/gate.json</code></td><td><code>tools/rag_eval.py --calibrate</code></td></tr>
     <tr><td>Embedder comparison</td><td><code>reports/rag/corpus_multilingual-e5-base_eval.md</code></td><td><code>tools/rag_eval.py --embed-model</code></td></tr>
     <tr><td>RAG end to end, faithfulness</td><td><code>reports/rag/e2e-20261012-2239/</code> (<code>summary.md</code>, <code>judge_sample_engineer_check.json</code>)</td><td><code>tools/rag_e2e.py</code></td></tr>
+    <tr><td>Open-corpus pool analysis, filters, coverage, Figure 1</td><td><code>reports/rag/open_pool_analysis.md</code>, <code>docs/shots/pool_relevance.svg</code></td><td><code>tools/fetch_rag_pool.py</code>, <code>tools/analyze_rag_pool.py</code></td></tr>
+    <tr><td>Corpus comparison by answer recall, ablations</td><td><code>reports/rag/compare_dev.md</code>, <code>compare_test.md</code>, <code>compare_all.md</code></td><td><code>tools/rag_compare.py</code></td></tr>
+    <tr><td>Open-corpus gate</td><td><code>reports/rag/open_gate.json</code>, <code>data/rag/open/gate.json</code></td><td><code>tools/rag_compare.py --calibrate</code></td></tr>
+    <tr><td>Open corpus end to end, short answers, faithfulness</td><td><code>reports/rag/e2e-20261013-1339/</code>, <code>reports/rag/e2e-short-course/</code>, <code>reports/rag/short_e2e-short-course_vs_e2e-20261013-1339.md</code></td><td><code>tools/rag_e2e.py</code>, <code>tools/rag_e2e_compare.py</code></td></tr>
     <tr><td>Generation speed 26.9 tok/s (wall clock, full stack)</td><td><code>PROJECT_CONTEXT.md</code> Section 7</td><td>Served stack, 300 tokens</td></tr>
-    <tr><td>Engineering decisions</td><td><code>docs/DECISIONS.md</code> (D-001 … D-008)</td><td>—</td></tr>
+    <tr><td>Engineering decisions</td><td><code>docs/DECISIONS.md</code> (D-001 … D-009)</td><td>—</td></tr>
   </tbody>
 </table>
 <h3>Reproducing</h3>

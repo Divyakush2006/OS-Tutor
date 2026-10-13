@@ -88,9 +88,9 @@ answer recall: a top-k chunk contains an accepted answer.
     test it scores 81.9%. Keeping Hailperin is the right call.
   - Without Stack Exchange, test scores 84.7% (p = 1.0) and dev 79.2%; it stays.
 - **Gate.** On test, notes are given for 72/72 in-scope questions and withheld for
-  **14/20** out-of-scope ones, against 18/20 on the course corpus. The leaks are
-  near-topic questions the wider corpus partly covers: JVM garbage collection, B-trees,
-  ACID/CAP, HTTP/2, monads and polymorphism.
+  **14/20** out-of-scope ones, against 18/20 on the course corpus. The test leaks
+  are near-topic questions the wider corpus partly covers: B-trees, CAP, database
+  normalisation, HTTP/2, monads and polymorphism (on dev also JVM garbage collection).
 - **Latency.** CPU retrieval latency is p50 23 ms and p95 26 ms (course corpus: 8 ms).
 - **A defect found by the analysis.** The first build kept Wikipedia "See also",
   "External links" and reference lists: 1,137 of 19,674 chunks. A heading-level

@@ -38,11 +38,11 @@ CODE = {
     "grounding": ("ostutor/solver.py", 351, 364),
     "corpus": ("ostutor/rag/corpus.py", 96, 125),
     "extract_pdf": ("ostutor/rag/extract.py", 102, 113),
-    "retrieve": ("ostutor/rag/retrieve.py", 117, 143),
-    "augment": ("ostutor/rag/retrieve.py", 150, 164),
+    "retrieve": ("ostutor/rag/retrieve.py", 123, 149),
+    "augment": ("ostutor/rag/retrieve.py", 156, 175),
     "calibrate": ("tools/rag_eval.py", 69, 85),
-    "gateway_notfound": ("serve/gateway.py", 310, 329),
-    "gateway_layers": ("serve/gateway.py", 392, 409),
+    "gateway_notfound": ("serve/gateway.py", 310, 330),
+    "gateway_layers": ("serve/gateway.py", 393, 410),
     "mcnemar": ("ostutor/evaluation/stats.py", 15, 30),
 }
 # other files shown as open (inactive) tabs next to each one
@@ -373,11 +373,11 @@ def main() -> None:
               wrap(ev.read_text(encoding="utf-8").split("## Hybrid misses")[0].rstrip("\n").splitlines()))
     ing = [l for l in run(["-m", "ostutor.rag.ingest", "data/rag/corpus"]) if l.strip()]
     term_shot("ingest", "python -m ostutor.rag.ingest data\\rag\\corpus", ing[-22:], command_visible=False)
-    e2e = sorted((ROOT / "reports/rag").glob("e2e-*/summary.md"))
-    if e2e:
-        rel = str(e2e[-1].relative_to(ROOT))
-        term_shot("rag_e2e", f"Get-Content -Encoding UTF8 {rel}",
-                  wrap(e2e[-1].read_text(encoding="utf-8").rstrip("\n").splitlines()))
+    # the files the figures' captions name (not simply the newest run)
+    for name, rel in (("rag_e2e", "reports/rag/e2e-20261012-2239/summary.md"),
+                      ("rag_short_compare", "reports/rag/short_e2e-short-course_vs_e2e-20261013-1339.md")):
+        term_shot(name, "Get-Content -Encoding UTF8 " + rel.replace("/", "\\"),
+                  wrap((ROOT / rel).read_text(encoding="utf-8").rstrip("\n").splitlines()))
     print(f"wrote {len(list(OUT.glob('*.png')))} images to {OUT}")
 
 
