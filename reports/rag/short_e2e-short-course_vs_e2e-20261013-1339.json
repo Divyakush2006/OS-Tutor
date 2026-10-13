@@ -1,0 +1,102 @@
+{
+ "a": {
+  "run": "e2e-short-course",
+  "corpus": "data/rag/corpus"
+ },
+ "b": {
+  "run": "e2e-20261013-1339",
+  "corpus": "data/rag/open"
+ },
+ "off_replies_identical": 288,
+ "off_replies": 288,
+ "rows": [
+  {
+   "grading": "pre-registered",
+   "split": "test",
+   "model": "v3",
+   "n": 72,
+   "a": 59,
+   "b": 62,
+   "lost": 4,
+   "gained": 7,
+   "p": 0.5488
+  },
+  {
+   "grading": "pre-registered",
+   "split": "test",
+   "model": "base",
+   "n": 72,
+   "a": 59,
+   "b": 62,
+   "lost": 6,
+   "gained": 9,
+   "p": 0.6072
+  },
+  {
+   "grading": "pre-registered",
+   "split": "all",
+   "model": "v3",
+   "n": 144,
+   "a": 124,
+   "b": 123,
+   "lost": 11,
+   "gained": 10,
+   "p": 1.0
+  },
+  {
+   "grading": "pre-registered",
+   "split": "all",
+   "model": "base",
+   "n": 144,
+   "a": 122,
+   "b": 124,
+   "lost": 11,
+   "gained": 13,
+   "p": 0.8388
+  },
+  {
+   "grading": "amended",
+   "split": "test",
+   "model": "v3",
+   "n": 72,
+   "a": 60,
+   "b": 64,
+   "lost": 3,
+   "gained": 7,
+   "p": 0.3438
+  },
+  {
+   "grading": "amended",
+   "split": "test",
+   "model": "base",
+   "n": 72,
+   "a": 59,
+   "b": 64,
+   "lost": 4,
+   "gained": 9,
+   "p": 0.2668
+  },
+  {
+   "grading": "amended",
+   "split": "all",
+   "model": "v3",
+   "n": 144,
+   "a": 125,
+   "b": 126,
+   "lost": 9,
+   "gained": 10,
+   "p": 1.0
+  },
+  {
+   "grading": "amended",
+   "split": "all",
+   "model": "base",
+   "n": 144,
+   "a": 122,
+   "b": 127,
+   "lost": 8,
+   "gained": 13,
+   "p": 0.3833
+  }
+ ]
+}

@@ -347,7 +347,11 @@ relevance to 40 syllabus topics and near-duplication (D-009,
 | Answer recall@10, test half | 94.4% vs 76.4% | `reports/rag/compare_test.md` |
 | "Not covered" gate, test half | notes for 72/72 in-scope; withheld for **14/20** off-topic (course corpus: 18/20) | `reports/rag/open_gate.json` |
 | Retrieval latency, CPU | p50 23 ms, p95 26 ms | D-009 |
-| End to end (MCQ-200, short answer, faithfulness) | pending: needs a free GPU | `python tools/rag_e2e.py data/rag/open` |
+| Short answers, v3, test half: no RAG → open corpus | 49/72 → **62/72** (17 / 4, **p = 0.0072**); all 144: 102 → 123 (p = 0.0011) | `reports/rag/e2e-20261013-1339/summary.md` |
+| Short answers, v3 + course vs v3 + open | test 59 vs 62 (p = 0.55); all 144: 124 vs 123 (p = 1.0): **no end-to-end difference** | `reports/rag/short_e2e-short-course_vs_e2e-20261013-1339.md` |
+| MCQ-200 | base 185 · base+open 184 · v3 186 · v3+open 186 (all p = 1.0) | `reports/rag/e2e-20261013-1339/summary.md` |
+| Explain answers citing the passages | **69/72**, 0 invented citations, 42 tok/s median | same |
+| Faithfulness | judge 110/138 (79.7%); engineer strict check 25/38 | same + `judge_sample_engineer_check.json` |
 
 ### Other
 

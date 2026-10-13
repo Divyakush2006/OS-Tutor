@@ -108,8 +108,44 @@ answer recall: a top-k chunk contains an accepted answer.
 - `docs/`, `extracted/` and `index/` are not committed (about 70 MB, rebuildable).
   The committed manifest holds each document's checksum, revision URL and attribution,
   so a rebuild that drifts is refused.
-- End-to-end answer accuracy is pending a free GPU, measured with `tools/rag_e2e.py`
-  `data/rag/open` (phases mcq, short, explain, judge).
+
+**End to end** (`reports/rag/e2e-20261013-1339/summary.md`, course run
+`reports/rag/e2e-short-course/`, comparison `reports/rag/short_e2e-short-course_vs_e2e-20261013-1339.md`;
+greedy, prompt cache off; all 288 retrieval-off replies identical across the two runs):
+
+- **Short answers, v3, test half (n = 72; pre-registered grading).** Without retrieval:
+  49 correct (68.1%). With the open corpus: **62 (86.1%)**, 17 gained and 4 lost,
+  **p = 0.0072**. On all 144: 102 → 123 (p = 0.0011). Base behaves the same (48 → 62).
+- **Open vs course, end to end.** With the course corpus v3 scores 59/72 on test and
+  124/144 overall; with the open corpus 62/72 (p = 0.55) and 123/144 (p = 1.0).
+  **The better retrieval does not show up as better answers.**
+  - v3 already answers 102/144 without retrieval. Retrieval helps only when the passages
+    hold an answer the model lacks: 25 items with the course corpus, 26 with the open one.
+  - Most of the open corpus's extra hits are on questions the model already gets right.
+  - Off-target passages turned a right answer wrong 7 times with the open corpus and
+    3 times with the course corpus.
+- **MCQ-200.** base 185, base + open 184, v3 186, v3 + open 186 (p = 1.0 throughout;
+  course run 184). The MCQ set is at ceiling for every configuration.
+- **Explain (72 test questions, v3 + open).**
+  - **69/72** answers cite at least one passage (target ≥ 90%: met; the course run's
+    rate was 50/59, on a different question set).
+  - 0 invented citations, 0 truncated.
+  - Decode speed: median 42 tok/s, slowest 39 tok/s (brief: ≥ 20).
+- **Faithfulness.** The judge marks 110/138 cited sentences supported (79.7%). My strict
+  check of 40 (`judge_sample_engineer_check.json`, not the human check): **25/38** claims
+  fully supported, with 2 "Reference:" lines not counted. The course run scored 24/40.
+  The judge is again lenient (8 vs 1 disagreements); the usual fault is a detail the
+  passage does not contain.
+- **Secondary grading.** Hyphen = space, an exact number reply counts, and four aliases;
+  fixed from the base model's misses before v3 was read. It adds 2–4 items per arm and
+  changes no conclusion.
+
+**Recommendation.** Both corpora raise short-answer accuracy by about 15 points, and
+neither is measurably better end to end. Serve the open corpus where students need wide
+coverage and a working citation rate. Serve the course corpus where answers should
+point to the course's own slides and say "not covered" more often (18/20 vs 14/20).
+Either way, a citation check on the answer side (§6.4 of the report), not more data,
+is what would move faithfulness.
 
 ---
 

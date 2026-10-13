@@ -1,0 +1,294 @@
+{
+ "checked_by": "AI-assisted check, not the human check the brief asks for; to be confirmed by hand in judge_sample.md",
+ "rule": "supported only if everything the sentence states is in the cited passage; a clause carrying a different citation is judged against its own passage; 'Reference: [Sn]' lines state nothing and are not counted",
+ "n": 40,
+ "claims": 38,
+ "not_claims": 2,
+ "engineer_supported": 25,
+ "judge_supported_on_claims": 32,
+ "agreement": 29,
+ "judge_yes_engineer_no": 8,
+ "judge_no_engineer_yes": 1,
+ "rows": [
+  {
+   "n": 1,
+   "key": "q074|4|2",
+   "engineer": false,
+   "judge": false,
+   "note": "garbles the passage: it says EXTERNAL fragmentation is less of a problem in file systems"
+  },
+  {
+   "n": 2,
+   "key": "q006|3|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 3,
+   "key": "q054|0|2",
+   "engineer": false,
+   "judge": true,
+   "note": "passage lists compare-and-swap but does not define it"
+  },
+  {
+   "n": 4,
+   "key": "q068|0|1",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 5,
+   "key": "q008|4|3",
+   "engineer": true,
+   "judge": true,
+   "note": "judged on the clause carrying [S3] (fork before exec); the env-variable clause cites S2"
+  },
+  {
+   "n": 6,
+   "key": "q104|3|2",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 7,
+   "key": "q100|0|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 8,
+   "key": "q036|0|1",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 9,
+   "key": "q014|1|2",
+   "engineer": false,
+   "judge": false,
+   "note": "passage does not give PID 1 and notes Linux may use a subreaper instead of init"
+  },
+  {
+   "n": 10,
+   "key": "q118|7|4",
+   "engineer": false,
+   "judge": false,
+   "note": "passage: the long-life block tracks wear / holds operational data, not frequently accessed data"
+  },
+  {
+   "n": 11,
+   "key": "q002|1|1",
+   "engineer": false,
+   "judge": true,
+   "note": "'easier updates and maintenance without affecting the entire system' is not in the passage"
+  },
+  {
+   "n": 12,
+   "key": "q068|3|4",
+   "engineer": true,
+   "judge": false,
+   "note": "the cited clause (one of four necessary conditions) is supported; all four must hold"
+  },
+  {
+   "n": 13,
+   "key": "q120|0|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 14,
+   "key": "q028|0|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 15,
+   "key": "q004|3|1",
+   "engineer": false,
+   "judge": true,
+   "note": "passage names EAX for INT 0x80, not RAX for SYSCALL"
+  },
+  {
+   "n": 16,
+   "key": "q008|0|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 17,
+   "key": "q134|0|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 18,
+   "key": "q118|4|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 19,
+   "key": "q112|0|1",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 20,
+   "key": "q106|5|1",
+   "engineer": false,
+   "judge": true,
+   "note": "'to prevent the system from crashing' is added"
+  },
+  {
+   "n": 21,
+   "key": "q076|7|2",
+   "engineer": null,
+   "judge": true,
+   "note": "'Reference: [S2]' states nothing - not a claim"
+  },
+  {
+   "n": 22,
+   "key": "q068|5|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 23,
+   "key": "q052|5|1",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 24,
+   "key": "q110|0|1",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 25,
+   "key": "q088|2|1",
+   "engineer": false,
+   "judge": false,
+   "note": "passage does not say the hardware sets it"
+  },
+  {
+   "n": 26,
+   "key": "q046|2|4",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 27,
+   "key": "q070|2|2",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 28,
+   "key": "q006|4|1",
+   "engineer": false,
+   "judge": true,
+   "note": "'these are not standard loadable kernel modules' is not in the passage"
+  },
+  {
+   "n": 29,
+   "key": "q118|2|1",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 30,
+   "key": "q122|4|1",
+   "engineer": false,
+   "judge": true,
+   "note": "passage: names in the directory table, other metadata in the inode; no inode-number mapping"
+  },
+  {
+   "n": 31,
+   "key": "q122|5|2",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 32,
+   "key": "q106|3|1",
+   "engineer": false,
+   "judge": true,
+   "note": "'process importance' and other heuristics are not in the passage"
+  },
+  {
+   "n": 33,
+   "key": "q072|3|2",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 34,
+   "key": "q088|5|2",
+   "engineer": null,
+   "judge": false,
+   "note": "'Reference: [S1], [S2], [S4]' states nothing - not a claim"
+  },
+  {
+   "n": 35,
+   "key": "q038|4|2",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 36,
+   "key": "q100|1|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 37,
+   "key": "q056|0|3",
+   "engineer": false,
+   "judge": false,
+   "note": "wrong answer (Mesa semantics); passage defines spurious wake-up only"
+  },
+  {
+   "n": 38,
+   "key": "q108|0|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 39,
+   "key": "q140|2|3",
+   "engineer": true,
+   "judge": true,
+   "note": ""
+  },
+  {
+   "n": 40,
+   "key": "q132|3|1",
+   "engineer": false,
+   "judge": true,
+   "note": "the parenthetical (permissions, buffer state) is not in the passage"
+  }
+ ]
+}
