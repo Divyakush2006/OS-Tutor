@@ -38,6 +38,72 @@ CRLF to LF on disk in `b7521be`; it stays LF (Python is indifferent to line endi
 
 ---
 
+## D-009 — Open OS corpus: openly licensed sources only, compiled by measured filters
+
+**Date:** 2026-10-13 · **Requested by:** owner ("ignore my faculty's notes … the best
+dataset") · **Decided by:** engineer (sources, filters, choice rule)
+
+**Decision.** A second corpus, `data/rag/open` (corpus `066bba582bf3`; 3,003 documents,
+19,674 chunks), built only from openly licensed OS text, with no course material:
+Hailperin's *Operating Systems and Middleware* (CC BY-SA 3.0, pinned commit), Wienand's
+*Computer Science from the Bottom Up* (CC BY-SA 3.0, DocBook at a pinned commit),
+1,176 Wikipedia articles from 24 OS categories at recorded revisions (CC BY-SA 4.0),
+Wikibooks *Operating System Design* (CC BY-SA 4.0), and 2,019 Stack Exchange questions
+from cs and unix under OS tags with question score ≥ 3 and up to two answers scoring ≥ 3
+(CC BY-SA 2.5/3.0/4.0 by post date; authors named per document). It is fetched by
+`tools/fetch_rag_pool.py` and compiled by `tools/analyze_rag_pool.py`. Every chunk is
+measured for letter share, code share, relevance (MiniLM cosine to the nearest of 40
+syllabus topics, ACM CS2013 OS area) and near-duplication (MinHash LSH, Jaccard ≥ 0.7,
+book > Wikipedia > Wikibooks > Stack Exchange). A chunk is dropped if its letter share is
+< 0.60, its code share is > 0.50, its relevance is below the floor, or it is a duplicate.
+Documents under 120 words are dropped whole. The relevance floor is **0.307**, the 5th
+percentile of the two textbooks' chunks. The rules and the choice rule were fixed before
+any measurement. The choice rule: change the compiled corpus only if a variant beats it
+on dev with p < 0.05. The gate is refitted for this corpus (cosine ≥ 0.52 or BM25 ≥ 24.0).
+
+**Alternatives.** (a) The unfiltered pool (`data/rag/open_all`, the control). (b) Any
+single-source corpus. (c) The variant without Hailperin, best on dev. (d) Keep the course
+corpus. (e) MMLU-Pro or other benchmark text: only about 14 genuine OS items. Excluded on
+licence: OSDev wiki (mixed), LibreTexts (unverified per page), the xv6 book (unverified),
+OSTEP (not openly licensed), and every NC-licensed text.
+
+**Evidence.** Pool analysis is in `reports/rag/open_pool_analysis.md`; comparisons are
+in `reports/rag/compare_{dev,test,all}.md`. The question set is 144 short-answer
+questions with aliases (`data/eval_rag/os_short_answer.jsonl`, unreviewed). Recall is
+answer recall: a top-k chunk contains an accepted answer.
+
+- **Coverage.** Kept chunks contain an answer to 71/72 dev questions; the course corpus
+  covers 65/72.
+- **Test split (n = 72, never used for a choice).** Recall@5 is **83.3%** for open
+  against 73.6% for course (12 gained, 5 lost, p = 0.143, not significant at this size).
+  Recall@10 is 93.1% against 76.4%.
+- **All 144 questions.** Recall@5 is 83.3% against 74.3% (21 gained, 8 lost,
+  **p = 0.024**). Dev was used only to apply the fixed rule; nothing was tuned on it.
+- **Filters.** They remove 15% of chunks at no recall cost: open_all scores 83.3% on dev
+  and 81.9% on test.
+- **Ablations.**
+  - Without Wikipedia, test recall@5 falls to 65.3% (p = 0.002); Wikipedia is the
+    source that matters.
+  - (c) Without Hailperin, dev scores 87.5% against open's 83.3%, but p = 0.25, and on
+    test it scores 81.9%. Keeping Hailperin is the right call.
+  - Without Stack Exchange, test scores 86.1% (p = 0.63).
+- **Gate.** On test, notes are given for 72/72 in-scope questions and withheld for
+  **14/20** out-of-scope ones, against 18/20 on the course corpus. The leaks are
+  near-topic questions the wider corpus partly covers: JVM garbage collection, B-trees,
+  ACID/CAP, HTTP/2, monads and polymorphism.
+- **Latency.** CPU retrieval latency is p50 24 ms and p95 28 ms (course corpus: 8 ms).
+
+**Trade-offs.**
+- The course corpus cites the students' own slides, which the open corpus cannot.
+- The open corpus abstains less often off-topic.
+- `docs/`, `extracted/` and `index/` are not committed (about 70 MB, rebuildable).
+  The committed manifest holds each document's checksum, revision URL and attribution,
+  so a rebuild that drifts is refused.
+- End-to-end answer accuracy is pending a free GPU, measured with `tools/rag_e2e.py`
+  `data/rag/open` (phases mcq, short, explain, judge).
+
+---
+
 ## D-008 — Course corpus: ingestion, embedding model and a calibrated "not covered" gate
 
 **Date:** 2026-10-12 · **Decided by:** engineer (G2 success criteria)

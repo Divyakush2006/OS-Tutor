@@ -45,3 +45,11 @@ data/rag/corpus/extracted/
 data/rag/corpus/index/
 data/rag/fixture/extracted/
 data/rag/fixture/index/
+data/rag/pool/
+# Open corpus (D-009): ~3,000 CC BY-SA documents rebuilt by tools/fetch_rag_pool.py and
+# tools/analyze_rag_pool.py; the manifest (checksums, revision URLs, attribution) and the
+# gate are committed, so any drift in a rebuild is refused by the checksum check.
+data/rag/open/docs/
+data/rag/open/extracted/
+data/rag/open/index/
+data/rag/open_all/

@@ -1,6 +1,7 @@
-"""End-to-end RAG evaluation on the served model over the course corpus (G2).
+"""End-to-end RAG evaluation on the served model over one corpus (G2).
 
     python tools/rag_e2e.py data/rag/corpus          (GPU must be free; ~40 min)
+    python tools/rag_e2e.py data/rag/open
 
 Phases (each resumable: finished rows are kept in <run>/<phase>.partial.jsonl):
 
@@ -11,8 +12,13 @@ Phases (each resumable: finished rows are kept in <run>/<phase>.partial.jsonl):
              gate. One adapter per server; base runs on a server with no adapter.
              Generated-letter protocol - NOT the logit protocol behind the earlier 90.00% /
              85.71%, so base is re-measured here and compared like for like.
-  explain    The test-split in-scope questions of data/rag/eval/corpus_questions.jsonl,
-             v3 with retrieval on: citation rate, invented citations, answer length,
+  short      The 144 short-answer questions (data/eval_rag/os_short_answer.jsonl) under
+             base and v3, retrieval off and on: "answer in a few words". Correct when the
+             reply contains an accepted answer (word-bounded; the rule of rag_compare.py).
+             Reported on the test split (the corpus was chosen on dev) and on all 144.
+  explain    v3 with retrieval on, test-split questions: for the course corpus the in-scope
+             questions of data/rag/eval/corpus_questions.jsonl, for any other corpus the
+             short-answer questions. Citation rate, invented citations, answer length,
              time and decode speed (brief: >= 20 tok/s).
   judge      Faithfulness. Every sentence of an explain answer that cites [Sn] is put to
              the untuned base model (LoRA scale 0) with passage Sn: "Does the passage
@@ -47,6 +53,9 @@ from ostutor.theory_filter import fact_flags  # noqa: E402
 EXPLAIN = C.SYSTEM_PROMPTS[("explain", "os")]
 MCQ = ROOT / "data" / "eval_theory" / "os_theory_mcq_200.jsonl"
 QUESTIONS = ROOT / "data" / "rag" / "eval" / "corpus_questions.jsonl"
+SHORT_QA = ROOT / "data" / "eval_rag" / "os_short_answer.jsonl"
+SHORT_TOKENS = 64
+SHORT_ASK = "Answer in a few words only: the name or term asked for, no explanation."
 EXPLAIN_TOKENS = 1500
 JUDGE = ("You check whether a sentence is supported by a passage. Answer with exactly one "
          "word: yes if everything the sentence states is supported by the passage, no otherwise.")
@@ -129,9 +138,48 @@ def run_mcq(out: Path, r: Retriever) -> None:
             g.stop_server(proc)
 
 
-def run_explain(out: Path, r: Retriever) -> None:
-    qs = [json.loads(l) for l in open(QUESTIONS, encoding="utf-8")]
-    qs = [q for q in qs if q["doc"] and q["split"] == "test"]
+def contains(text: str, answers: list[str]) -> bool:
+    low = text.lower()
+    return any(re.search(r"(?<![a-z0-9])" + re.escape(a.lower()) + r"(?![a-z0-9])", low)
+               for a in answers if len(a) >= 3 and not a.isdigit())
+
+
+def run_short(out: Path, r: Retriever) -> None:
+    items = [json.loads(l) for l in open(SHORT_QA, encoding="utf-8")]
+    store = Partial(out / "short.partial.jsonl")
+    notes = {q["id"]: r.retrieve(q["question"]) for q in items}
+    for server, adapter, scale in (("base", None, None), ("v3", "v3", 1.0)):
+        if all(f"{server}|{arm}|{q['id']}" in store.rows for q in items for arm in ("off", "on")):
+            continue
+        proc = g.start_server(adapter, ROOT / "serve" / "logs" / f"rag-e2e-short-{server}.log")
+        try:
+            for q in items:
+                user = f"{q['question']}\n\n{SHORT_ASK}"
+                for arm, system in (("off", EXPLAIN), ("on", augment(EXPLAIN, notes[q["id"]]))):
+                    key = f"{server}|{arm}|{q['id']}"
+                    if key in store.rows:
+                        continue
+                    a = ask(system, user, SHORT_TOKENS, scale)
+                    store.add(dict(key=key, server=server, arm=arm, id=q["id"], split=q["split"],
+                                   answers=q["answers"], text=a["text"], correct=contains(a["text"], q["answers"]),
+                                   notes=[h["chunk"].chunk_id for h in notes[q["id"]]],
+                                   answer_in_notes=any(contains(h["chunk"].text, q["answers"])
+                                                       for h in notes[q["id"]])))
+                print(f"  short {server} {q['id']}", flush=True)
+        finally:
+            g.stop_server(proc)
+
+
+def explain_questions(corpus: Path) -> list[dict]:
+    if corpus.name == "corpus":
+        qs = [json.loads(l) for l in open(QUESTIONS, encoding="utf-8")]
+        return [q for q in qs if q["doc"] and q["split"] == "test"]
+    return [dict(id=q["id"], query=q["question"], doc=None, answers=q["answers"])
+            for q in map(json.loads, open(SHORT_QA, encoding="utf-8")) if q["split"] == "test"]
+
+
+def run_explain(out: Path, r: Retriever, corpus: Path) -> None:
+    qs = explain_questions(corpus)
     store = Partial(out / "explain.partial.jsonl")
     if all(q["id"] in store.rows for q in qs):
         return
@@ -147,7 +195,8 @@ def run_explain(out: Path, r: Retriever) -> None:
                            notes=[dict(n=n, chunk=h["chunk"].chunk_id, doc=h["chunk"].doc_id,
                                        citation=h["chunk"].citation(), text=h["chunk"].text)
                                   for n, h in enumerate(hits, 1)],
-                           gold_doc_given=any(h["chunk"].doc_id == q["doc"] for h in hits),
+                           gold_doc_given=(any(h["chunk"].doc_id == q["doc"] for h in hits) if q["doc"]
+                                           else any(contains(h["chunk"].text, q["answers"]) for h in hits)),
                            valid_citations=sorted(valid), invented_citations=sorted(invented),
                            fact_flags=sorted({n for n, _ in fact_flags(a["text"])})))
             print(f"  explain {q['id']} notes={len(hits)} cites={sorted(valid)} {a['tok_s']:.1f} tok/s", flush=True)
@@ -197,6 +246,22 @@ def summarise(out: Path, meta: dict) -> None:
         new = {r["id"] for r in mcq if r.get("status") == "unreviewed"}
         res["mcq_new_items_only"] = {k: sum(v[i] for i in new if i in v) for k, v in by.items()}
         res["mcq_items_with_notes"] = sum(1 for r in mcq if r["server"] == "v3" and r["arm"] == "on" and r["notes"])
+    sh = list(Partial(out / "short.partial.jsonl").rows.values())
+    if sh:
+        res["short"] = {}
+        for split in ("test", "all"):
+            by = {}
+            for row in sh:
+                if split == "all" or row["split"] == split:
+                    by.setdefault(f"{row['server']}+{'rag' if row['arm'] == 'on' else 'norag'}", {})[row["id"]] = row["correct"]
+            pairs = [("v3+rag", "v3+norag"), ("base+rag", "base+norag"), ("v3+rag", "base+norag"),
+                     ("v3+norag", "base+norag")]
+            res["short"][split] = dict(
+                accuracy={k: dict(correct=sum(v.values()), n=len(v), accuracy=round(sum(v.values()) / len(v), 4))
+                          for k, v in by.items()},
+                paired={f"{b} -> {a}": paired(by[b], by[a], b, a) for a, b in pairs if a in by and b in by},
+                answer_in_notes=sum(1 for row in sh if row["server"] == "v3" and row["arm"] == "on"
+                                    and (split == "all" or row["split"] == split) and row["answer_in_notes"]))
     ex = list(Partial(out / "explain.partial.jsonl").rows.values())
     if ex:
         given = [x for x in ex if x["notes"]]
@@ -242,10 +307,21 @@ def summarise(out: Path, meta: dict) -> None:
                for k, p in res["mcq_paired"].items()]
         md += ["", f"Items given notes by the gate: {res['mcq_items_with_notes']}/200. "
                f"Correct on the 130 new (unreviewed) items only: {res['mcq_new_items_only']}"]
+    if "short" in res:
+        for split, x in res["short"].items():
+            n = next(iter(x["accuracy"].values()))["n"]
+            md += ["", f"## Short-answer questions, {split} ({n} items; correct = an accepted answer in the reply)", "",
+                   "| Configuration | Correct | Accuracy |", "|---|---|---|"]
+            md += [f"| {k} | {v['correct']}/{v['n']} | {v['accuracy']:.2%} |" for k, v in sorted(x["accuracy"].items())]
+            md += ["", "| Comparison | Right→wrong | Wrong→right | exact McNemar p |", "|---|---|---|---|"]
+            md += [f"| {k} | {p['right_to_wrong']} | {p['wrong_to_right']} | {p['mcnemar_p']:.4f} |"
+                   for k, p in x["paired"].items()]
+            md += ["", f"Notes given to v3 contained an accepted answer for {x['answer_in_notes']}/{n} items."]
     if "explain" in res:
         e = res["explain"]
         md += ["", f"## Explain answers ({e['n']} test-split questions, v3 + RAG)", "",
-               f"- given notes: {e['given_notes']}/{e['n']}; notes included the labelled document: {e['gold_doc_given']}",
+               f"- given notes: {e['given_notes']}/{e['n']}; notes included the labelled document "
+               f"(other corpora: an accepted answer): {e['gold_doc_given']}",
                f"- answers citing at least one note: **{e['cited_at_least_once']}/{e['given_notes']}**",
                f"- invented citations: **{e['invented_citations']}**",
                f"- truncated at {EXPLAIN_TOKENS} tokens: {e['truncated']}; fact-checker flags: {e['fact_flags']}",
@@ -267,7 +343,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("corpus", nargs="?", default=str(ROOT / "data/rag/corpus"))
     ap.add_argument("--run", help="resume this run directory")
-    ap.add_argument("--phases", default="mcq,explain,judge")
+    ap.add_argument("--phases", default="mcq,short,explain,judge")
     a = ap.parse_args()
     corpus = Path(a.corpus).resolve()
     out = Path(a.run) if a.run else ROOT / "reports" / "rag" / time.strftime("e2e-%Y%m%d-%H%M")
@@ -281,8 +357,10 @@ def main() -> None:
     phases = a.phases.split(",")
     if "mcq" in phases:
         run_mcq(out, r)
+    if "short" in phases:
+        run_short(out, r)
     if "explain" in phases:
-        run_explain(out, r)
+        run_explain(out, r, corpus)
     if "judge" in phases:
         run_judge(out)
     summarise(out, meta)

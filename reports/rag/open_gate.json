@@ -1,0 +1,36 @@
+{
+ "corpus": "data/rag/open",
+ "thresholds": {
+  "strong_cosine": 0.52,
+  "min_bm25": 24.0
+ },
+ "dev": {
+  "in_scope": 72,
+  "in_scope_given_notes": 71,
+  "out_of_scope": 20,
+  "out_of_scope_abstained": 17,
+  "in_scope_refused": [
+   "q105"
+  ],
+  "out_of_scope_given_notes": [
+   "x001",
+   "x009",
+   "x019"
+  ]
+ },
+ "test": {
+  "in_scope": 72,
+  "in_scope_given_notes": 72,
+  "out_of_scope": 20,
+  "out_of_scope_abstained": 14,
+  "in_scope_refused": [],
+  "out_of_scope_given_notes": [
+   "x002",
+   "x010",
+   "x018",
+   "x024",
+   "x032",
+   "x040"
+  ]
+ }
+}

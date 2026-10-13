@@ -10,6 +10,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+import numpy as np
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
@@ -193,6 +195,31 @@ check("the footer names each source", "`n07`" in sources_footer(hits[:2]))
 check("no hits, no footer", sources_footer([]) == "")
 check("valid and invented citations are told apart",
       cited("as [S1] and [S2] show, and [S7]", 2) == ({1, 2}, {7}))
+
+print("open corpus tools")
+sys.path.insert(0, str(ROOT / "tools"))
+import analyze_rag_pool as pool  # noqa: E402
+import rag_compare  # noqa: E402
+import rag_e2e  # noqa: E402
+
+for name, fn in (("rag_compare", rag_compare.contains), ("rag_e2e", rag_e2e.contains),
+                 ("analyze_rag_pool", pool.contains)):
+    check(f"{name}: an alias counts only as a whole word",
+          fn("A microkernel moves drivers out", ["microkernel"]) and not fn("microkernels", ["microkernel"]))
+    check(f"{name}: aliases under 3 characters and bare numbers are ignored",
+          not fn("it is 4 KB in OS", ["OS", "4"]))
+check("letter share counts letters only", abs(pool.alpha_share("ab 12") - 0.5) < 1e-9)
+check("C code lines are counted as code", pool.code_share("int x;\nThe text.\nreturn 0;") == 2 / 3)
+qa = [json.loads(l) for l in open(rag_compare.QA, encoding="utf-8")]
+check("short-answer set: 144 questions, half dev and half test",
+      len(qa) == 144 and sum(q["split"] == "dev" for q in qa) == 72)
+check("short-answer set: no question contains its own answer",
+      not [q["id"] for q in qa if rag_compare.contains(q["question"], q["answers"])])
+rs = Retriever(FIXTURE)
+sub = rag_compare.subset(rs, lambda c: c.doc_id != "n07")
+check("a subset keeps the matching chunks with their own embeddings",
+      len(sub.chunks) == len(sub.emb) and all(c.doc_id != "n07" for c in sub.chunks)
+      and np.allclose(sub.emb[0], rs.emb[[c.chunk_id for c in rs.chunks].index(sub.chunks[0].chunk_id)]))
 
 print("\nALL RAG TESTS PASSED" if not FAILED else f"\n{len(FAILED)} FAILED: {FAILED}")
 sys.exit(1 if FAILED else 0)

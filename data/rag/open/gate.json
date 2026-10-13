@@ -1,0 +1,7 @@
+{
+ "strong_cosine": 0.52,
+ "min_bm25": 24.0,
+ "fitted_on": "data/eval_rag/os_short_answer.jsonl (in scope) + data/rag/eval/corpus_questions.jsonl out-of-scope questions (split=dev)",
+ "keep_target": 0.95,
+ "corpus_sha256": "066bba582bf37bd993934529660796aadbf30a9daf10565fb3190f0b99e45967"
+}
