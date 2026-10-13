@@ -331,6 +331,24 @@ The MCQ target (v3+RAG ≥ base) is **not met numerically** (92.0% vs 92.5%, 1 i
 on this 200-item set v3 alone is not below base either. Only 132 of 446 answer sentences
 carry a citation. The 130 new MCQ items and the 164 retrieval questions are `unreviewed`.
 
+### RAG over the open corpus (G2, 2026-10-13)
+
+At the owner's request (no course material), corpus `data/rag/open` holds 2,970 documents
+and 18,515 chunks. It is compiled from a CC BY-SA pool: Hailperin, CSBU, 1,176 Wikipedia
+articles, Wikibooks, and 2,019 Stack Exchange Q&As. Chunks are filtered on quality,
+relevance to 40 syllabus topics and near-duplication (D-009,
+`reports/rag/open_pool_analysis.md`). It is measured on 144 short-answer questions
+(`data/eval_rag/os_short_answer.jsonl`, unreviewed) by answer recall.
+
+| Measure | Result | Source |
+|---|---|---|
+| Answer recall@5, test half (n = 72) | **83.3%** vs course corpus 73.6% (12 gained / 5 lost, p = 0.143) | `reports/rag/compare_test.md` |
+| Answer recall@5, all 144 | 83.3% vs 74.3% (21 / 8, **p = 0.024**) | `reports/rag/compare_all.md` |
+| Answer recall@10, test half | 94.4% vs 76.4% | `reports/rag/compare_test.md` |
+| "Not covered" gate, test half | notes for 72/72 in-scope; withheld for **14/20** off-topic (course corpus: 18/20) | `reports/rag/open_gate.json` |
+| Retrieval latency, CPU | p50 23 ms, p95 26 ms | D-009 |
+| End to end (MCQ-200, short answer, faithfulness) | pending: needs a free GPU | `python tools/rag_e2e.py data/rag/open` |
+
 ### Other
 
 | Check | Result |
@@ -508,6 +526,9 @@ python tools/test_rag.py
 # Retrieval: measure on the fixture; serve with the owners' notes
 python tools/rag_eval.py data/rag/fixture
 $env:OSTUTOR_RAG = "data/rag/corpus"   # before start_tutor.ps1; unset = no retrieval
+#   or "data/rag/open" (open corpus, D-009): rebuild it first with
+#   python tools/fetch_rag_pool.py; python tools/analyze_rag_pool.py; python -m ostutor.rag.ingest data/rag/open
+python tools/rag_compare.py --split test   # corpus comparison by answer recall
 
 # Start / stop the local tutor  (UI at http://localhost:3000)
 powershell -ExecutionPolicy Bypass -File serve\start_tutor.ps1

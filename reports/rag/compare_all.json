@@ -326,8 +326,8 @@
  },
  "open_all (unfiltered pool)": {
   "n": 144,
-  "chunks": 23106,
-  "recall_at_1": 0.5347,
+  "chunks": 21715,
+  "recall_at_1": 0.5417,
   "recall_at_5": 0.8264,
   "recall_at_10": 0.9375,
   "hits5": {
@@ -491,10 +491,10 @@
  },
  "open (compiled)": {
   "n": 144,
-  "chunks": 19674,
+  "chunks": 18515,
   "recall_at_1": 0.5486,
   "recall_at_5": 0.8333,
-  "recall_at_10": 0.9375,
+  "recall_at_10": 0.9444,
   "hits5": {
    "q001": true,
    "q002": true,
@@ -651,8 +651,8 @@
  },
  "open minus csbu": {
   "n": 144,
-  "chunks": 19224,
-  "recall_at_1": 0.5556,
+  "chunks": 18065,
+  "recall_at_1": 0.5486,
   "recall_at_5": 0.8333,
   "recall_at_10": 0.9375,
   "hits5": {
@@ -981,7 +981,7 @@
  },
  "open minus hailperin": {
   "n": 144,
-  "chunks": 18847,
+  "chunks": 17688,
   "recall_at_1": 0.5625,
   "recall_at_5": 0.8472,
   "recall_at_10": 0.9375,
@@ -1311,10 +1311,10 @@
  },
  "open minus stackexchange": {
   "n": 144,
-  "chunks": 12505,
-  "recall_at_1": 0.5486,
-  "recall_at_5": 0.8333,
-  "recall_at_10": 0.9306,
+  "chunks": 11346,
+  "recall_at_1": 0.5625,
+  "recall_at_5": 0.8194,
+  "recall_at_10": 0.9375,
   "hits5": {
    "q001": true,
    "q002": true,
@@ -1411,8 +1411,8 @@
    "q093": true,
    "q094": true,
    "q095": true,
-   "q096": true,
-   "q097": true,
+   "q096": false,
+   "q097": false,
    "q098": true,
    "q099": false,
    "q100": true,
@@ -1464,13 +1464,13 @@
   "vs": {
    "course": {
     "lost": 10,
-    "gained": 23,
-    "p": 0.0351
+    "gained": 21,
+    "p": 0.0708
    },
    "open (compiled)": {
-    "lost": 4,
-    "gained": 4,
-    "p": 1.0
+    "lost": 5,
+    "gained": 3,
+    "p": 0.7266
    }
   }
  },
@@ -1641,10 +1641,10 @@
  },
  "open minus wikibooks": {
   "n": 144,
-  "chunks": 19492,
+  "chunks": 18333,
   "recall_at_1": 0.5486,
   "recall_at_5": 0.8333,
-  "recall_at_10": 0.9236,
+  "recall_at_10": 0.9306,
   "hits5": {
    "q001": true,
    "q002": true,
@@ -2136,10 +2136,10 @@
  },
  "only wikipedia": {
   "n": 144,
-  "chunks": 11046,
-  "recall_at_1": 0.5,
+  "chunks": 9887,
+  "recall_at_1": 0.5278,
   "recall_at_5": 0.8264,
-  "recall_at_10": 0.8889,
+  "recall_at_10": 0.8958,
   "hits5": {
    "q001": true,
    "q002": true,
@@ -2186,7 +2186,7 @@
    "q043": true,
    "q044": true,
    "q045": true,
-   "q046": false,
+   "q046": true,
    "q047": true,
    "q048": true,
    "q049": false,
@@ -2236,7 +2236,7 @@
    "q093": true,
    "q094": true,
    "q095": true,
-   "q096": true,
+   "q096": false,
    "q097": true,
    "q098": true,
    "q099": true,
@@ -2293,8 +2293,8 @@
     "p": 0.0576
    },
    "open (compiled)": {
-    "lost": 10,
-    "gained": 9,
+    "lost": 9,
+    "gained": 8,
     "p": 1.0
    }
   }

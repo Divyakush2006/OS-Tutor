@@ -86,6 +86,12 @@ class Retriever:
         self.embed_model = embed_model
         self.qp, self.pp = PREFIX.get(embed_model, ("", ""))
         self.chunks, self.manifest = load_corpus(Path(corpus_dir))
+        # what the passages are called to the model and to the student (manifest "label";
+        # a corpus that is not the students' own notes must not be presented as such)
+        lab = self.manifest.get("label", {})
+        self.noun = lab.get("noun", NOUN)
+        self.sources_heading = lab.get("sources_heading", SOURCES_HEADING)
+        self.not_found = lab.get("not_found", "")
         self.bm25 = BM25([tokens(c.title + " " + c.section + " " + c.text) for c in self.chunks])
         self.model = None
         self.emb = None
@@ -147,7 +153,11 @@ class Retriever:
         return hits, (time.perf_counter() - t) * 1000
 
 
-def augment(system: str, hits: list[dict]) -> str:
+NOUN = "course notes"
+SOURCES_HEADING = "Sources from your course notes"
+
+
+def augment(system: str, hits: list[dict], noun: str = NOUN) -> str:
     """The system prompt with the retrieved notes appended and a citation rule.
 
     The trained system prompt is kept word for word at the start, so the adapter still
@@ -158,19 +168,20 @@ def augment(system: str, hits: list[dict]) -> str:
     for n, h in enumerate(hits, 1):
         c: Chunk = h["chunk"]
         blocks.append(f"[S{n}] {c.citation()}\n{c.text}")
-    return (system + "\n\nCourse notes that may be relevant:\n\n" + "\n\n".join(blocks)
-            + "\n\nWhere your answer relies on these notes, cite them as [S1], [S2] and so "
-              "on. If the notes do not cover the question, answer from your own knowledge "
-              "and say that the notes do not cover it. Never invent a citation.")
+    short = "notes" if noun == NOUN else noun
+    return (system + f"\n\n{noun[0].upper() + noun[1:]} that may be relevant:\n\n" + "\n\n".join(blocks)
+            + f"\n\nWhere your answer relies on these {short}, cite them as [S1], [S2] and so "
+              f"on. If the {short} do not cover the question, answer from your own knowledge "
+              f"and say that the {short} do not cover it. Never invent a citation.")
 
 
-def sources_footer(hits: list[dict]) -> str:
+def sources_footer(hits: list[dict], heading: str = SOURCES_HEADING) -> str:
     """The list of sources shown under the answer, so a student can look them up."""
     if not hits:
         return ""
     lines = [f"> [S{n}] {h['chunk'].citation()} (`{h['chunk'].doc_id}`)"
              for n, h in enumerate(hits, 1)]
-    return "\n\n---\n> **Sources from your course notes**\n" + "\n".join(lines)
+    return f"\n\n---\n> **{heading}**\n" + "\n".join(lines)
 
 
 def cited(answer: str, n_hits: int) -> tuple[set[int], set[int]]:

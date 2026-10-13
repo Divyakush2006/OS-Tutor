@@ -56,6 +56,12 @@ MIN_DOC_WORDS = 120       # stub documents are dropped whole
 KEEP_TEXTBOOK = 0.95      # relevance floor keeps this share of textbook chunks
 DUP_JACCARD = 0.70
 
+# how passages from this corpus are named to the model and the student (not "course notes")
+LABEL = dict(noun="reference passages",
+             sources_heading="Sources (openly licensed references, not your course notes)",
+             not_found="\n\n---\n> **Not found in the reference corpus.** This answer comes from the "
+                       "tutor's general knowledge; check it against your textbook or ask your instructor.")
+
 TOPICS = {
     "OS overview": "what an operating system is, its roles as resource manager and abstraction layer, kernel versus user programs",
     "OS structure": "monolithic kernels, microkernels, layered and modular kernel design, loadable kernel modules",
@@ -287,7 +293,7 @@ def main() -> None:
         corpus="ostutor-open-os",
         note="Openly licensed OS texts only, compiled by tools/analyze_rag_pool.py (D-009). No course "
              "material. Each document keeps only the sections that passed the quality, relevance and "
-             "duplicate filters.", documents=[]), indent=1) + "\n", encoding="utf-8")
+             "duplicate filters.", label=LABEL, documents=[]), indent=1) + "\n", encoding="utf-8")
     written = []
     for doc_id, secs in keep_sections.items():
         d = by_id[doc_id]

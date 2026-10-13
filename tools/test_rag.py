@@ -193,6 +193,15 @@ check("each passage is labelled [S1], [S2]", "[S1] Page replacement" in aug and 
 check("the model is told never to invent a citation", "Never invent a citation" in aug)
 check("the footer names each source", "`n07`" in sources_footer(hits[:2]))
 check("no hits, no footer", sources_footer([]) == "")
+check("the course-notes wording is unchanged by default",
+      aug.endswith("\n\nWhere your answer relies on these notes, cite them as [S1], [S2] and so on. If the "
+                   "notes do not cover the question, answer from your own knowledge and say that the notes "
+                   "do not cover it. Never invent a citation.") and "\n\nCourse notes that may be relevant:\n\n" in aug)
+other = augment(SYSTEM, hits[:2], "reference passages")
+check("another corpus is not called the student's course notes",
+      "course notes" not in other.lower() and "Reference passages that may be relevant" in other
+      and "relies on these reference passages" in other)
+check("the footer heading follows the corpus", "**Sources (open)**" in sources_footer(hits[:1], "Sources (open)"))
 check("valid and invented citations are told apart",
       cited("as [S1] and [S2] show, and [S7]", 2) == ({1, 2}, {7}))
 
@@ -208,6 +217,15 @@ for name, fn in (("rag_compare", rag_compare.contains), ("rag_e2e", rag_e2e.cont
           fn("A microkernel moves drivers out", ["microkernel"]) and not fn("microkernels", ["microkernel"]))
     check(f"{name}: aliases under 3 characters and bare numbers are ignored",
           not fn("it is 4 KB in OS", ["OS", "4"]))
+import fetch_rag_pool  # noqa: E402
+wmd = fetch_rag_pool.wikitext_to_md("Paging{{cn}} maps [[page (memory)|pages]].<ref>x</ref>\n\n== Use ==\n"
+                                    "Frames.\n\n=== Detail ===\nTLB.\n\n== See also ==\n* [[Segmentation]]\n\n"
+                                    "== External links ==\n* [http://x.org Site]\n", "Paging")
+check("wikitext: templates and references removed, link text kept",
+      "maps pages." in wmd and "cn" not in wmd and "<ref" not in wmd, wmd)
+check("wikitext: content sections and subsections are kept", "## Use" in wmd and "### Detail" in wmd and "TLB." in wmd, wmd)
+check("wikitext: See also and External links sections are dropped",
+      "Segmentation" not in wmd and "See also" not in wmd and "Site" not in wmd, wmd)
 check("letter share counts letters only", abs(pool.alpha_share("ab 12") - 0.5) < 1e-9)
 check("C code lines are counted as code", pool.code_share("int x;\nThe text.\nreturn 0;") == 2 / 3)
 qa = [json.loads(l) for l in open(rag_compare.QA, encoding="utf-8")]

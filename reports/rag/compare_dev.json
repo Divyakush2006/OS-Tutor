@@ -182,7 +182,7 @@
  },
  "open_all (unfiltered pool)": {
   "n": 72,
-  "chunks": 23106,
+  "chunks": 21715,
   "recall_at_1": 0.5556,
   "recall_at_5": 0.8333,
   "recall_at_10": 0.9306,
@@ -275,7 +275,7 @@
  },
  "open (compiled)": {
   "n": 72,
-  "chunks": 19674,
+  "chunks": 18515,
   "recall_at_1": 0.5694,
   "recall_at_5": 0.8333,
   "recall_at_10": 0.9444,
@@ -363,10 +363,10 @@
  },
  "open minus csbu": {
   "n": 72,
-  "chunks": 19224,
+  "chunks": 18065,
   "recall_at_1": 0.5694,
   "recall_at_5": 0.8333,
-  "recall_at_10": 0.9444,
+  "recall_at_10": 0.9306,
   "hits5": {
    "q001": true,
    "q003": false,
@@ -549,7 +549,7 @@
  },
  "open minus hailperin": {
   "n": 72,
-  "chunks": 18847,
+  "chunks": 17688,
   "recall_at_1": 0.5972,
   "recall_at_5": 0.875,
   "recall_at_10": 0.9444,
@@ -735,10 +735,10 @@
  },
  "open minus stackexchange": {
   "n": 72,
-  "chunks": 12505,
-  "recall_at_1": 0.5278,
-  "recall_at_5": 0.8056,
-  "recall_at_10": 0.9306,
+  "chunks": 11346,
+  "recall_at_1": 0.5417,
+  "recall_at_5": 0.7917,
+  "recall_at_10": 0.9444,
   "hits5": {
    "q001": true,
    "q003": false,
@@ -788,7 +788,7 @@
    "q091": false,
    "q093": true,
    "q095": true,
-   "q097": true,
+   "q097": false,
    "q099": false,
    "q101": true,
    "q103": true,
@@ -816,13 +816,13 @@
   "vs": {
    "course": {
     "lost": 4,
-    "gained": 8,
-    "p": 0.3877
+    "gained": 7,
+    "p": 0.5488
    },
    "open (compiled)": {
-    "lost": 3,
+    "lost": 4,
     "gained": 1,
-    "p": 0.625
+    "p": 0.375
    }
   }
  },
@@ -921,7 +921,7 @@
  },
  "open minus wikibooks": {
   "n": 72,
-  "chunks": 19492,
+  "chunks": 18333,
   "recall_at_1": 0.5694,
   "recall_at_5": 0.8472,
   "recall_at_10": 0.9306,
@@ -1200,10 +1200,10 @@
  },
  "only wikipedia": {
   "n": 72,
-  "chunks": 11046,
-  "recall_at_1": 0.5139,
+  "chunks": 9887,
+  "recall_at_1": 0.5417,
   "recall_at_5": 0.8333,
-  "recall_at_10": 0.8889,
+  "recall_at_10": 0.9028,
   "hits5": {
    "q001": true,
    "q003": false,

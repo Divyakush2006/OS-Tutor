@@ -273,7 +273,7 @@ def wikitext_to_md(wt: str, title: str) -> str:
         m = re.match(r"^(#+)\s+(.*)$", line)
         if m:
             level = len(m.group(1)) + 1                     # article title is level 1
-            if level == 2:
+            if len(m.group(1)) <= 2:                        # a top section (== X == in wikitext)
                 keep = m.group(2).strip().lower() not in DROP_WIKI
             if keep:
                 out.append("#" * level + " " + m.group(2).strip())

@@ -1,7 +1,7 @@
 {
  "pool_documents": 3291,
- "pool_chunks": 23131,
- "stubs": 143,
+ "pool_chunks": 21740,
+ "stubs": 164,
  "relevance_floor": 0.307,
  "rules": {
   "min_alpha": 0.6,
@@ -10,8 +10,8 @@
   "keep_textbook": 0.95,
   "dup_jaccard": 0.7
  },
- "kept_chunks": 18578,
- "kept_documents": 3003,
+ "kept_chunks": 17420,
+ "kept_documents": 2970,
  "sources": [
   {
    "source": "hailperin",
@@ -44,16 +44,16 @@
   {
    "source": "wikipedia",
    "documents": 1176,
-   "stubs": 71,
-   "chunks": 12786,
-   "kept": 10544,
-   "words_kept": 1216081,
-   "relevance_median": 0.433,
+   "stubs": 92,
+   "chunks": 11395,
+   "kept": 9386,
+   "words_kept": 1178390,
+   "relevance_median": 0.432,
    "drop_reasons": {
-    "off-syllabus": 1876,
-    "mostly code": 237,
-    "low letter share": 122,
-    "duplicate": 7
+    "off-syllabus": 1679,
+    "mostly code": 236,
+    "low letter share": 89,
+    "duplicate": 5
    }
   },
   {
@@ -99,263 +99,265 @@
   "OS overview": {
    "hailperin": 28,
    "csbu": 16,
-   "wikipedia": 404,
+   "wikipedia": 363,
    "wikibooks": 39,
    "stackexchange": 156
   },
   "OS structure": {
    "hailperin": 1,
    "csbu": 4,
-   "wikipedia": 298,
+   "wikipedia": 272,
    "wikibooks": 9,
    "stackexchange": 354
   },
   "dual mode": {
    "hailperin": 8,
    "csbu": 7,
-   "wikipedia": 184,
+   "wikipedia": 162,
    "stackexchange": 48
   },
   "system calls": {
    "hailperin": 9,
    "csbu": 113,
-   "wikipedia": 657,
+   "wikipedia": 577,
    "wikibooks": 4,
    "stackexchange": 258
   },
   "interrupts": {
    "hailperin": 1,
    "csbu": 4,
-   "wikipedia": 175,
+   "wikipedia": 141,
    "wikibooks": 3,
    "stackexchange": 56
   },
   "booting": {
-   "wikipedia": 76,
+   "wikipedia": 69,
    "wikibooks": 13,
    "stackexchange": 108
   },
   "processes": {
    "hailperin": 2,
    "csbu": 8,
-   "wikipedia": 194,
+   "wikipedia": 179,
    "wikibooks": 2,
    "stackexchange": 135
   },
   "process API": {
    "hailperin": 16,
    "csbu": 9,
-   "wikipedia": 89,
+   "wikipedia": 79,
    "wikibooks": 1,
    "stackexchange": 503
   },
   "context switch": {
    "hailperin": 20,
    "csbu": 6,
-   "wikipedia": 183,
+   "wikipedia": 174,
    "wikibooks": 6,
    "stackexchange": 145
   },
   "threads": {
    "hailperin": 73,
    "csbu": 5,
-   "wikipedia": 222,
+   "wikipedia": 199,
    "wikibooks": 4,
    "stackexchange": 225
   },
   "IPC": {
    "hailperin": 7,
    "csbu": 4,
-   "wikipedia": 457,
+   "wikipedia": 392,
    "wikibooks": 1,
    "stackexchange": 120
   },
   "signals": {
    "csbu": 10,
-   "wikipedia": 195,
+   "wikipedia": 167,
    "wikibooks": 1,
    "stackexchange": 485
   },
   "CPU scheduling": {
    "hailperin": 34,
    "csbu": 12,
-   "wikipedia": 344,
+   "wikipedia": 311,
    "wikibooks": 15,
    "stackexchange": 170
   },
   "scheduling algorithms": {
    "hailperin": 1,
-   "wikipedia": 64,
+   "wikipedia": 57,
    "wikibooks": 3,
    "stackexchange": 48
   },
   "MLFQ and fair share": {
    "hailperin": 4,
-   "wikipedia": 85,
+   "wikipedia": 74,
    "stackexchange": 24
   },
   "multiprocessor scheduling": {
    "hailperin": 28,
    "csbu": 9,
-   "wikipedia": 182,
+   "wikipedia": 159,
    "wikibooks": 1,
    "stackexchange": 160
   },
   "real-time scheduling": {
    "hailperin": 3,
    "csbu": 1,
-   "wikipedia": 101,
+   "wikipedia": 91,
    "wikibooks": 4,
    "stackexchange": 62
   },
   "race conditions": {
    "hailperin": 5,
-   "wikipedia": 45,
+   "wikipedia": 41,
    "stackexchange": 37
   },
   "locks": {
    "hailperin": 30,
    "csbu": 2,
-   "wikipedia": 143,
+   "wikipedia": 125,
    "stackexchange": 66
   },
   "semaphores": {
    "hailperin": 7,
    "csbu": 1,
-   "wikipedia": 41,
+   "wikipedia": 38,
    "wikibooks": 7,
    "stackexchange": 45
   },
   "monitors and condition variables": {
    "hailperin": 9,
    "csbu": 1,
-   "wikipedia": 124,
+   "wikipedia": 113,
    "wikibooks": 1,
    "stackexchange": 17
   },
   "classic sync problems": {
    "hailperin": 12,
    "csbu": 1,
-   "wikipedia": 131,
+   "wikipedia": 112,
    "wikibooks": 2,
    "stackexchange": 50
   },
   "concurrency bugs": {
    "hailperin": 37,
    "csbu": 13,
-   "wikipedia": 460,
+   "wikipedia": 415,
    "wikibooks": 3,
    "stackexchange": 93
   },
   "deadlock": {
    "hailperin": 17,
-   "wikipedia": 95,
+   "wikipedia": 90,
    "wikibooks": 14,
    "stackexchange": 41
   },
   "memory basics": {
    "hailperin": 17,
    "csbu": 56,
-   "wikipedia": 419,
+   "wikipedia": 400,
    "wikibooks": 4,
    "stackexchange": 212
   },
   "memory allocation": {
    "hailperin": 3,
    "csbu": 14,
-   "wikipedia": 502,
+   "wikipedia": 449,
    "wikibooks": 3,
    "stackexchange": 204
   },
   "segmentation": {
-   "wikipedia": 13,
+   "wikipedia": 10,
    "wikibooks": 1,
    "stackexchange": 3
   },
   "paging": {
    "hailperin": 10,
    "csbu": 2,
-   "wikipedia": 36,
+   "wikipedia": 31,
    "stackexchange": 24
   },
   "TLB and page tables": {
    "hailperin": 10,
    "csbu": 14,
-   "wikipedia": 50,
+   "wikipedia": 49,
    "stackexchange": 31
   },
   "virtual memory": {
    "hailperin": 123,
    "csbu": 51,
-   "wikipedia": 750,
+   "wikipedia": 660,
    "wikibooks": 9,
    "stackexchange": 1033
   },
   "page replacement": {
    "hailperin": 5,
-   "wikipedia": 61,
+   "wikipedia": 53,
    "stackexchange": 17
   },
   "thrashing and working set": {
    "csbu": 3,
-   "wikipedia": 102,
+   "wikipedia": 97,
    "stackexchange": 68
   },
   "storage devices": {
    "hailperin": 14,
    "csbu": 2,
-   "wikipedia": 597,
+   "wikipedia": 558,
    "stackexchange": 69
   },
   "disk scheduling": {
    "hailperin": 3,
-   "wikipedia": 85,
+   "wikipedia": 70,
    "stackexchange": 68
   },
   "RAID": {
-   "wikipedia": 19,
+   "wikipedia": 17,
    "stackexchange": 22
   },
   "I/O systems": {
    "hailperin": 5,
    "csbu": 18,
-   "wikipedia": 691,
+   "wikipedia": 609,
    "wikibooks": 3,
    "stackexchange": 244
   },
   "file system interface": {
    "hailperin": 65,
    "csbu": 27,
-   "wikipedia": 500,
+   "wikipedia": 400,
    "wikibooks": 3,
    "stackexchange": 411
   },
   "file system implementation": {
    "hailperin": 68,
    "csbu": 12,
-   "wikipedia": 906,
+   "wikipedia": 833,
    "wikibooks": 18,
    "stackexchange": 635
   },
   "crash consistency": {
    "hailperin": 18,
    "csbu": 3,
-   "wikipedia": 215,
+   "wikipedia": 196,
    "wikibooks": 3,
    "stackexchange": 138
   },
   "protection and security": {
    "hailperin": 98,
    "csbu": 1,
-   "wikipedia": 319,
+   "wikipedia": 277,
    "stackexchange": 23
   },
   "virtualisation": {
    "hailperin": 9,
    "csbu": 4,
-   "wikipedia": 330,
+   "wikipedia": 277,
    "stackexchange": 16
   }
  },
- "thin_topics": []
+ "thin_topics": [
+  "segmentation"
+ ]
 }

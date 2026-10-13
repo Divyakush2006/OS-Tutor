@@ -70,3 +70,21 @@ images without text, the assignment brief, one legacy `.doc` Office could not co
 open it in Word and save as `.docx` to include it). Online sources are re-fetched exactly
 by `python tools/fetch_open_os_sources.py`; the course corpus is rebuilt from the zip by
 `python tools/import_rag_sources.py`. Decisions: `docs/DECISIONS.md` D-006, D-007, D-008.
+
+## The open corpus (`data/rag/open`, 2026-10-13)
+
+The open corpus is a second corpus with no course material. It holds 2,970 openly
+licensed documents (CC BY-SA): Hailperin, CSBU, Wikipedia, Wikibooks and Stack Exchange
+cs/unix. They are selected from a 3,291-document pool by measured filters (D-009).
+Rebuild it with:
+
+    python tools/fetch_rag_pool.py        # downloads into data/rag/pool/ (cached)
+    python tools/analyze_rag_pool.py      # analysis report + data/rag/open (+ the unfiltered control)
+    python -m ostutor.rag.ingest data/rag/open
+    python tools/rag_compare.py --calibrate data/rag/open   # refit the gate after any change
+
+Serve it with `$env:OSTUTOR_RAG = "data/rag/open"`. It retrieves the answer more often than
+the course corpus (answer recall@5 83% vs 74% over 144 questions). However, its citations
+are Wikipedia articles and Stack Exchange posts, not the course slides. It also says "not
+covered" less often for near-topic questions (14/20 off-topic withheld vs 18/20). Which
+corpus students see is the owners' choice; the default stays off.

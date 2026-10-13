@@ -43,8 +43,8 @@ CRLF to LF on disk in `b7521be`; it stays LF (Python is indifferent to line endi
 **Date:** 2026-10-13 · **Requested by:** owner ("ignore my faculty's notes … the best
 dataset") · **Decided by:** engineer (sources, filters, choice rule)
 
-**Decision.** A second corpus, `data/rag/open` (corpus `066bba582bf3`; 3,003 documents,
-19,674 chunks), built only from openly licensed OS text, with no course material:
+**Decision.** A second corpus, `data/rag/open` (corpus `f16f42d89331`; 2,970 documents,
+18,515 chunks), built only from openly licensed OS text, with no course material:
 Hailperin's *Operating Systems and Middleware* (CC BY-SA 3.0, pinned commit), Wienand's
 *Computer Science from the Bottom Up* (CC BY-SA 3.0, DocBook at a pinned commit),
 1,176 Wikipedia articles from 24 OS categories at recorded revisions (CC BY-SA 4.0),
@@ -76,22 +76,31 @@ answer recall: a top-k chunk contains an accepted answer.
   covers 65/72.
 - **Test split (n = 72, never used for a choice).** Recall@5 is **83.3%** for open
   against 73.6% for course (12 gained, 5 lost, p = 0.143, not significant at this size).
-  Recall@10 is 93.1% against 76.4%.
+  Recall@10 is 94.4% against 76.4%.
 - **All 144 questions.** Recall@5 is 83.3% against 74.3% (21 gained, 8 lost,
   **p = 0.024**). Dev was used only to apply the fixed rule; nothing was tuned on it.
-- **Filters.** They remove 15% of chunks at no recall cost: open_all scores 83.3% on dev
-  and 81.9% on test.
+- **Filters.** They remove 15% of chunks (21,715 → 18,515) at no recall cost: open_all
+  scores 83.3% on dev and 81.9% on test.
 - **Ablations.**
   - Without Wikipedia, test recall@5 falls to 65.3% (p = 0.002); Wikipedia is the
     source that matters.
   - (c) Without Hailperin, dev scores 87.5% against open's 83.3%, but p = 0.25, and on
     test it scores 81.9%. Keeping Hailperin is the right call.
-  - Without Stack Exchange, test scores 86.1% (p = 0.63).
+  - Without Stack Exchange, test scores 84.7% (p = 1.0) and dev 79.2%; it stays.
 - **Gate.** On test, notes are given for 72/72 in-scope questions and withheld for
   **14/20** out-of-scope ones, against 18/20 on the course corpus. The leaks are
   near-topic questions the wider corpus partly covers: JVM garbage collection, B-trees,
   ACID/CAP, HTTP/2, monads and polymorphism.
-- **Latency.** CPU retrieval latency is p50 24 ms and p95 28 ms (course corpus: 8 ms).
+- **Latency.** CPU retrieval latency is p50 23 ms and p95 26 ms (course corpus: 8 ms).
+- **A defect found by the analysis.** The first build kept Wikipedia "See also",
+  "External links" and reference lists: 1,137 of 19,674 chunks. A heading-level
+  off-by-one in `wikitext_to_md` caused it; it is fixed and covered by tests. The
+  rebuilt corpus has 39 such chunks. Recall@5 did not change, recall@10 on test rose
+  from 93.1% to 94.4%, and the gate thresholds were refitted and came out the same.
+- **Labelling.** Passages from this corpus are presented to the model as "reference
+  passages". The student sees "Sources (openly licensed references, not your course
+  notes)", or "Not found in the reference corpus". The wording comes from the
+  manifest's `label`; the course corpus wording is unchanged and tested word for word.
 
 **Trade-offs.**
 - The course corpus cites the students' own slides, which the open corpus cannot.

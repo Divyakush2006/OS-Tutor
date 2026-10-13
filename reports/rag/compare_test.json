@@ -182,8 +182,8 @@
  },
  "open_all (unfiltered pool)": {
   "n": 72,
-  "chunks": 23106,
-  "recall_at_1": 0.5139,
+  "chunks": 21715,
+  "recall_at_1": 0.5278,
   "recall_at_5": 0.8194,
   "recall_at_10": 0.9444,
   "hits5": {
@@ -275,10 +275,10 @@
  },
  "open (compiled)": {
   "n": 72,
-  "chunks": 19674,
+  "chunks": 18515,
   "recall_at_1": 0.5278,
   "recall_at_5": 0.8333,
-  "recall_at_10": 0.9306,
+  "recall_at_10": 0.9444,
   "hits5": {
    "q002": true,
    "q004": true,
@@ -363,10 +363,10 @@
  },
  "open minus csbu": {
   "n": 72,
-  "chunks": 19224,
-  "recall_at_1": 0.5417,
+  "chunks": 18065,
+  "recall_at_1": 0.5278,
   "recall_at_5": 0.8333,
-  "recall_at_10": 0.9306,
+  "recall_at_10": 0.9444,
   "hits5": {
    "q002": true,
    "q004": true,
@@ -549,7 +549,7 @@
  },
  "open minus hailperin": {
   "n": 72,
-  "chunks": 18847,
+  "chunks": 17688,
   "recall_at_1": 0.5278,
   "recall_at_5": 0.8194,
   "recall_at_10": 0.9306,
@@ -735,9 +735,9 @@
  },
  "open minus stackexchange": {
   "n": 72,
-  "chunks": 12505,
-  "recall_at_1": 0.5694,
-  "recall_at_5": 0.8611,
+  "chunks": 11346,
+  "recall_at_1": 0.5833,
+  "recall_at_5": 0.8472,
   "recall_at_10": 0.9306,
   "hits5": {
    "q002": true,
@@ -787,7 +787,7 @@
    "q090": true,
    "q092": false,
    "q094": true,
-   "q096": true,
+   "q096": false,
    "q098": true,
    "q100": true,
    "q102": false,
@@ -816,13 +816,13 @@
   "vs": {
    "course": {
     "lost": 6,
-    "gained": 15,
-    "p": 0.0784
+    "gained": 14,
+    "p": 0.1153
    },
    "open (compiled)": {
     "lost": 1,
-    "gained": 3,
-    "p": 0.625
+    "gained": 2,
+    "p": 1.0
    }
   }
  },
@@ -921,10 +921,10 @@
  },
  "open minus wikibooks": {
   "n": 72,
-  "chunks": 19492,
+  "chunks": 18333,
   "recall_at_1": 0.5278,
   "recall_at_5": 0.8194,
-  "recall_at_10": 0.9167,
+  "recall_at_10": 0.9306,
   "hits5": {
    "q002": true,
    "q004": true,
@@ -1200,8 +1200,8 @@
  },
  "only wikipedia": {
   "n": 72,
-  "chunks": 11046,
-  "recall_at_1": 0.4861,
+  "chunks": 9887,
+  "recall_at_1": 0.5139,
   "recall_at_5": 0.8194,
   "recall_at_10": 0.8889,
   "hits5": {
@@ -1227,7 +1227,7 @@
    "q040": true,
    "q042": true,
    "q044": true,
-   "q046": false,
+   "q046": true,
    "q048": true,
    "q050": true,
    "q052": true,
@@ -1252,7 +1252,7 @@
    "q090": true,
    "q092": false,
    "q094": true,
-   "q096": true,
+   "q096": false,
    "q098": true,
    "q100": false,
    "q102": false,
@@ -1285,8 +1285,8 @@
     "p": 0.3075
    },
    "open (compiled)": {
-    "lost": 7,
-    "gained": 6,
+    "lost": 6,
+    "gained": 5,
     "p": 1.0
    }
   }

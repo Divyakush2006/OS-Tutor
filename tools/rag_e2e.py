@@ -124,7 +124,7 @@ def run_mcq(out: Path, r: Retriever) -> None:
             for q in items:
                 opts = "\n".join(f"{'ABCD'[k]}. {c}" for k, c in enumerate(q["choices"]))
                 user = f"{q['question']}\n\n{opts}\n\nAnswer with the letter of the correct option only."
-                for arm, system in (("off", EXPLAIN), ("on", augment(EXPLAIN, notes[q["id"]]))):
+                for arm, system in (("off", EXPLAIN), ("on", augment(EXPLAIN, notes[q["id"]], r.noun))):
                     key = f"{server}|{arm}|{q['id']}"
                     if key in store.rows:
                         continue
@@ -155,7 +155,7 @@ def run_short(out: Path, r: Retriever) -> None:
         try:
             for q in items:
                 user = f"{q['question']}\n\n{SHORT_ASK}"
-                for arm, system in (("off", EXPLAIN), ("on", augment(EXPLAIN, notes[q["id"]]))):
+                for arm, system in (("off", EXPLAIN), ("on", augment(EXPLAIN, notes[q["id"]], r.noun))):
                     key = f"{server}|{arm}|{q['id']}"
                     if key in store.rows:
                         continue
@@ -189,7 +189,7 @@ def run_explain(out: Path, r: Retriever, corpus: Path) -> None:
             if q["id"] in store.rows:
                 continue
             hits = r.retrieve(q["query"])
-            a = ask(augment(EXPLAIN, hits), q["query"], EXPLAIN_TOKENS, 1.0)
+            a = ask(augment(EXPLAIN, hits, r.noun), q["query"], EXPLAIN_TOKENS, 1.0)
             valid, invented = cited(a["text"], len(hits))
             store.add(dict(key=q["id"], id=q["id"], query=q["query"], doc=q["doc"], **a,
                            notes=[dict(n=n, chunk=h["chunk"].chunk_id, doc=h["chunk"].doc_id,

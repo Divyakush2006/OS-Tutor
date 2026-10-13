@@ -319,14 +319,15 @@ def grounded(spec, question):
     not retrieve, leaves both untouched."""
     if RAG is None or not spec.get("rag") or not question:
         return spec["prompt"], ""
+    not_found = RAG.not_found or NOT_IN_NOTES
     try:
         hits = RAG.retrieve(question)
     except Exception as e:                       # never let retrieval break the chat path
         log.warning("retrieval failed, answering without notes: %s", e)
-        return spec["prompt"], NOT_IN_NOTES
+        return spec["prompt"], not_found
     if not hits:
-        return spec["prompt"], NOT_IN_NOTES
-    return augment(spec["prompt"], hits), sources_footer(hits)
+        return spec["prompt"], not_found
+    return augment(spec["prompt"], hits, RAG.noun), sources_footer(hits, RAG.sources_heading)
 
 
 def fact_checked(answer, system, question):
