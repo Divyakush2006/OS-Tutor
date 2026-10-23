@@ -244,5 +244,20 @@ check("a subset keeps the matching chunks with their own embeddings",
       len(sub.chunks) == len(sub.emb) and all(c.doc_id != "n07" for c in sub.chunks)
       and np.allclose(sub.emb[0], rs.emb[[c.chunk_id for c in rs.chunks].index(sub.chunks[0].chunk_id)]))
 
+print("follow-up queries")
+from ostutor.rag.retrieve import contextual_query  # noqa: E402
+conv = [dict(role="user", content="What is Belady's anomaly?"), dict(role="assistant", content="..."),
+        dict(role="user", content="Does LRU suffer from it?")]
+check("a short follow-up that refers back is read with the previous question",
+      contextual_query(conv, "Does LRU suffer from it?") == "What is Belady's anomaly? Does LRU suffer from it?")
+check("a standalone question is retrieved as typed",
+      contextual_query(conv[:2] + [dict(role="user", content="What is thrashing?")], "What is thrashing?")
+      == "What is thrashing?")
+check("the first question of a chat is retrieved as typed",
+      contextual_query(conv[2:], "Does LRU suffer from it?") == "Does LRU suffer from it?")
+long_q = "What is it called when processes keep changing state in response to each other without progress?"
+check("a long question is not widened even if it says 'it'",
+      contextual_query(conv[:2] + [dict(role="user", content=long_q)], long_q) == long_q)
+
 print("\nALL RAG TESTS PASSED" if not FAILED else f"\n{len(FAILED)} FAILED: {FAILED}")
 sys.exit(1 if FAILED else 0)

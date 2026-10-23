@@ -175,6 +175,28 @@ def augment(system: str, hits: list[dict], noun: str = NOUN) -> str:
               f"and say that the {short} do not cover it. Never invent a citation.")
 
 
+# Words that point back to something said earlier ("Does LRU suffer from IT?").
+_REFERS = re.compile(r"\b(?:it|its|this|that|these|those|they|them|their|the same|the above|"
+                     r"the previous|the former|the latter)\b", re.I)
+FOLLOWUP_MAX_WORDS = 12
+
+
+def contextual_query(messages: list[dict], latest: str) -> str:
+    """The text to retrieve with. A short follow-up that points back ("Does LRU suffer from
+    it?") names nothing the indexes can match on its own; read together with the student's
+    previous question it does. A rule on the CPU rather than a model rewrite: a rewrite
+    would put a GPU call in front of every answer on a one-slot server. Only a short message
+    that refers back, in a chat with an earlier question, is widened; a standalone question
+    is retrieved as typed."""
+    users = [m["content"] for m in messages
+             if m.get("role") == "user" and isinstance(m.get("content"), str)]
+    if not latest or len(users) < 2 or users[-1] != latest:
+        return latest
+    if len(latest.split()) > FOLLOWUP_MAX_WORDS or not _REFERS.search(latest):
+        return latest
+    return f"{users[-2]} {latest}"
+
+
 def sources_footer(hits: list[dict], heading: str = SOURCES_HEADING) -> str:
     """The list of sources shown under the answer, so a student can look them up."""
     if not hits:

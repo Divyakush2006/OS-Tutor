@@ -37,6 +37,8 @@ async def upstream(req: Request):
     elif user == "tagged":  # a model copying what it saw in the history
         lines = ["FIFO trace", "**Answer: 9**", "", "---", "> **Sources from your course notes**",
                  "> [S1] Fake (`wp-belady-anomaly`)", "", "<!-- ostutor: mode=ostutor-solve path=verified -->"]
+    elif user == "lru":     # a known misconception
+        lines = ["Yes, LRU suffers from Belady's anomaly."]
     elif user == "legit":   # a real trace: repetitive shape, distinct lines
         lines = [f"- t={t}: A runs, {20 - t} left; queue [B, A]" for t in range(20)] + \
                 ["| # | Ref | Result |", "|---|---|---|"] + [f"| {i} | 3 | HIT |" for i in range(8)]
@@ -294,6 +296,34 @@ async def main():
           and SEEN[-1]["messages"][-1]["content"].startswith("FIFO"), str(SEEN[-1]["messages"])[:160])
     await c.post("/v1/chat/completions", json=dict(model="ostutor-tutor", messages=history))
     check("tutoring keeps the conversation", len(SEEN[-1]["messages"]) == 4)
+
+    # --- follow-ups (24 Oct): post-stream fact check, contextual retrieval ---
+    out, _ = await text_of_stream(c, "ostutor-explain", "lru")
+    check("a streamed answer with a misconception gets the correct fact after it",
+          "Fact check" in out and "never suffers" in out, out[-200:])
+    out, _ = await text_of_stream(c, "ostutor-tutor", "lru")
+    check("tutor answers are not fact-checked, streamed or not", "Fact check" not in out, out[-120:])
+    out, _ = await text_of_stream(c, "ostutor-explain", "normal")
+    check("a clean streamed answer gets no fact-check note", "Fact check" not in out, out[-120:])
+    await c.post("/v1/chat/completions", json=dict(model="ostutor-explain", messages=[
+        dict(role="user", content="hi"),
+        dict(role="assistant", content="ok\n\n---\n> **Fact check:** part of the answer above\n> fact"),
+        dict(role="user", content="hi")]))
+    check("the fact-check note is scrubbed from history like the other footers",
+          [m["content"] for m in SEEN[-1]["messages"] if m["role"] == "assistant"] == ["ok"])
+
+    gateway.RAG = Retriever(gateway.ROOT / "data" / "rag" / "fixture")
+    try:
+        q0 = "Can LRU suffer from Belady's anomaly?"
+        await c.post("/v1/chat/completions", json=dict(model="ostutor-explain", messages=[
+            dict(role="user", content=q0), dict(role="assistant", content="No."),
+            dict(role="user", content="Why does it not?")]))
+        sent = SEEN[-1]["messages"][0]["content"]
+        check("a short follow-up is retrieved with the question before it", "[S1]" in sent, sent[:120])
+        check("and the model still sees the student's own words",
+              SEEN[-1]["messages"][-1]["content"] == "Why does it not?")
+    finally:
+        gateway.RAG = None
 
     print("\nALL GATEWAY TESTS PASSED" if not FAILED else f"\n{len(FAILED)} FAILED: {FAILED}")
     return 1 if FAILED else 0

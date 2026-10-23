@@ -58,7 +58,7 @@ from ostutor.config import SYSTEM_PROMPTS  # noqa: E402  (single source of truth
 from ostutor.solver import (EXTRACT_PROMPT, SOLVER_KINDS, normalise,  # noqa: E402
                             parse_json, solve)
 from ostutor.theory_filter import CORRECTIONS, fact_flags  # noqa: E402
-from ostutor.rag.retrieve import Retriever, augment, sources_footer  # noqa: E402
+from ostutor.rag.retrieve import Retriever, augment, contextual_query, sources_footer  # noqa: E402
 
 UPSTREAM = os.environ.get("TUTOR_UPSTREAM", "http://127.0.0.1:8081")
 log = logging.getLogger("tutor-gateway")
@@ -195,7 +195,7 @@ _TAG = re.compile(r"[ \t]*<!--\s*ostutor:.*?-->[ \t]*\n?", re.S | re.I)
 _FOOTER = re.compile(
     r"\n*^---[ \t]*\n(?=> (?:\*\*Sources|\*\*Not found in|_Computed by the verified|"
     r"_Not computed by a simulator|_I am an Operating Systems tutor|"
-    r"\*\*Stopped by the loop guard))(?:^>.*(?:\n|\Z))+", re.M)
+    r"\*\*Stopped by the loop guard|\*\*Fact check))(?:^>.*(?:\n|\Z))+", re.M)
 
 
 def scrub(text):
@@ -374,6 +374,18 @@ UNVERIFIED_NOTE = ("\n\n---\n> _Not computed by a simulator: the numbers above c
                    "every value written out._")
 
 
+def stream_fact_note(text):
+    """The note appended after a STREAMED answer that states a known misconception. A
+    streamed answer has already been shown, so it cannot be redrafted as fact_checked()
+    does; the correct fact is stated under it instead."""
+    names = sorted({n for n, _ in fact_flags(text or "")})
+    facts = [CORRECTIONS[n] for n in names if n in CORRECTIONS]
+    if not facts:
+        return ""
+    return ("\n\n---\n> **Fact check:** part of the answer above states a known "
+            "misconception. The correct fact:\n" + "\n".join(f"> {f}" for f in facts))
+
+
 def verified_answer(question):
     """(text, path) for a simulator-computed worked solution, or for a request for a
     missing input; None when the model should answer for itself.
@@ -405,16 +417,17 @@ NOT_IN_NOTES = ("\n\n---\n> **Not found in the course materials.** This answer c
                 "or ask your instructor.")
 
 
-def grounded(spec, question):
+def grounded(spec, question, query=None):
     """(system prompt, footer): the mode's trained prompt with the relevant course notes
     appended and a sources footer; or, when the notes do not cover the question, the
     trained prompt unchanged and a footer saying so. Retrieval off, or a mode that does
-    not retrieve, leaves both untouched."""
+    not retrieve, leaves both untouched. `query` is what to retrieve with when it differs
+    from the question (a follow-up read with the question before it)."""
     if RAG is None or not spec.get("rag") or not question:
         return spec["prompt"], ""
     not_found = RAG.not_found or NOT_IN_NOTES
     try:
-        hits = RAG.retrieve(question)
+        hits = RAG.retrieve(query or question)
     except Exception as e:                       # never let retrieval break the chat path
         log.warning("retrieval failed, answering without notes: %s", e)
         return spec["prompt"], not_found
@@ -498,7 +511,8 @@ async def chat(req: Request):
             return _reply(verified[0], asked, chose, verified[1], scope)
 
     # LAYER 2 - prose is grounded in the course notes (when retrieval is on).
-    system, footer = (spec["prompt"], "") if client_system else grounded(spec, question)
+    system, footer = (spec["prompt"], "") if client_system else \
+        grounded(spec, question, contextual_query(raw.get("messages", []), question))
     # Solve mode without a simulator: the model's own numbers, marked as such.
     if chose == "ostutor-solve" and not client_system:
         footer += UNVERIFIED_NOTE
@@ -570,8 +584,11 @@ async def chat(req: Request):
                     rest = tags.flush()
                     if rest:
                         yield piece(rest)
-                    if footer:
-                        yield piece(footer)
+                    # Post-stream check: Open WebUI streams, which used to skip the fact
+                    # checker for every Explain and Analyze answer in the UI.
+                    note = stream_fact_note(text) if spec.get("factcheck") and not client_system else ""
+                    if note or footer:
+                        yield piece(note + footer)
                     yield "data: [DONE]\n\n"
                     return
                 try:

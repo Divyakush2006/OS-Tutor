@@ -56,6 +56,14 @@ testing) · **Decided by:** engineer (root causes and the form of each fix)
    in the chat. A Solve answer no simulator produced carries a visible "Not computed by a
    simulator" note. Tutor, Explain and Analyze keep the conversation.
 4. The Sources footer lists each document once, with every passage label that came from it.
+5. A short follow-up that refers back ("Does LRU suffer from it?", at most 12 words, in a
+   chat with an earlier question) is retrieved together with the previous question; the
+   model still sees the student's own words. A CPU rule, not a model rewrite, which would
+   put a GPU call before every answer on a one-slot server. Alone, that follow-up retrieved
+   nothing from either corpus; widened, it retrieves the Belady passages.
+6. Streamed answers, which is every answer in Open WebUI, used to skip the fact checker. A
+   streamed Explain or Analyze answer that states a known misconception now gets the correct
+   fact stated under it once the stream ends, since a shown answer cannot be redrafted.
 
 **Alternatives.** Appending rules ("do not output metadata tags", "do not guess missing
 parameters") to the system prompts. Rejected: the adapter was trained on the exact prompts,
