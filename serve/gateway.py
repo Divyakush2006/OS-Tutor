@@ -185,6 +185,82 @@ def _last_user(body):
                  if m.get("role") == "user"), None)
 
 
+# Text only the gateway may write: the mode tag and the notes under an answer. Open WebUI
+# sends every earlier reply back as history, tags and footers included, and a model shown
+# them copies them - a "path=verified" tag on an answer no simulator produced, a second
+# Sources block with misremembered ids, a simulator-style trace it made up. So they are
+# removed from the history before it is forwarded, and from anything the model writes,
+# before the gateway appends its own.
+_TAG = re.compile(r"[ \t]*<!--\s*ostutor:.*?-->[ \t]*\n?", re.S | re.I)
+_FOOTER = re.compile(
+    r"\n*^---[ \t]*\n(?=> (?:\*\*Sources|\*\*Not found in|_Computed by the verified|"
+    r"_Not computed by a simulator|_I am an Operating Systems tutor|"
+    r"\*\*Stopped by the loop guard))(?:^>.*(?:\n|\Z))+", re.M)
+
+
+def scrub(text):
+    """`text` without the gateway's own tags and footers."""
+    return _FOOTER.sub("", _TAG.sub("", text or "")).rstrip()
+
+
+def clean_history(body):
+    """The request with every earlier assistant reply scrubbed of gateway artefacts."""
+    msgs = [dict(m, content=scrub(m["content"]))
+            if m.get("role") == "assistant" and isinstance(m.get("content"), str) else m
+            for m in body.get("messages", [])]
+    return dict(body, messages=msgs)
+
+
+def _followup(raw):
+    """When the gateway's previous reply asked for a missing input, the student's next
+    message is that input: read it together with the question it completes, so that
+    "the quantum is 3" can be solved. Detected from the gateway's own tag, before the
+    history is scrubbed."""
+    msgs = [m for m in raw.get("messages", []) if m.get("role") in ("user", "assistant")]
+    if (len(msgs) >= 3 and [m.get("role") for m in msgs[-3:]] == ["user", "assistant", "user"]
+            and "path=asked-for-input" in str(msgs[-2].get("content", ""))):
+        return f"{msgs[-3].get('content', '')}\n{msgs[-1].get('content', '')}"
+    return None
+
+
+class TagFilter:
+    """Drops `<!-- ostutor: ... -->` from streamed text, which arrives in pieces: text
+    from a "<" on is held back until it is known whether it starts such a tag."""
+
+    HOLD = 300
+
+    def __init__(self):
+        self.buf = ""
+
+    def feed(self, piece):
+        self.buf += piece
+        out = ""
+        while self.buf:
+            i = self.buf.find("<")
+            if i < 0:
+                out, self.buf = out + self.buf, ""
+                break
+            out, self.buf = out + self.buf[:i], self.buf[i:]
+            if len(self.buf) < 4 and "<!--".startswith(self.buf):
+                break                                   # may still become a comment
+            if not self.buf.startswith("<!--"):
+                out, self.buf = out + self.buf[0], self.buf[1:]
+                continue
+            j = self.buf.find("-->")
+            if j < 0:
+                if len(self.buf) > self.HOLD:            # not a short tag: let it through
+                    out, self.buf = out + self.buf, ""
+                break
+            comment, self.buf = self.buf[:j + 3], self.buf[j + 3:]
+            if not _TAG.match(comment):
+                out += comment
+        return out
+
+    def flush(self):
+        rest, self.buf = self.buf, ""
+        return "" if re.match(r"<!--\s*ostutor", rest, re.I) else rest
+
+
 def _reply(text, asked, chose, how, extra=""):
     """An OpenAI-shaped reply. `chose` and `how` are surfaced so the UI (and the log) can
     show which mode answered and whether a verification layer acted. `extra` is appended
@@ -288,8 +364,19 @@ SCOPE_NOTE = ("\n\n---\n> _I am an Operating Systems tutor, so that is outside w
               "concurrency or the Linux command line and I can be genuinely useful._")
 
 
+ASK_MISSING = ("I can't solve this one yet: the question doesn't give **{missing}**, and "
+               "the answer depends on it. I won't assume a value, because a guessed input "
+               "gives a confident wrong answer.\n\nReply with {missing} and I'll compute "
+               "the full solution.")
+
+UNVERIFIED_NOTE = ("\n\n---\n> _Not computed by a simulator: the numbers above come from the "
+                   "language model and may be wrong. Check them, or restate the problem with "
+                   "every value written out._")
+
+
 def verified_answer(question):
-    """A simulator-computed worked solution, or None.
+    """(text, path) for a simulator-computed worked solution, or for a request for a
+    missing input; None when the model should answer for itself.
 
     Measured on the 57 hand-written items: the model alone scores 64.9%, and every
     scheduling failure was a perfect table built from a wrong schedule. Reading the
@@ -301,10 +388,16 @@ def verified_answer(question):
         log.warning("solver path failed, falling back to the model: %s", e)
         return None
     if text is None:
+        # Pre-flight validation: extraction found the problem but not every input it needs
+        # (Round Robin without a quantum, paging without a frame count, ...). The model is
+        # not asked to answer - it would invent the value - the input is asked for.
+        missing = " ".join(str(meta.get("missing") or "").split())[:120]
+        if meta.get("reason") == "incomplete" and missing:
+            return ASK_MISSING.format(missing=missing), "asked-for-input"
         return None
     return text + ("\n\n---\n> _Computed by the verified "
                    f"{meta['kind'].replace('_', ' ')} simulator rather than by the "
-                   "language model, so these numbers are exact._")
+                   "language model, so these numbers are exact._"), "verified"
 
 
 NOT_IN_NOTES = ("\n\n---\n> **Not found in the course materials.** This answer comes from the "
@@ -371,9 +464,11 @@ def fact_checked(answer, system, question):
 @app.post("/v1/chat/completions")
 async def chat(req: Request):
     raw = await req.json()
+    pending = _followup(raw)
+    raw = clean_history(raw)
     asked = raw.get("model", DEFAULT_MODEL)
     spec = MODELS.get(asked, MODELS[DEFAULT_MODEL])
-    question = _last_user(prepare(raw))
+    question = pending or _last_user(prepare(raw))
     chose = asked
 
     # AUTO mode: read the question, pick the mode, then behave exactly as that mode.
@@ -386,20 +481,27 @@ async def chat(req: Request):
         if why == OFFTOPIC_REASON:
             scope = SCOPE_NOTE
         spec = MODELS[chose]
+    # A worked problem is answered on its own: earlier problems in the same chat (SRTF,
+    # then RR, then FIFO) are not shown to the model, so their rules cannot bleed in.
+    client_system = any(m.get("role") == "system" and str(m.get("content", "")).strip()
+                        for m in raw.get("messages", []))
+    if chose == "ostutor-solve" and question and not client_system:
+        raw = dict(raw, messages=[dict(role="user", content=question)])
     body = prepare(raw, prompt_override=spec["prompt"])
     body["lora"] = [dict(id=0, scale=spec["lora"])]
     log_request(raw, body)
 
     # LAYER 1 - the numbers come from a simulator wherever one applies.
-    client_system = any(m.get("role") == "system" and str(m.get("content", "")).strip()
-                        for m in raw.get("messages", []))
     if spec.get("verify") and question and not client_system:
         verified = verified_answer(question)
         if verified is not None:
-            return _reply(verified, asked, chose, "verified", scope)
+            return _reply(verified[0], asked, chose, verified[1], scope)
 
     # LAYER 2 - prose is grounded in the course notes (when retrieval is on).
     system, footer = (spec["prompt"], "") if client_system else grounded(spec, question)
+    # Solve mode without a simulator: the model's own numbers, marked as such.
+    if chose == "ostutor-solve" and not client_system:
+        footer += UNVERIFIED_NOTE
     if system != spec["prompt"]:
         body = prepare(raw, prompt_override=system)
         body["lora"] = [dict(id=0, scale=spec["lora"])]
@@ -413,7 +515,7 @@ async def chat(req: Request):
                 text = draft.json()["choices"][0]["message"]["content"] or ""
             except (KeyError, IndexError, TypeError):
                 text = ""
-            checked, flagged = fact_checked(text, system, question)
+            checked, flagged = fact_checked(scrub(text), system, question)
             if checked:
                 return _reply(checked + footer, asked, chose,
                               "fact-corrected" if flagged else "checked", scope)
@@ -422,7 +524,8 @@ async def chat(req: Request):
         r = await client.post("/v1/chat/completions", json=body)
         data = r.json()
         try:
-            text = data["choices"][0]["message"]["content"] or ""
+            text = scrub(data["choices"][0]["message"]["content"] or "")
+            data["choices"][0]["message"]["content"] = text
             lines = text.split("\n")
             for i in range(len(lines)):
                 if loop_detected(lines[: i + 1]):
@@ -446,6 +549,13 @@ async def chat(req: Request):
 
     async def stream():
         text, last_id, created = "", "guard", int(time.time())
+        tags = TagFilter()
+
+        def piece(content, finish=None):
+            return "data: " + json.dumps(dict(id=last_id, object="chat.completion.chunk",
+                                              created=created, model=body["model"],
+                                              choices=[dict(index=0, delta=dict(content=content),
+                                                            finish_reason=finish)])) + "\n\n"
         async with client.stream("POST", "/v1/chat/completions", json=body) as r:
             if r.status_code != 200:
                 err = (await r.aread()).decode("utf-8", "replace")
@@ -457,21 +567,27 @@ async def chat(req: Request):
                     continue
                 payload = line[5:].strip()
                 if payload == "[DONE]":
+                    rest = tags.flush()
+                    if rest:
+                        yield piece(rest)
                     if footer:
-                        note = dict(id=last_id, object="chat.completion.chunk", created=created,
-                                    model=body["model"],
-                                    choices=[dict(index=0, delta=dict(content=footer),
-                                                  finish_reason=None)])
-                        yield f"data: {json.dumps(note)}\n\n"
+                        yield piece(footer)
                     yield "data: [DONE]\n\n"
                     return
-                yield f"data: {payload}\n\n"
                 try:
                     chunk = json.loads(payload)
                     last_id = chunk.get("id", last_id)
                     delta = chunk["choices"][0]["delta"].get("content") or ""
                 except (ValueError, KeyError, IndexError, TypeError):
+                    yield f"data: {payload}\n\n"
                     continue
+                if delta:
+                    clean = tags.feed(delta)
+                    chunk["choices"][0]["delta"]["content"] = clean
+                    if clean or chunk["choices"][0].get("finish_reason"):
+                        yield f"data: {json.dumps(chunk)}\n\n"
+                else:
+                    yield f"data: {payload}\n\n"
                 if "\n" in delta:
                     text += delta
                     if loop_detected(text.split("\n")[:-1]):

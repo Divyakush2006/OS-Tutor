@@ -38,6 +38,40 @@ CRLF to LF on disk in `b7521be`; it stays LF (Python is indifferent to line endi
 
 ---
 
+## D-010 — Gateway owns its tags and footers; missing inputs are asked for; worked problems are isolated
+
+**Date:** 2026-10-24 · **Requested by:** owner (audit prompt in `prompt.txt`, from live
+testing) · **Decided by:** engineer (root causes and the form of each fix)
+
+**Decision.**
+1. Open WebUI sends every earlier reply back as history, with the gateway's mode tag, Sources
+   footer and simulator notes. The gateway now scrubs those from assistant turns before
+   forwarding, and scrubs any tag or Sources block the model writes, in both streamed and
+   non-streamed replies. Only the gateway writes `<!-- ostutor: … -->`.
+2. When extraction finds the problem but not an input it needs (Round Robin without a
+   quantum, paging without a frame count), the gateway replies itself, naming the input
+   (`path=asked-for-input`); the model is not called. The student's next message is read
+   together with the question it completes.
+3. In Solve mode a worked problem is sent to the model on its own, without earlier problems
+   in the chat. A Solve answer no simulator produced carries a visible "Not computed by a
+   simulator" note. Tutor, Explain and Analyze keep the conversation.
+4. The Sources footer lists each document once, with every passage label that came from it.
+
+**Alternatives.** Appending rules ("do not output metadata tags", "do not guess missing
+parameters") to the system prompts. Rejected: the adapter was trained on the exact prompts,
+and a rule a 4B model may ignore is weaker than the gateway refusing to forward or emit the
+text. The "router" is code, not a prompted model, so it has no prompt to change.
+
+**Evidence.** Root causes were read from `serve/gateway.py`: history forwarded verbatim; the
+"incomplete" extraction verdict discarded, so the model answered with an invented quantum;
+streamed answers never scrubbed. `serve/test_gateway.py` gained 11 checks (48 pass, now with
+no real model server reachable). Live, through the running stack: a forgotten quantum is
+asked for and "The time quantum is 2." then gives the verified solution; SRTF, RR and FIFO in
+one chat each come back verified (FIFO 9 faults); a streamed Explain follow-up after a
+reply with Sources shows no copied tag or second Sources block.
+
+---
+
 ## D-009 — Open OS corpus: openly licensed sources only, compiled by measured filters
 
 **Date:** 2026-10-13 · **Requested by:** owner ("ignore my faculty's notes … the best

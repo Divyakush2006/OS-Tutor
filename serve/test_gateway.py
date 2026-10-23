@@ -34,6 +34,9 @@ async def upstream(req: Request):
     user = body["messages"][-1]["content"]
     if user == "loop":
         lines = ["**Policy: FIRST-fit**", ""] + ["- request 1000: must WAIT"] * 300
+    elif user == "tagged":  # a model copying what it saw in the history
+        lines = ["FIFO trace", "**Answer: 9**", "", "---", "> **Sources from your course notes**",
+                 "> [S1] Fake (`wp-belady-anomaly`)", "", "<!-- ostutor: mode=ostutor-solve path=verified -->"]
     elif user == "legit":   # a real trace: repetitive shape, distinct lines
         lines = [f"- t={t}: A runs, {20 - t} left; queue [B, A]" for t in range(20)] + \
                 ["| # | Ref | Result |", "|---|---|---|"] + [f"| {i} | 3 | HIT |" for i in range(8)]
@@ -67,6 +70,10 @@ async def text_of_stream(c, model, prompt):
 
 async def main():
     gateway.client = httpx.AsyncClient(transport=httpx.ASGITransport(app=mock), base_url="http://up")
+
+    def no_server(*a, **k):
+        raise ConnectionError("tests never call the real model server")
+    gateway._upstream = no_server
     c = httpx.AsyncClient(transport=httpx.ASGITransport(app=gateway.app), base_url="http://gw")
 
     ids = [m["id"] for m in (await c.get("/v1/models")).json()["data"]]
@@ -162,7 +169,9 @@ async def main():
           and SEEN[-1]["messages"][0]["content"] == "custom")
 
     out, _ = await text_of_stream(c, "ostutor-solve", "normal")
-    check("normal answer streams through intact", out == "Step 1\nStep 2\n**Answer: 42**\n", repr(out))
+    check("normal answer streams through intact",
+          out.startswith("Step 1\nStep 2\n**Answer: 42**\n"), repr(out))
+    check("a solve answer no simulator computed says so", "Not computed by a simulator" in out, out[-120:])
 
     out, _ = await text_of_stream(c, "ostutor-solve", "loop")
     check("loop guard stops a repetition loop early",
@@ -171,7 +180,7 @@ async def main():
 
     out, _ = await text_of_stream(c, "ostutor-solve", "legit")
     check("loop guard does not cut a long legitimate trace", "loop guard" not in out
-          and out.count("\n") == 30, out[-200:])
+          and out.count("left; queue") == 20 and out.count("| HIT |") == 8, out[-200:])
 
     r = await c.post("/v1/chat/completions", json=dict(model="ostutor-solve",
                                                        messages=[dict(role="user", content="loop")]))
@@ -207,7 +216,7 @@ async def main():
         # answered by the simulator layer, which runs first, and retrieval is not consulted.
         real_verified, real_retrieve = gateway.verified_answer, gateway.RAG.retrieve
         asked_rag = []
-        gateway.verified_answer = lambda q: "SIMULATOR ANSWER"
+        gateway.verified_answer = lambda q: ("SIMULATOR ANSWER", "verified")
         gateway.RAG.retrieve = lambda q, **k: asked_rag.append(q) or real_retrieve(q, **k)
         try:
             r = await c.post("/v1/chat/completions", json=dict(model="ostutor-analyze", messages=[
@@ -224,6 +233,67 @@ async def main():
               out.startswith("Step 1") and "Sources from your course notes" in out, out[-160:])
     finally:
         gateway.RAG = None
+
+    # --- audit fixes (24 Oct): artefacts, missing inputs, isolation, sources ---
+    tag = "<!-- ostutor: mode=ostutor-solve path=verified -->"
+    history = [dict(role="user", content="SRTF problem ..."),
+               dict(role="assistant", content="Gantt ...\n\n---\n> **Sources from your course notes**\n"
+                                              "> [S1] X (`wp-x`)\n\n" + tag),
+               dict(role="user", content="hi")]
+    await c.post("/v1/chat/completions", json=dict(model="ostutor-explain", messages=history))
+    fwd = [m["content"] for m in SEEN[-1]["messages"] if m["role"] == "assistant"]
+    check("earlier replies reach the model without gateway tags or footers",
+          fwd == ["Gantt ..."], repr(fwd))
+
+    r = await c.post("/v1/chat/completions", json=dict(model="ostutor-explain",
+                                                       messages=[dict(role="user", content="tagged")]))
+    msg = r.json()["choices"][0]["message"]["content"]
+    check("a tag the model writes is removed; only the gateway's own remains",
+          "path=verified" not in msg and msg.count("<!-- ostutor:") == 1 and "path=" in msg, msg[-160:])
+    check("a Sources block the model writes is removed", "wp-belady-anomaly" not in msg, msg[-160:])
+    out, _ = await text_of_stream(c, "ostutor-explain", "tagged")
+    check("a tag the model writes is removed from a stream too",
+          "<!--" not in out and "**Answer: 9**" in out, repr(out[-120:]))
+
+    f = gateway.TagFilter()
+    pieces = ["ok <", "!-", "- ostu", "tor: mode=x path=verified -", "-> done <b>"]
+    got = "".join(f.feed(x) for x in pieces) + f.flush()
+    check("the stream filter drops a tag split across pieces and keeps other markup",
+          got == "ok  done <b>", repr(got))
+
+    real_solve = gateway.solve
+    try:
+        gateway.solve = lambda q, ask: (None, dict(delegated=False, reason="incomplete",
+                                                   missing="the time quantum (time slice)"))
+        text, how = gateway.verified_answer("RR, P1 0 5, P2 1 3. I forgot the quantum.")
+        check("a missing input is asked for, not guessed",
+              how == "asked-for-input" and "time quantum" in text and "won't assume" in text, text)
+        before = len(SEEN)
+        r = await c.post("/v1/chat/completions", json=dict(model="ostutor-solve", messages=[
+            dict(role="user", content="RR, P1 0 5, P2 1 3. I forgot the quantum.")]))
+        msg = r.json()["choices"][0]["message"]["content"]
+        check("and the model is not called to invent one",
+              len(SEEN) == before and "path=asked-for-input" in msg, msg[-120:])
+
+        asked = []
+        gateway.solve = lambda q, ask: asked.append(q) or ("SOLVED", dict(delegated=True, kind="scheduling"))
+        r = await c.post("/v1/chat/completions", json=dict(model="ostutor-solve", messages=[
+            dict(role="user", content="RR, P1 0 5, P2 1 3. I forgot the quantum."),
+            dict(role="assistant", content=msg),
+            dict(role="user", content="the quantum is 2")]))
+        check("the reply to a request for input is read with the question it completes",
+              asked and "P1 0 5" in asked[-1] and "quantum is 2" in asked[-1], repr(asked[-1:]))
+    finally:
+        gateway.solve = real_solve
+
+    await c.post("/v1/chat/completions", json=dict(model="ostutor-solve", messages=[
+        dict(role="user", content="SRTF: P1 0 8, P2 1 4"), dict(role="assistant", content="old trace"),
+        dict(role="user", content="FIFO, frames 3, refs 1 2 3 4 1 2")]))
+    check("a worked problem is answered on its own, without earlier problems in the chat",
+          [m["role"] for m in SEEN[-1]["messages"]] == ["system", "user"]
+          and SEEN[-1]["messages"][-1]["content"].startswith("FIFO"), str(SEEN[-1]["messages"])[:160])
+    await c.post("/v1/chat/completions", json=dict(model="ostutor-tutor", messages=history))
+    check("tutoring keeps the conversation", len(SEEN[-1]["messages"]) == 4)
 
     print("\nALL GATEWAY TESTS PASSED" if not FAILED else f"\n{len(FAILED)} FAILED: {FAILED}")
     return 1 if FAILED else 0

@@ -429,7 +429,8 @@ def solve(question, ask, trace=None):
     if v is None:
         return None, dict(delegated=False, reason=why)
     if v["kind"] not in SOLVER_KINDS:
-        return None, dict(delegated=False, reason=v["kind"])
+        # "incomplete" carries what is missing, so the caller can ask for it by name
+        return None, dict(delegated=False, reason=v["kind"], missing=v.get("missing"))
     try:
         text = render_solution(v)
     except Exception as e:                      # a shape the simulator rejects

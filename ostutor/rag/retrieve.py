@@ -179,8 +179,18 @@ def sources_footer(hits: list[dict], heading: str = SOURCES_HEADING) -> str:
     """The list of sources shown under the answer, so a student can look them up."""
     if not hits:
         return ""
-    lines = [f"> [S{n}] {h['chunk'].citation()} (`{h['chunk'].doc_id}`)"
-             for n, h in enumerate(hits, 1)]
+    # One line per DOCUMENT: several passages of one article used to be listed as near-
+    # identical sources. Every passage label stays on its line, so an [S3] in the answer
+    # can still be found.
+    docs = {}
+    for n, h in enumerate(hits, 1):
+        docs.setdefault(h["chunk"].doc_id, []).append((n, h["chunk"]))
+    lines = []
+    for doc_id, items in docs.items():
+        labels = ", ".join(f"S{n}" for n, _ in items)
+        sections = list(dict.fromkeys(c.section for _, c in items if c.section))
+        where = f" — {'; '.join(sections)}" if sections else ""
+        lines.append(f"> [{labels}] {items[0][1].title}{where} (`{doc_id}`)")
     return f"\n\n---\n> **{heading}**\n" + "\n".join(lines)
 
 
