@@ -8,6 +8,9 @@ import json
 import sys
 from pathlib import Path
 
+# Test names contain non-ASCII characters; a legacy Windows console would otherwise crash.
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "tools"))
@@ -131,6 +134,20 @@ solver.extract("What is a page fault?",
                scripted(json.dumps({"kind": "concept"})), trace=trace)
 check("a non-solver question is traced as non_solver",
       [e["outcome"] for e in trace] == ["non_solver"] and trace[0]["kind"] == "concept")
+
+# Disk range (final review): "spans 0-299" is 300 cylinders. Extraction read the top of
+# the range as the size in 9 of 9 misread OOD items; normalise() now reads the range.
+DQ = ("Disk telemetry reports the arm at **156** (device spans 0-299) and a queue of: "
+      "`170, 112, 188, 92, 34, 86`. Using **CSCAN** scheduling, give the total head movement.")
+d = solver.normalise({"kind": "disk", "policy": "CSCAN", "head": 156,
+                      "reqs": [170, 112, 188, 92, 34, 86], "size": 299}, DQ)
+check("a 0-299 range is read as 300 cylinders", d and d["size"] == 300, str(d))
+d = solver.normalise({"kind": "disk", "policy": "CSCAN", "head": 156,
+                      "reqs": [170, 112, 188, 92, 34, 86], "size": 300}, DQ)
+check("a size already read correctly is left alone", d and d["size"] == 300, str(d))
+d = solver.normalise({"kind": "disk", "policy": "SSTF", "head": 136, "reqs": [333, 440],
+                      "size": 500}, "head at cylinder 136 on a 500-cylinder device, queue 333, 440")
+check("a stated size with no range is unchanged", d and d["size"] == 500, str(d))
 
 r1 = solver.solve(Q, scripted("nope", GOOD))
 r2 = solver.solve(Q, scripted("nope", GOOD), trace=[])
