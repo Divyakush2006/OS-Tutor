@@ -99,11 +99,7 @@ flowchart LR
         M3 --> CC["Command checker<br/>known pitfalls"]
     end
 
-    X -.-> L
-    M1 -.-> L
-    M2 -.-> L
-    M3 -.-> L
-    L[("llama-server (GPU)<br/>Qwen3-4B-Instruct-2507 Q8_0<br/>+ LoRA adapter v3")]
+    GW -. "all model calls" .-> L[("llama-server (GPU)<br/>Qwen3-4B-Instruct-2507 Q8_0<br/>+ LoRA adapter v3")]
 ```
 
 | Layer | What it does | Guards against |
