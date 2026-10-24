@@ -183,7 +183,7 @@ powershell -ExecutionPolicy Bypass -File serve\stop_tutor.ps1      # frees the G
 | `python tools/final_review_eval.py` | Before and after measurements of the testing fixes | GPU, model server |
 | `python docs/final_report/build.py` | Rebuild the final report PDF | `requirements-report.txt`, Microsoft Edge |
 
-Every run records its commit, model hashes, server arguments and decoding settings under [`reports/`](reports/), and every number in the report names the result file it comes from. Scientific choices are logged with alternatives and evidence in [`docs/DECISIONS.md`](docs/DECISIONS.md).
+Every run records its commit, model hashes, server arguments and decoding settings under [`reports/`](reports/), and every number in the report names the result file it comes from. Commit ids in older run manifests refer to the pre-publication history; [`reports/COMMIT_MAP.md`](reports/COMMIT_MAP.md) maps each to its published id. Scientific choices are logged with alternatives and evidence in [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
 ## Repository layout
 
