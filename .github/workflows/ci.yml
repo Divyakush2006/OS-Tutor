@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   cpu-suites:
-    name: CPU test suites (355 checks)
+    name: CPU test suites (351 checks on a clean clone)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -36,10 +36,10 @@ jobs:
           path: ~/.cache/huggingface
           key: hf-all-MiniLM-L6-v2
 
-      - name: Data pipeline, simulators, release gates (124 checks)
+      - name: Data pipeline, simulators, release gates (122 checks)
         run: python tools/test_pipeline.py
 
-      - name: Retrieval (69 checks)
+      - name: Retrieval (67 checks)
         run: python tools/test_rag.py
 
       - name: Measurement code (58 checks)

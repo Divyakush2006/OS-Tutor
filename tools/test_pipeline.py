@@ -246,19 +246,23 @@ check("MathDial test split is not ingested",
       not any("mathdial_test" in r["lineage"].get("file", "") for r in ingest_tutoring()[0]))
 check("NL2SH-ALFA verified test set is not ingested",
       not any(r["subcategory"] == "nl2sh_verified" for r in ingest_shell()))
-_ev = [_json.loads(l) for l in open("data/eval/os_solve_ood.jsonl", encoding="utf-8")][:2]
-_leaks = []
-for _i, _e in enumerate(_ev):
-    _r = _copy.deepcopy(_proc[_i]); _r["id"] = f"LEAK{_i}"
-    _r["messages"][0]["content"] = "Completely reworded statement of the problem."
-    _r["lineage"]["fingerprint"] = fingerprint(_e["verify"]); _leaks.append(_r)
-_kept = decontaminate(_proc[:200] + _leaks, [], {},
-                      eval_fingerprints={fingerprint(e["verify"]) for e in _ev})
-check("reworded leak caught by parameter fingerprint",
-      not any(r["id"].startswith("LEAK") for r in _kept),
-      "n-gram matching cannot see a leak whose wording changed")
-check("no false positives on clean generated rows", len(_kept) == 200,
-      f"kept {len(_kept)}/200")
+if _proc:
+    _ev = [_json.loads(l) for l in open("data/eval/os_solve_ood.jsonl", encoding="utf-8")][:2]
+    _leaks = []
+    for _i, _e in enumerate(_ev):
+        _r = _copy.deepcopy(_proc[_i]); _r["id"] = f"LEAK{_i}"
+        _r["messages"][0]["content"] = "Completely reworded statement of the problem."
+        _r["lineage"]["fingerprint"] = fingerprint(_e["verify"]); _leaks.append(_r)
+    _kept = decontaminate(_proc[:200] + _leaks, [], {},
+                          eval_fingerprints={fingerprint(e["verify"]) for e in _ev})
+    check("reworded leak caught by parameter fingerprint",
+          not any(r["id"].startswith("LEAK") for r in _kept),
+          "n-gram matching cannot see a leak whose wording changed")
+    check("no false positives on clean generated rows", len(_kept) == 200,
+          f"kept {len(_kept)}/200")
+else:
+    print("  SKIP  parameter-fingerprint leak check: the procedural pool in data/raw is not "
+          "published (tools/generate_procedural.py rebuilds it)")
 
 # ============================================================ harness
 print("\n-- eval harness: parsers --")

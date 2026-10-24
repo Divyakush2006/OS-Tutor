@@ -175,7 +175,7 @@ h = rh.retrieve("The system spends nearly all its time swapping pages and the CP
 check("a paraphrase finds thrashing", h and h[0]["chunk"].doc_id == "n08", str(h[:1]))
 check("an off-topic question abstains", rh.retrieve("What is the capital of Australia?") == [])
 check("gate='none' never abstains", len(rh.retrieve("What is the capital of Australia?", gate="none")) > 0)
-if (CORPUS / "gate.json").is_file():
+if (CORPUS / "gate.json").is_file() and (CORPUS / "docs" / "course").is_dir():
     g = json.loads((CORPUS / "gate.json").read_text(encoding="utf-8"))
     rc = Retriever(CORPUS, dense=False)
     check("the course corpus loads with its calibrated gate",
@@ -183,6 +183,8 @@ if (CORPUS / "gate.json").is_file():
     kinds = {d["kind"] for d in rc.manifest["documents"]}
     check("every course-corpus document says whether it is course or online material",
           kinds == {"course", "online"}, str(kinds))
+else:
+    print("  SKIP  course-corpus checks: the course documents are not redistributed with the repository")
 
 print("prompt and citations")
 SYSTEM = "You are an Operating Systems tutor."
