@@ -38,9 +38,53 @@ CRLF to LF on disk in `b7521be`; it stays LF (Python is indifferent to line endi
 
 ---
 
+## D-011 — Tutor replies are checked before they are shown; four more faults fixed
+
+**Date:** 2026-10-24 · **Requested by:** owner (final review: "fix the shortcomings") ·
+**Decided by:** engineer (root causes, fixes, measurements)
+
+**Decision.**
+1. Tutor mode runs the solver privately on the student's problem. The model is told only
+   whether the attempt is right (never the value), and its reply is checked before it is
+   shown: one that states the simulator's answer, asserts a result the student did not
+   write, or works the problem out (4+ trace steps or a 5-row table) is redrafted once,
+   then replaced by a fixed hint for the problem kind (`tutor_reply`, `tutor_leak`).
+2. Disk extraction reads a 0-based cylinder range: a size equal to the top of "0-299" is
+   299 + 1 (`_disk_range_top` in `ostutor/solver.py`).
+3. The gateway's fact checker scopes negation to the claim (30 characters before it, or a
+   hedge such as "possible" just after), skips question sentences and strips emphasis
+   (`fact_flags(..., serving=True)`). The default reading is unchanged, so the v3.0.0
+   build is unaffected: old and new code agree on all 19,911 assistant texts compared.
+4. Shell answers pass a command checker (`ostutor/shell_check.py`): a `sort` of
+   human-readable sizes gets `-h`, an unquoted `find -name` pattern is quoted, and
+   recursive deletes of / or ~ and `chmod 777` carry a caution.
+5. A question the classifier calls off-topic is declined without a model call, in auto
+   mode and, when retrieval finds nothing, in a hand-picked Explain or Analyze mode.
+
+**Alternatives.** Giving the tutor the computed answer with an instruction not to reveal
+it (rejected: a 4B model told a number tends to say it). Prompt rules for shell pitfalls
+(rejected for the same reason as in D-010).
+
+**Evidence.** `reports/final_review/` (`tools/final_review_eval.py`, live model): disk
+items of the OOD holdout 74/80 -> 80/80, extraction 71/80 -> 80/80, none lost; tutor and
+off-topic results in `summary.md`. Fact-checker probes re-scored offline from
+`reports/g0/20261012-1429/factcheck_v3.json`: precision 1/3 -> 2/2, recall 1/2 -> 2/2, 0
+flags on the 70 broad answers. Tutor, 30 attempts (24 wrong): replies stating the answer, asserting
+another result or working the problem out 15 -> 0; correct attempts confirmed 0/6 -> 6/6 (the
+gateway confirms a verified correct attempt itself, since the model, told the student was right,
+never said so); private verdict right 28/30, "unknown" for 2. Off-topic: 17/20 everyday questions
+declined, 1 of 268 OS questions. Tests: gateway 54 -> 76 checks, G0 55 -> 58.
+
+**Note.** A rebuild of the dataset to confirm (3) produced different hashes, because the
+evaluation sets grew after v3.0.0 (4,836 -> 5,036 items) and the config changed; that is
+independent of these changes. The released files were restored from `dist/ostutor-sft/`
+(SHA-256 matches the dataset card) and the build reports from git.
+
+---
+
 ## D-010 — Gateway owns its tags and footers; missing inputs are asked for; worked problems are isolated
 
-**Date:** 2026-10-24 · **Requested by:** owner (audit prompt in `prompt.txt`, from live
+**Date:** 2026-10-24 · **Requested by:** owner (an audit of the system from live
 testing) · **Decided by:** engineer (root causes and the form of each fix)
 
 **Decision.**

@@ -57,7 +57,8 @@ sys.path.insert(0, str(ROOT))
 from ostutor.config import SYSTEM_PROMPTS  # noqa: E402  (single source of truth)
 from ostutor.solver import (EXTRACT_PROMPT, SOLVER_KINDS, normalise,  # noqa: E402
                             parse_json, solve)
-from ostutor.theory_filter import CORRECTIONS, fact_flags  # noqa: E402
+from ostutor.theory_filter import CORRECTIONS, _reveals, fact_flags  # noqa: E402
+from ostutor.shell_check import check_shell  # noqa: E402
 from ostutor.rag.retrieve import Retriever, augment, contextual_query, sources_footer  # noqa: E402
 
 UPSTREAM = os.environ.get("TUTOR_UPSTREAM", "http://127.0.0.1:8081")
@@ -91,11 +92,15 @@ MODELS = {
     "ostutor-explain": dict(prompt=SYSTEM_PROMPTS[("explain", "os")], lora=1.0,
                             factcheck=True, rag=True,
                             desc="Concept explanations - fact-checked against known misconceptions"),
-    "ostutor-tutor": dict(prompt=SYSTEM_PROMPTS[("tutor", "os")], lora=1.0,
+    # `guard`: the reply is checked before it is shown (tutor_reply below). The simulator
+    # runs privately to tell whether the student is right; its answer never reaches the
+    # model, and a reply that works the problem out or states a result is redrafted.
+    "ostutor-tutor": dict(prompt=SYSTEM_PROMPTS[("tutor", "os")], lora=1.0, guard=True,
                           desc="Socratic tutoring - diagnoses your attempt, never hands over the answer"),
     # 707 shell rows were trained and, until routing existed, unreachable: nothing in
-    # the picker used the ("shell", "linux") prompt.
-    "ostutor-shell": dict(prompt=SYSTEM_PROMPTS[("shell", "linux")], lora=1.0,
+    # the picker used the ("shell", "linux") prompt. `shellcheck`: commands are checked
+    # against known pitfalls (ostutor/shell_check.py) before they are shown.
+    "ostutor-shell": dict(prompt=SYSTEM_PROMPTS[("shell", "linux")], lora=1.0, shellcheck=True,
                           desc="Linux commands - the right command, with each flag explained"),
 }
 DEFAULT_MODEL = "ostutor"
@@ -264,7 +269,7 @@ class TagFilter:
 def _reply(text, asked, chose, how, extra=""):
     """An OpenAI-shaped reply. `chose` and `how` are surfaced so the UI (and the log) can
     show which mode answered and whether a verification layer acted. `extra` is appended
-    to the visible answer, and carries the out-of-scope note."""
+    to the visible answer."""
     note = f"\n\n<!-- ostutor: mode={chose} path={how} -->"
     print(json.dumps(dict(t=time.strftime("%H:%M:%S"), asked=asked, mode=chose,
                           path=how, why=_WHY.get("last", ""))), flush=True)
@@ -283,7 +288,7 @@ _WHY = {}
 def _classify(question):
     """What kind of question is this? Reuses the extraction call, which already returns
     the kind, so routing costs nothing extra. Cached because the handler needs the
-    answer twice (to route, and to decide whether to add the scope note)."""
+    answer twice (to route, and to decide whether a hand-picked mode got an off-topic question)."""
     if question in _classify_cache:
         return _classify_cache[question]
     try:
@@ -322,7 +327,7 @@ MODE_FOR_KIND = {
     "analysis": "ostutor-analyze",
     "concept": "ostutor-explain",
     "shell": "ostutor-shell",
-    "offtopic": "ostutor-explain",     # answered, but with the scope note below
+    "offtopic": "ostutor-explain",     # declined in chat() with OFFTOPIC_REPLY
 }
 
 
@@ -359,11 +364,6 @@ def route(question):
     return "ostutor-explain", "no other signal; treated as a concept question"
 
 
-SCOPE_NOTE = ("\n\n---\n> _I am an Operating Systems tutor, so that is outside what I am "
-              "built for. Ask me about scheduling, memory, deadlock, file systems, "
-              "concurrency or the Linux command line and I can be genuinely useful._")
-
-
 ASK_MISSING = ("I can't solve this one yet: the question doesn't give **{missing}**, and "
                "the answer depends on it. I won't assume a value, because a guessed input "
                "gives a confident wrong answer.\n\nReply with {missing} and I'll compute "
@@ -374,11 +374,180 @@ UNVERIFIED_NOTE = ("\n\n---\n> _Not computed by a simulator: the numbers above c
                    "every value written out._")
 
 
+OFFTOPIC_REPLY = ("That question is outside what I am built for: I am an Operating Systems "
+                  "tutor. Ask me about scheduling, memory management, deadlock, file systems, "
+                  "concurrency or the Linux command line and I can help properly.")
+
+
+def _respond(text, asked, chose, how, extra="", stream=False):
+    """A finished answer, as JSON or - when the client asked to stream - as one SSE
+    stream, so every client sees the shape it requested."""
+    if not stream:
+        return _reply(text, asked, chose, how, extra)
+    print(json.dumps(dict(t=time.strftime("%H:%M:%S"), asked=asked, mode=chose, path=how)),
+          flush=True)
+    full = text + extra + f"\n\n<!-- ostutor: mode={chose} path={how} -->"
+
+    def gen():
+        for i in range(0, len(full), 400):
+            yield "data: " + json.dumps(dict(
+                id=f"ostutor-{how}", object="chat.completion.chunk", created=int(time.time()),
+                model=asked, choices=[dict(index=0, delta=dict(content=full[i:i + 400]),
+                                           finish_reason=None)])) + "\n\n"
+        yield "data: [DONE]\n\n"
+    return StreamingResponse(gen(), media_type="text/event-stream")
+
+
+# --- Verified tutoring ---------------------------------------------------------------
+# Tutor mode is kept away from the solver's answer so it cannot leak it, and so for a
+# while nothing checked what it said: asked about a FIFO attempt of 13 faults, it walked
+# the whole trace itself, ignored the three-frame limit, and stated "total page faults =
+# 7" (the simulator gives 10). Now the simulator runs privately, the model is told only
+# whether the student is right, and the reply is checked before it is shown.
+NUMERIC_KINDS = ("scheduling", "paging", "disk", "translate")
+_NUM = re.compile(r"(?<![\w.])-?\d+(?:\.\d+)?(?![\w.])")
+# The student's own result: "I got 13", "my answer is 4.5", "= 236".
+# A few words may sit between the verb and the number: "I got an average waiting time of
+# 7", "I got a total head movement of 643 cylinders", "I got physical address 4306".
+_CLAIM = re.compile(r"\b(?:got|get|getting|obtained|answer(?:\s+(?:is|was))?|calculated|computed|"
+                    r"came\s+to|comes\s+to|think\s+it(?:'s|\s+is)|believe\s+it(?:'s|\s+is))\s+"
+                    r"(?:[A-Za-z][\w-]*\s+){0,6}?(-?\d+(?:\.\d+)?)|=\s*(-?\d+(?:\.\d+)?)", re.I)
+# The reply asserting a result of its own: "total page faults = 7", "the answer is 9".
+_RESULT = re.compile(r"(?:\btotal\b|\banswer\b|\bresult\b|\baltogether\b|\bin all\b|"
+                     r"\bshould (?:be|get)\b|\bcorrect (?:count|value|number)\b)"
+                     r"[^\n.?]{0,30}?(?:=|\bis\b|\bare\b|\bof\b|:|\bbe\b|\bget\b)\s*\**\s*"
+                     r"(-?\d+(?:\.\d+)?)", re.I)
+# One step of a worked trace: a list item with a number and a step word, or a table row.
+_STEP = re.compile(r"^\s*(?:[-*]|\d+[.)])\s+.*\d.*\b(?:fault|hit|evict|replac\w*|runs?|"
+                   r"serve[ds]?|seek|moves?|allocat\w*|need|work|queue|t\s*=)", re.I)
+TRACE_STEPS = 4
+TUTOR_GUIDE = {
+    "correct": ("The student's final answer has been checked and is correct. Tell them so, "
+                "and ask them to explain why one step of their method works."),
+    "incorrect": ("The student's final answer has been checked and is incorrect. Do not tell "
+                  "them the correct value. Name the idea behind their first mistake and ask "
+                  "one question that leads them to it."),
+    "unknown": ("Diagnose the misconception behind the attempt and ask one question that "
+                "leads the student to it."),
+}
+TUTOR_RULE = ("\n\nBefore you reply: {guide} Do not solve the problem for them: write no "
+              "step-by-step trace, schedule or table, and state no final answer or total. "
+              "Keep it short and end with one question.")
+TUTOR_RETRY = ("\n\nYour previous draft worked the problem out for the student. Rewrite it in "
+               "at most four sentences, using no numbers except those the student wrote, and "
+               "end with one question.")
+# A verified correct attempt is confirmed by the gateway itself: the model, told the
+# student is right, still opened with "let's verify it" in every such case measured.
+TUTOR_CONFIRM = ("Your answer is correct: the simulator gets the same result. To make sure the "
+                 "method is solid, explain one step in your own words: {step}")
+CONFIRM_STEP = {
+    "paging": "at the first reference where a page had to leave, which page left, and why did "
+              "the policy choose it?",
+    "scheduling": "at the first moment two processes were ready, why did the one you chose get "
+                  "the CPU?",
+    "disk": "why did the head serve your second request before the others?",
+    "translate": "how did you split the logical address into a page number and an offset?",
+    None: "which step of your working would you check first if the numbers had changed, and why?",
+}
+TUTOR_FALLBACK = {
+    "paging": ("Let's check one step rather than the whole count. Before you mark a reference "
+               "as a fault, ask: is that page already in one of the frames at that moment? Go "
+               "back to the first reference that repeats a page. Was it a fault in your count, "
+               "and should it be?"),
+    "scheduling": ("Let's check the schedule before the arithmetic. Write down the ready queue "
+                   "each time a process arrives or a time slice ends. At which point does your "
+                   "order first differ from the rule this algorithm uses?"),
+    "disk": ("Before adding up distances, write down the order in which the head visits the "
+             "requests. Does that order follow the algorithm's rule at every step, including "
+             "what happens at the end of the disk?"),
+    "translate": ("Split the logical address into a page number and an offset first. Which "
+                  "page does your address fall in, and which frame does the table map it to?"),
+    None: ("Let's go through your working one step at a time and check each against the rule "
+           "for this method. Which step is the first one you are least sure about?"),
+}
+
+
+def _nums(text):
+    return {float(x) for x in _NUM.findall(text or "")}
+
+
+def _claimed(question):
+    return {float(x or y) for x, y in _CLAIM.findall(question or "")}
+
+
+def tutor_truth(question):
+    """(kind, right answers, verdict) from a private simulator run. The answer is used
+    only to judge the student and to check the reply; it is never sent to the model."""
+    try:
+        text, meta = solve(question, lambda s, u: _upstream(s, u, scale=0.0))
+    except Exception as e:                       # never let this break the chat path
+        log.warning("tutor check unavailable: %s", e)
+        return None, set(), "unknown"
+    if not text:
+        return None, set(), "unknown"
+    kind = meta.get("kind")
+    line = next((l for l in text.splitlines() if l.startswith("**Answer:")), "")
+    right = _nums(line) if kind in NUMERIC_KINDS else set()
+    claimed = _claimed(question)
+    if not right or not claimed:
+        return kind, right, "unknown"
+    return kind, right, "correct" if claimed & right else "incorrect"
+
+
+def tutor_leak(reply, right, claimed):
+    """Why the reply must not be shown, or "" when it may be. It leaks if it states the
+    simulator's answer (when the student does not have it), asserts any result the
+    student did not write, or works the problem out step by step."""
+    for r in right - claimed:
+        if _reveals(reply, int(r) if r == int(r) else r):
+            return "states the answer"
+    for x in _RESULT.findall(reply or ""):
+        if float(x) not in claimed:
+            return f"asserts a result ({x})"
+    steps = sum(bool(_STEP.search(l)) for l in (reply or "").splitlines())
+    rows = sum(l.lstrip().startswith("|") for l in (reply or "").splitlines())
+    if steps >= TRACE_STEPS or rows >= 5:
+        return "works the problem out"
+    return ""
+
+
+async def tutor_reply(raw, question):
+    """(text, path) for tutor mode: checked, redrafted once, or a safe hint."""
+    kind, right, verdict = tutor_truth(question)
+    claimed = _claimed(question)
+    if verdict == "correct":
+        return TUTOR_CONFIRM.format(step=CONFIRM_STEP.get(kind, CONFIRM_STEP[None])), "tutor-confirmed"
+    system = SYSTEM_PROMPTS[("tutor", "os")] + TUTOR_RULE.format(guide=TUTOR_GUIDE[verdict])
+    for attempt in range(2):
+        body = prepare(raw, prompt_override=system)
+        body.update(stream=False, lora=[dict(id=0, scale=1.0)])
+        try:
+            r = await client.post("/v1/chat/completions", json=body)
+            text = scrub(r.json()["choices"][0]["message"]["content"] or "")
+        except (httpx.HTTPError, KeyError, IndexError, TypeError, ValueError) as e:
+            log.warning("tutor draft failed: %s", e)
+            break
+        why = tutor_leak(text, right, claimed)
+        if not why:
+            return text, "tutor-checked" if attempt == 0 else "tutor-redrafted"
+        log.info("tutor draft rejected: %s", why)
+        system += TUTOR_RETRY
+    return TUTOR_FALLBACK.get(kind, TUTOR_FALLBACK[None]), "tutor-safe-hint"
+
+
+def shell_checked(text):
+    """The answer with mechanical command fixes applied and a note explaining each."""
+    fixed, notes = check_shell(text)
+    if not notes:
+        return text, False
+    return fixed + "\n\n---\n> **Command check:**\n" + "\n".join(f"> - {n}" for n in notes), True
+
+
 def stream_fact_note(text):
     """The note appended after a STREAMED answer that states a known misconception. A
     streamed answer has already been shown, so it cannot be redrafted as fact_checked()
     does; the correct fact is stated under it instead."""
-    names = sorted({n for n, _ in fact_flags(text or "")})
+    names = sorted({n for n, _ in fact_flags(text or "", serving=True)})
     facts = [CORRECTIONS[n] for n in names if n in CORRECTIONS]
     if not facts:
         return ""
@@ -443,7 +612,7 @@ def fact_checked(answer, system, question):
     does not teach the correction - the trained model still says "Yes, LRU suffers from
     Belady's anomaly", because one row cannot outweigh a confident pretrained prior. So
     the check moves to serving, where the fact can be stated and the answer redrafted."""
-    flags = fact_flags(answer or "")
+    flags = fact_flags(answer or "", serving=True)
     if not flags:
         return answer, []
     names = sorted({n for n, _ in flags})
@@ -468,7 +637,7 @@ def fact_checked(answer, system, question):
         # correction is attached to it instead.
         log.warning("fact-check retry failed: %s", e)
         return corrected(answer), names
-    if fact_flags(second):
+    if fact_flags(second, serving=True):
         return corrected(second), names
     return second + ("\n\n---\n> _Checked against known OS misconceptions; one "
                      "statement was corrected before answering._"), names
@@ -485,15 +654,17 @@ async def chat(req: Request):
     chose = asked
 
     # AUTO mode: read the question, pick the mode, then behave exactly as that mode.
-    why, scope = "", ""
+    why = ""
     if spec.get("route") and question:
         chose, why = route(question)
         _WHY["last"] = why
-        # Read it from the routing decision itself rather than peeking at the classifier
-        # cache: one source of truth, and it survives the cache being cleared.
-        if why == OFFTOPIC_REASON:
-            scope = SCOPE_NOTE
         spec = MODELS[chose]
+        # Not an OS question: say so, rather than answer it with OS analogies attached.
+        # Read from the routing decision itself rather than the classifier cache: one
+        # source of truth, and it survives the cache being cleared.
+        if why == OFFTOPIC_REASON:
+            return _respond(OFFTOPIC_REPLY, asked, chose, "out-of-scope",
+                            stream=bool(raw.get("stream")))
     # A worked problem is answered on its own: earlier problems in the same chat (SRTF,
     # then RR, then FIFO) are not shown to the model, so their rules cannot bleed in.
     client_system = any(m.get("role") == "system" and str(m.get("content", "")).strip()
@@ -504,15 +675,38 @@ async def chat(req: Request):
     body["lora"] = [dict(id=0, scale=spec["lora"])]
     log_request(raw, body)
 
+    # Tutor mode: the reply is checked against a private simulator run before it is shown.
+    if spec.get("guard") and question and not client_system:
+        text, how = await tutor_reply(raw, question)
+        return _respond(text, asked, chose, how, stream=bool(body.get("stream")))
+
+    # Shell mode: commands are checked against known pitfalls, and fixed, before shown.
+    if spec.get("shellcheck") and question and not client_system:
+        r = await client.post("/v1/chat/completions", json=dict(body, stream=False))
+        try:
+            text = scrub(r.json()["choices"][0]["message"]["content"] or "")
+        except (KeyError, IndexError, TypeError, ValueError):
+            text = None
+        if text is not None:
+            text, fixed = shell_checked(text)
+            return _respond(text, asked, chose, "command-fixed" if fixed else "command-checked",
+                            stream=bool(body.get("stream")))
+
     # LAYER 1 - the numbers come from a simulator wherever one applies.
     if spec.get("verify") and question and not client_system:
         verified = verified_answer(question)
         if verified is not None:
-            return _reply(verified[0], asked, chose, verified[1], scope)
+            return _reply(verified[0], asked, chose, verified[1])
 
     # LAYER 2 - prose is grounded in the course notes (when retrieval is on).
     system, footer = (spec["prompt"], "") if client_system else \
         grounded(spec, question, contextual_query(raw.get("messages", []), question))
+    # A mode picked by hand is not routed, so an off-topic question reaches it unread.
+    # When retrieval finds nothing relevant (or is off), ask the classifier, and decline
+    # a question that is not about operating systems at all.
+    if (spec.get("rag") and question and not client_system and asked == chose
+            and system == spec["prompt"] and _classify(question) == "offtopic"):
+        return _respond(OFFTOPIC_REPLY, asked, chose, "out-of-scope", stream=bool(body.get("stream")))
     # Solve mode without a simulator: the model's own numbers, marked as such.
     if chose == "ostutor-solve" and not client_system:
         footer += UNVERIFIED_NOTE
@@ -532,7 +726,7 @@ async def chat(req: Request):
             checked, flagged = fact_checked(scrub(text), system, question)
             if checked:
                 return _reply(checked + footer, asked, chose,
-                              "fact-corrected" if flagged else "checked", scope)
+                              "fact-corrected" if flagged else "checked")
 
     if not body.get("stream"):
         r = await client.post("/v1/chat/completions", json=body)

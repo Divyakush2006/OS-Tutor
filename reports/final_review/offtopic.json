@@ -1,0 +1,48 @@
+{
+ "in_scope_retrieval": {
+  "n": 124,
+  "declined": 1,
+  "declined_questions": [
+   "Which company's research lab first invented the desktop GUI?"
+  ]
+ },
+ "short_answer": {
+  "n": 144,
+  "declined": 0,
+  "declined_questions": []
+ },
+ "not_covered_by_corpora": {
+  "n": 40,
+  "declined": 5,
+  "declined_questions": [
+   "How do I configure a VLAN on a Cisco switch?",
+   "What is the capital of Australia?",
+   "What causes inflation in an economy?",
+   "How do I train a random forest classifier in scikit-learn?",
+   "How do you write a regular expression for an email address?"
+  ]
+ },
+ "everyday": {
+  "n": 20,
+  "declined": 17,
+  "declined_questions": [
+   "What is the best way to cook biryani?",
+   "Who won the 2011 Cricket World Cup?",
+   "What is the capital of Australia?",
+   "How do I improve my running stamina?",
+   "Write a poem about the monsoon.",
+   "What is the plot of Hamlet?",
+   "How many calories are in a banana?",
+   "Recommend a good fantasy novel.",
+   "What causes inflation?",
+   "Translate 'good morning' into French.",
+   "How do I tie a tie?",
+   "Who painted the Mona Lisa?",
+   "How do I make cold brew coffee?",
+   "What is the tallest mountain in Africa?",
+   "How do I learn to play guitar?",
+   "What is the boiling point of water at high altitude?",
+   "Plan a 3-day trip to Goa."
+  ]
+ }
+}

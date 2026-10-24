@@ -139,6 +139,19 @@ def _asks_request(question):
                           r"|\brequests?\s*(?:for|of)?\s*[\(\[]", question, re.I))
 
 
+_RANGE = re.compile(r"\b0\s*(?:-|–|—|to|through|\.\.)\s*(\d+)\b", re.I)
+_CYL = re.compile(r"cylinder|track|disk|head|sector", re.I)
+
+
+def _disk_range_top(question):
+    """N when the question numbers the cylinders 0..N ("cylinders 0-299", "tracks 0 to
+    199"); None when it states no such range."""
+    for m in _RANGE.finditer(question or ""):
+        if _CYL.search(question[max(0, m.start() - 60): m.end() + 40]):
+            return int(m.group(1))
+    return None
+
+
 def _key(s):
     return re.sub(r"[^A-Z0-9]", "", str(s).upper())
 
@@ -256,6 +269,13 @@ def normalise(d, question):
         out["reqs"] = [int(x) for x in _flatten(d.get("reqs") or [])]
         out["head"] = int(d.get("head", -1))
         out["size"] = int(d.get("size") or 200)
+        # "cylinders 0-299" is a disk of 300 cylinders, but extraction reads the range's
+        # upper end as the size (9 of 9 misreads on the OOD holdout, 6 wrong answers on
+        # SCAN/C-SCAN). Grounding cannot catch it - 299 is in the question - so the range
+        # is read here: a size equal to the top of a 0-based range is the last cylinder.
+        top = _disk_range_top(question)
+        if top is not None and out["size"] == top:
+            out["size"] = top + 1
         out["direction"] = "down" if _key(d.get("direction")) == "DOWN" else "up"
         # A previously-served request fixes the direction, and the renderer explains it
         # ("previous request 125 < head 143, so the head is moving UP"). Without it the

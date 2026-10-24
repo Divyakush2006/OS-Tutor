@@ -1,0 +1,8 @@
+{
+ "corpus": "data/rag/open",
+ "queries": 308,
+ "passes": 3,
+ "p50_ms": 17.33,
+ "p95_ms": 21.18,
+ "measured": "2026-10-24, CPU, hybrid retrieval with gate"
+}

@@ -222,14 +222,44 @@ def _units(text):
     return sents + [f"{a} {b}" for a, b in zip(lines, lines[1:])]
 
 
-def fact_flags(text):
+_QUESTION = re.compile(r"[^.?!\n]*\?")
+NEG_WINDOW = 30   # characters before a claim that can negate it ("does not suffer from")
+# A hedge just AFTER the claim also undoes it: "an unsafe state means deadlock is
+# POSSIBLE". Negation after the claim does not: in "suffers from internal fragmentation
+# but not external" the "not" belongs to the next clause.
+_AFTER_HEDGE = re.compile(r"\b(?:possible|possibly|possibility|may|might|could|risk)\b", re.I)
+
+
+def _negated(neg, unit, m):
+    """Serving scope: a negation counts only inside the claim or just before it.
+
+    Sentence-wide negation let the probes through both ways. "Segmentation suffers from
+    internal fragmentation but not external" passed because of the "not" in the other
+    clause (a miss), and question headings ("Does a cycle always indicate deadlock?")
+    were read as assertions (false alarms)."""
+    return bool(neg.search(unit[max(0, m.start() - NEG_WINDOW): m.end()])
+                or _AFTER_HEDGE.search(unit[m.end(): m.end() + 25]))
+
+
+def fact_flags(text, serving=False):
+    """Known misconceptions asserted in `text`, as (rule, sentence) pairs.
+
+    `serving=True` is the gateway's reading: markdown emphasis removed, questions
+    skipped, and negation scoped to the claim. The default is the reading the v3.0.0
+    dataset was built with, kept so the build stays byte-identical."""
+    if serving:
+        text = re.sub(r"\*\*|__|`", "", text)
     flags, seen = [], set()
     for unit in _units(text):
+        if serving:
+            unit = _QUESTION.sub("", unit)
         for rule in MISCONCEPTIONS:
             name, pat = rule[0], rule[1]
             unless = rule[2] if len(rule) > 2 else None
             neg = _HARD_NEG if name in _HEDGE_IMMUNE else _NEG
-            if pat.search(unit) and not neg.search(unit) \
+            m = pat.search(unit)
+            negated = m and (_negated(neg, unit, m) if serving else neg.search(unit))
+            if m and not negated \
                     and not (unless and unless.search(unit)):
                 key = (name, unit[:80])
                 if key not in seen:

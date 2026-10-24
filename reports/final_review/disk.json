@@ -1,0 +1,731 @@
+{
+ "n": 80,
+ "before_correct": 74,
+ "after_correct": 80,
+ "before_extraction_exact": 71,
+ "after_extraction_exact": 80,
+ "right_to_wrong": 0,
+ "wrong_to_right": 6,
+ "items": [
+  {
+   "id": "7713985ad2af4353d00b",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "c4980283843e70ea38c9",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "785b4602c211b4682823",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "827330a19196c0414a40",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "8b8ade2bc88c56d04331",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "d15194c74f9203b32c3c",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "a5ab2943053376e94c9f",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "01807ce4003f9e8601da",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": false,
+   "before_extraction_exact": false
+  },
+  {
+   "id": "32d48922850d0dc0bfcc",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "a57ec232f7096b65efbc",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "e9152edb12be93edacbe",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "7a5987198597f947d7ed",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "5c5d38718d64a2d61438",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "ae25b5a9bd34c4eab0b1",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "9e688ae6b618476242a8",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "1bfbbfb834b5d490538b",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "681b43ee10914310edb9",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "7313afe12c1ae6765482",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "7c60f00a2e5c1d49d9a2",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "47f388a1c5c3bba4ff36",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "9c3e79434e37368b963e",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "d3b93dec2f5a71a3f2e1",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "795e5c73577335b488c2",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "444b8f61c028d2f0e355",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "94f5af17a09eabce182e",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "f900b84ce9ede5d62e01",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": false,
+   "before_extraction_exact": false
+  },
+  {
+   "id": "375473e241eeac962575",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "d29e4a6951fdf92a419d",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "4c567287fd5aed9d76d0",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "d2b415f4c6d7161d91b3",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "a8df4ca7113bf595dddd",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "80b8ec25243d9f4e1678",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "f18f4ef84dec54356fb9",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "263f918f77dbdd204d04",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "7a3c134371f6dc4c0822",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "61c46471c7e96c7c4dda",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "63e9560551ba9c5783f2",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "b570fd81564e6cccbda5",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "4f79246859650f505881",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "a3a91c21a3dd5c2b9f3c",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "dd109ecb27dc64aabd33",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "0f56f70432490b8307cb",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "a9113ea4d8abf2ee538f",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "56f6027da143067f2165",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "a5ecd4340e4243cb3b97",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": false,
+   "before_extraction_exact": false
+  },
+  {
+   "id": "3755db14fa6653c8793b",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "0d31189f83e0cae7449b",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "62ed1fc3fd7049c78fa2",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "72e65696070388847541",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "c74b7c804e1e769c7a29",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": false,
+   "before_extraction_exact": false
+  },
+  {
+   "id": "766af4099f419a517321",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": false,
+   "before_extraction_exact": false
+  },
+  {
+   "id": "6891970c9daafc292382",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "10f217c32b1afbb23eca",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "bd1033dbe82263e35a68",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "7d73ce962d1e5586cc2c",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "35cb66ce61b592bd17e0",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "1fa54f194277e1cd25c6",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "2adcc2a152d8e0a1e781",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "4e9268f26a9e509d0651",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "b4bf6da56f1a099c304d",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": false
+  },
+  {
+   "id": "8ad3bddeeee2ccbb4bf9",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "222edab77b22df25bd25",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "b39d2417ac73d6ac442e",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "6c928348246efc6306be",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "e12c3e1e52643c48b7fb",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "cda2403d8291f97264d6",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "71b138f42cff36d6ffce",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "942f88c5c5efbd2468f8",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "ae07e7ab560cbf3abf2c",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "7b680eeb2bf419cedc40",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "27f686e9656ff5d92fef",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "af455f1f3b6fb7ebd4a4",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "1fa0cb813a071d522160",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "6c681218d773d1a83308",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "671a027a1155cccee83d",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "f5412203fd1e7d6086f8",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": false
+  },
+  {
+   "id": "cd96d6f39be2400c26a7",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "371aac1fc188a0a37444",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": false
+  },
+  {
+   "id": "d6698f66327738494a5d",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": true,
+   "before_extraction_exact": true
+  },
+  {
+   "id": "02fd2a6df62d641b7b07",
+   "correct": true,
+   "extraction_exact": true,
+   "wrong_fields": [],
+   "delegated": true,
+   "before_correct": false,
+   "before_extraction_exact": false
+  }
+ ]
+}

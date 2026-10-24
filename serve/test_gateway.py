@@ -39,6 +39,17 @@ async def upstream(req: Request):
                  "> [S1] Fake (`wp-belady-anomaly`)", "", "<!-- ostutor: mode=ostutor-solve path=verified -->"]
     elif user == "lru":     # a known misconception
         lines = ["Yes, LRU suffers from Belady's anomaly."]
+    elif user.startswith("leaky"):   # a tutor reply that works the problem out
+        lines = ["You counted hits as faults. Let's go through it:"] + \
+                [f"- {p}: not in frames -> fault" for p in (7, 0, 1, 2, 3)] + \
+                ["So total page faults = 7 (not 13). What do you get?"]
+    elif user.startswith("tells10"):  # states the simulator's answer outright
+        lines = ["Not quite: the answer is **10** page faults. Can you see why?"]
+    elif user.startswith("socratic"):
+        lines = ["You counted every reference as a fault. When page 0 comes back, is it "
+                 "already in one of the three frames?"]
+    elif user == "sizes":   # a command that sorts human-readable sizes as text
+        lines = ['find /var/log -name "*.log" -size +10M -exec ls -lh {} \\; | sort -k 5 -r']
     elif user == "legit":   # a real trace: repetitive shape, distinct lines
         lines = [f"- t={t}: A runs, {20 - t} left; queue [B, A]" for t in range(20)] + \
                 ["| # | Ref | Result |", "|---|---|---|"] + [f"| {i} | 3 | HIT |" for i in range(8)]
@@ -206,8 +217,9 @@ async def main():
               "Sources from your course notes" in r.json()["choices"][0]["message"]["content"])
         await c.post("/v1/chat/completions", json=dict(model="ostutor-tutor", messages=[
             dict(role="user", content="Can LRU suffer from Belady's anomaly? I think yes.")]))
+        sent = SEEN[-1]["messages"][0]["content"]
         check("tutor mode never retrieves",
-              SEEN[-1]["messages"][0]["content"] == gateway.SYSTEM_PROMPTS[("tutor", "os")])
+              sent.startswith(gateway.SYSTEM_PROMPTS[("tutor", "os")]) and "[S1]" not in sent, sent[:160])
         r = await c.post("/v1/chat/completions", json=dict(model="ostutor-explain", messages=[
             dict(role="user", content="What is the capital of Australia?")]))
         check("a question the notes do not cover gets no notes",
@@ -324,6 +336,106 @@ async def main():
               SEEN[-1]["messages"][-1]["content"] == "Why does it not?")
     finally:
         gateway.RAG = None
+
+    # --- final review: verified tutoring, shell check, off-topic, scoped fact check ---
+    tutor = gateway.SYSTEM_PROMPTS[("tutor", "os")]
+    r = await c.post("/v1/chat/completions", json=dict(model="ostutor-tutor", messages=[
+        dict(role="user", content="socratic: refs 7 0 1 2 0, 3 frames, FIFO, I got 13. Right?")]))
+    msg = r.json()["choices"][0]["message"]["content"]
+    check("a Socratic tutor reply that solves nothing is shown as written",
+          "already in one of the three frames" in msg and "path=tutor-checked" in msg, msg[-120:])
+    check("the tutor keeps its trained prompt, with the reply rules after it",
+          SEEN[-1]["messages"][0]["content"].startswith(tutor + "\n\nBefore you reply"))
+    before = len(SEEN)
+    r = await c.post("/v1/chat/completions", json=dict(model="ostutor-tutor", messages=[
+        dict(role="user", content="leaky: refs 7 0 1 2 0 3 0 4 2 3 0 3 2, 3 frames, FIFO, I got 13.")]))
+    msg = r.json()["choices"][0]["message"]["content"]
+    check("a tutor reply that works the problem out is redrafted, then replaced by a safe hint",
+          len(SEEN) - before == 2 and "total page faults = 7" not in msg
+          and "path=tutor-safe-hint" in msg, msg[-160:])
+    check("the redraft is asked for in the prompt", "previous draft worked the problem out"
+          in SEEN[-1]["messages"][0]["content"])
+    real_truth = gateway.tutor_truth
+    try:
+        gateway.tutor_truth = lambda q: ("paging", {10.0}, "incorrect")
+        r = await c.post("/v1/chat/completions", json=dict(model="ostutor-tutor", messages=[
+            dict(role="user", content="tells10: FIFO, 3 frames, I got 13 page faults.")]))
+        msg = r.json()["choices"][0]["message"]["content"]
+        sent = SEEN[-1]["messages"][0]["content"]
+        check("the model is told the attempt is wrong, never the right value",
+              "is incorrect" in sent and "10" not in sent, sent[-200:])
+        check("a reply stating the simulator's answer is never shown",
+              "**10**" not in msg and "frames at that moment" in msg, msg[-160:])
+        gateway.tutor_truth = lambda q: ("paging", {10.0}, "correct")
+        before = len(SEEN)
+        r = await c.post("/v1/chat/completions", json=dict(model="ostutor-tutor", messages=[
+            dict(role="user", content="socratic: FIFO, 3 frames, I got 10 page faults.")]))
+        msg = r.json()["choices"][0]["message"]["content"]
+        check("a verified correct attempt is confirmed, with a question about the method",
+              msg.startswith("Your answer is correct") and "?" in msg and len(SEEN) == before
+              and "path=tutor-confirmed" in msg, msg[:120])
+    finally:
+        gateway.tutor_truth = real_truth
+    check("a claim with words before the number is read",
+          gateway._claimed("Using FCFS I got an average waiting time of 7.5. Right?") == {7.5}
+          and gateway._claimed("I got a total head movement of 643 cylinders") == {643.0}
+          and gateway._claimed("I translated it and got physical address 4306.") == {4306.0})
+    bad = ("- 7: not in frames fault add 7\n- 0: not in frames fault add 0\n"
+           "- 1: not in frames fault add 1\n- 2: not in frames fault add 2\n"
+           "So total page faults = 7 (not 13)")
+    check("the recorded leaking reply is caught", gateway.tutor_leak(bad, {10.0}, {13.0}) != "")
+    check("the student's own number may be repeated",
+          gateway.tutor_leak("You said 13 page faults. Is page 0 in a frame?", {10.0}, {13.0}) == "")
+    check("a correct student may be told the answer they already have",
+          gateway.tutor_leak("Yes, 10 page faults is right. Why?", {10.0}, {10.0}) == "")
+    check("the student's claim is read from the attempt",
+          gateway._claimed("I tried FIFO and got 13 page faults") == {13.0})
+
+    r = await c.post("/v1/chat/completions", json=dict(model="ostutor-shell",
+                                                       messages=[dict(role="user", content="sizes")]))
+    msg = r.json()["choices"][0]["message"]["content"]
+    check("a shell command that sorts sizes as text is corrected and explained",
+          "sort -k 5 -rh" in msg and "Command check" in msg and "path=command-fixed" in msg, msg)
+    out, _ = await text_of_stream(c, "ostutor-shell", "sizes")
+    check("the checked command also streams", "sort -k 5 -rh" in out, out[-120:])
+    r = await c.post("/v1/chat/completions", json=dict(model="ostutor-shell",
+                                                       messages=[dict(role="user", content="normal")]))
+    check("a clean shell answer gets no command note",
+          "Command check" not in r.json()["choices"][0]["message"]["content"])
+
+    real_route, real_classify = gateway.route, gateway._classify
+    try:
+        gateway.route = lambda q: ("ostutor-explain", gateway.OFFTOPIC_REASON)
+        before = len(SEEN)
+        r = await c.post("/v1/chat/completions", json=dict(model="ostutor", messages=[
+            dict(role="user", content="What is the best way to cook biryani?")]))
+        msg = r.json()["choices"][0]["message"]["content"]
+        check("an off-topic question is declined, not answered",
+              len(SEEN) == before and msg.startswith(gateway.OFFTOPIC_REPLY)
+              and "path=out-of-scope" in msg, msg[:120])
+        gateway._classify = lambda q: "offtopic"
+        before = len(SEEN)
+        r = await c.post("/v1/chat/completions", json=dict(model="ostutor-explain", messages=[
+            dict(role="user", content="What is the best way to cook biryani?")]))
+        check("in a hand-picked mode too", len(SEEN) == before and "path=out-of-scope"
+              in r.json()["choices"][0]["message"]["content"])
+        gateway._classify = lambda q: "concept"
+        await c.post("/v1/chat/completions", json=dict(model="ostutor-explain", messages=[
+            dict(role="user", content="What is a TLB?")]))
+        check("an OS question in a hand-picked mode is still answered", len(SEEN) == before + 1)
+    finally:
+        gateway.route, gateway._classify = real_route, real_classify
+
+    ff = gateway.fact_flags
+    check("a question heading is not read as a claim",
+          ff("### Does a Cycle Always Indicate Deadlock?\nOnly with single instances.", serving=True) == [])
+    check("a negation in the other clause does not hide a claim",
+          [n for n, _ in ff("Segmentation suffers from **internal fragmentation** but not external "
+                           "fragmentation.", serving=True)] == ["seg_internal_frag"])
+    check("a negated claim is still not flagged",
+          ff("LRU does not suffer from Belady's anomaly.", serving=True) == [])
+    check("a hedge after the claim is respected",
+          ff("An unsafe state means that a deadlock is possible, not certain.", serving=True) == [])
 
     print("\nALL GATEWAY TESTS PASSED" if not FAILED else f"\n{len(FAILED)} FAILED: {FAILED}")
     return 1 if FAILED else 0
