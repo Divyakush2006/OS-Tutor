@@ -13,7 +13,7 @@ and **63.2%** without it.
 | | |
 |---|---|
 | **Author** | Divyakush Punjabi (24BCB0126) |
-| **Course context** | Case study assessment set by Jagalingam Sir (brief: `Problem Statement LLM.docx.pdf`) |
+| **Course context** | Case study assessment set by Jagalingam Sir (brief: `Problem Statement LLM.docx.pdf`, supplied by the course and not redistributed in this repository) |
 | **Base model** | Qwen3-4B-Instruct-2507 (Apache-2.0) |
 | **Current version** | Dataset v3.0.0 · LoRA adapter v3.0 |
 | **State** | Built, trained, deployed locally, evaluated. One open weakness (declarative OS theory). |
@@ -44,7 +44,7 @@ and **63.2%** without it.
 ## 1. The problem statement
 
 The assignment is a **case study on building an LLM specifically for learning and teaching
-Operating Systems**. The brief (`Problem Statement LLM.docx.pdf`, 4 pages) contains:
+Operating Systems**. The brief (`Problem Statement LLM.docx.pdf`, 4 pages, not redistributed in this repository) contains:
 
 - **A survey of existing LLMs for OS teaching** — ChatGPT, Claude, Gemini, Copilot,
   DeepSeek-R1, Qwen 3, Llama 3.3 — with strengths, limitations, and a per-topic

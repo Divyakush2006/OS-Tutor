@@ -1,0 +1,52 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  cpu-suites:
+    name: CPU test suites (355 checks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install CPU-only PyTorch, then the project dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt
+
+      - name: Cache the MiniLM embedding model
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-all-MiniLM-L6-v2
+
+      - name: Data pipeline, simulators, release gates (124 checks)
+        run: python tools/test_pipeline.py
+
+      - name: Retrieval (69 checks)
+        run: python tools/test_rag.py
+
+      - name: Measurement code (58 checks)
+        run: python tools/test_g0.py
+
+      - name: Router (28 labelled cases, zero misroutes allowed)
+        run: python tools/test_router.py
+
+      - name: Gateway (76 checks)
+        run: python serve/test_gateway.py

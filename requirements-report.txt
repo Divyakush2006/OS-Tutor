@@ -1,0 +1,6 @@
+# Only needed to rebuild the final report (docs/final_report/build.py and charts.py).
+# The PDF is rendered by headless Microsoft Edge, so the build runs on Windows.
+-r requirements.txt
+matplotlib>=3.8
+reportlab>=4.0
+pypdf>=4.0

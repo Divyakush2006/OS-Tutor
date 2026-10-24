@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use OS Tutor in your work, please cite it as below."
+title: "OS Tutor: A Fine-Tuned, Retrieval-Grounded and Simulator-Verified Tutor for Operating Systems"
+type: software
+version: "3.0.0"
+date-released: "2026-10-24"
+license: MIT
+repository-code: "https://github.com/Divyakush2006/OS-Tutor"
+authors:
+  - family-names: Punjabi
+    given-names: Divyakush
+    affiliation: "School of Computer Science and Engineering (SCOPE), Vellore Institute of Technology"
+abstract: >-
+  OS Tutor is a locally hosted teaching system for undergraduate Operating Systems. A fine-tuned
+  4B-parameter model explains concepts and teaches Socratically, while verified simulators compute
+  every numerical answer, hybrid retrieval grounds explanations in cited sources, and code checks
+  every reply before it is shown.
+keywords:
+  - operating systems education
+  - intelligent tutoring system
+  - retrieval-augmented generation
+  - QLoRA
+  - tool-augmented reasoning
