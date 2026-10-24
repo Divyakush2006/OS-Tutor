@@ -527,7 +527,7 @@
 <p>All thresholds were fitted on the dev half and reported once on the test half, and every training row was decontaminated against all 4,836 evaluation items that existed when the dataset was built.</p>
 
 <h3>5.10 Engineering quality and reproducibility<span class="mk">QQc5-10QQ</span></h3>
-<p class="tcap"><span>Table 5.8</span> Automated test suites (CPU only, no model server needed)</p>
+<p class="tcap"><span>Table 5.8</span> Automated test suites (four run on the CPU alone; the router suite needs the running model server)</p>
 <table>
   <thead><tr><th style="width:32%">Suite</th><th class="n" style="width:10%">Checks</th><th>Covers</th></tr></thead>
   <tbody>
@@ -741,7 +741,7 @@
   <thead><tr><th style="width:52%">Command</th><th>Purpose</th></tr></thead>
   <tbody>
     <tr><td><code>python -m ostutor.build</code></td><td>Build the dataset (11 stages, 19 release gates)</td></tr>
-    <tr><td><code>tools/test_pipeline.py</code>, <code>test_rag.py</code>, <code>test_g0.py</code>, <code>test_router.py</code>; <code>serve/test_gateway.py</code></td><td>Run the 355 automated checks (CPU)</td></tr>
+    <tr><td><code>tools/test_pipeline.py</code>, <code>test_rag.py</code>, <code>test_g0.py</code>, <code>test_router.py</code>; <code>serve/test_gateway.py</code></td><td>Run the 355 automated checks (the router suite needs the model server)</td></tr>
     <tr><td><code>python tools/g0_ablation.py</code></td><td>Problem suite, OOD holdout, fact checker (GPU)</td></tr>
     <tr><td><code>python tools/rag_eval.py data/rag/corpus --calibrate</code></td><td>Retrieval quality and gate</td></tr>
     <tr><td><code>python tools/rag_e2e.py data/rag/open</code></td><td>End-to-end retrieval evaluation (GPU)</td></tr>

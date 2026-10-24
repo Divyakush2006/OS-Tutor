@@ -10,11 +10,13 @@ permissions:
 
 jobs:
   cpu-suites:
-    name: CPU test suites (351 checks on a clean clone)
+    name: CPU test suites (323 checks on a clean clone)
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       PYTHONUTF8: "1"
+    # tools/test_router.py is not run here: it classifies questions with the live model
+    # and needs llama-server on :8081.
     steps:
       - uses: actions/checkout@v4
 
@@ -52,9 +54,6 @@ jobs:
 
       - name: Measurement code (58 checks)
         run: python tools/test_g0.py
-
-      - name: Router (28 labelled cases, zero misroutes allowed)
-        run: python tools/test_router.py
 
       - name: Gateway (76 checks)
         run: python serve/test_gateway.py

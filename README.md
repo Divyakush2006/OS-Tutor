@@ -48,7 +48,7 @@ Every claim is measured with paired, significance-tested evaluations (exact McNe
 | General-knowledge forgetting after fine-tuning | **none detectable** | MMLU 80.25 % → 79.50 %, p = 0.68 |
 | Retrieval latency (95th percentile, CPU) | **9.2 – 21.2 ms** | budget 500 ms |
 | Decode speed on an 8 GB laptop GPU | **42.9 tok/s** | target ≥ 20 tok/s |
-| Automated checks | **355** | five suites, all passing (351 on a clean clone, see [Quick start](#quick-start)) |
+| Automated checks | **355** | five suites, all passing (323 run on a clean clone with no model server, see [Quick start](#quick-start)) |
 
 ### What each layer contributes
 
@@ -136,7 +136,7 @@ flowchart LR
 
 ## Quick start
 
-### Run the test suites (any OS, CPU only, no model server)
+### Run the test suites (any OS, CPU only)
 
 ```bash
 git clone https://github.com/Divyakush2006/OS-Tutor.git
@@ -151,11 +151,10 @@ python -c "from huggingface_hub import snapshot_download; snapshot_download('sen
 python tools/test_pipeline.py    # 124 checks (122 on a clean clone): simulators, cleaning, dedup, gates
 python tools/test_rag.py         #  69 checks (67 on a clean clone): manifests, chunking, retrieval, gate
 python tools/test_g0.py          #  58 checks: statistics, extraction scoring, grader regressions
-python tools/test_router.py      #  28 labelled routing cases, zero misroutes allowed
 python serve/test_gateway.py     #  76 checks: layers, tutor check, command check, scope, fact checker
 ```
 
-A clean clone runs **351 of the 355 checks**; the other four need inputs that are deliberately not published (the procedural pool under `data/raw`, and the course documents) and skip with a message. The embedding model (`all-MiniLM-L6-v2`, about 90 MB) is downloaded once by the command above. The same five suites run in CI on every push.
+A clean clone runs **323 checks** with no GPU and no model server. Four more need inputs that are deliberately not published (the procedural pool under `data/raw`, and the course documents) and skip with a message. The router suite (28 labelled cases, `python tools/test_router.py`) classifies questions with the live model, so it needs the running model server and is not part of CI. With that local data and a running model server, all 355 pass. The embedding model (`all-MiniLM-L6-v2`, about 90 MB) is downloaded once by the command above. The four CPU suites run in CI on every push.
 
 ### Run the full stack
 
