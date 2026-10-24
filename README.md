@@ -144,6 +144,10 @@ cd OS-Tutor
 python -m venv .venv && source .venv/bin/activate       # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
+# One-time download of the embedding model. Retrieval loads it strictly offline,
+# by design, so that nothing about a question ever leaves the machine.
+python -c "from huggingface_hub import snapshot_download; snapshot_download('sentence-transformers/all-MiniLM-L6-v2')"
+
 python tools/test_pipeline.py    # 124 checks (122 on a clean clone): simulators, cleaning, dedup, gates
 python tools/test_rag.py         #  69 checks (67 on a clean clone): manifests, chunking, retrieval, gate
 python tools/test_g0.py          #  58 checks: statistics, extraction scoring, grader regressions
@@ -151,13 +155,13 @@ python tools/test_router.py      #  28 labelled routing cases, zero misroutes al
 python serve/test_gateway.py     #  76 checks: layers, tutor check, command check, scope, fact checker
 ```
 
-A clean clone runs **351 of the 355 checks**; the other four need inputs that are deliberately not published (the procedural pool under `data/raw`, and the course documents) and skip with a message. The first retrieval test downloads `all-MiniLM-L6-v2` (about 90 MB). The same five suites run in CI on every push.
+A clean clone runs **351 of the 355 checks**; the other four need inputs that are deliberately not published (the procedural pool under `data/raw`, and the course documents) and skip with a message. The embedding model (`all-MiniLM-L6-v2`, about 90 MB) is downloaded once by the command above. The same five suites run in CI on every push.
 
 ### Run the full stack
 
 This part needs an NVIDIA GPU with 8 GB (the stack uses about 6.5 GB), Windows 10/11 and Python 3.11 for Open WebUI. The model weights are **not** in this repository (the fine-tuned adapter is 138 MB, over GitHub's file limit); the base model is public on Hugging Face and the adapter is reproduced by the training script below.
 
-1. Follow [`serve/README.md`](serve/README.md) for the one-time setup: llama.cpp build b11050, the Qwen3-4B-Instruct-2507 GGUF, the LoRA converted to GGUF, and Open WebUI.
+1. Follow [`serve/README.md`](serve/README.md) for the one-time setup: llama.cpp build b11050, the Qwen3-4B-Instruct-2507 GGUF, the LoRA converted to GGUF, and Open WebUI. Download the MiniLM embedding model once, with the command in the section above.
 2. Choose a retrieval corpus (optional, unset means no retrieval) and start everything:
 
 ```powershell

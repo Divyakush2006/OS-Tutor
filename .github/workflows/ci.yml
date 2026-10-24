@@ -36,6 +36,14 @@ jobs:
           path: ~/.cache/huggingface
           key: hf-all-MiniLM-L6-v2
 
+      - name: Download the MiniLM embedding model (retrieval loads it offline, by design)
+        run: |
+          for attempt in 1 2 3 4; do
+            python -c "from huggingface_hub import snapshot_download; snapshot_download('sentence-transformers/all-MiniLM-L6-v2')" && break
+            echo "download failed (attempt $attempt), retrying"; sleep 15
+          done
+          python -c "from huggingface_hub import snapshot_download; snapshot_download('sentence-transformers/all-MiniLM-L6-v2', local_files_only=True)"
+
       - name: Data pipeline, simulators, release gates (122 checks)
         run: python tools/test_pipeline.py
 
