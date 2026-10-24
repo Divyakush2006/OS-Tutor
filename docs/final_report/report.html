@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>OS Tutor — Project Report (BCSE303L)</title>
+<style>
+  @page { size: A4; margin: 20mm 20mm 20mm 20mm; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font-family: "Times New Roman", Times, serif; font-size: 11pt; line-height: 1.33;
+         color: #000; background: #fff; }
+  .mk { font-size: 0.1px; letter-spacing: 0; color: #fff !important; line-height: 0; text-transform: none; }
+  .pb { break-before: page; page-break-before: always; }
+
+  .cover { height: 248mm; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .cover .logo { width: 112mm; margin-top: 2mm; }
+  .cover .lead { margin-top: 12mm; font-size: 14pt; }
+  .cover h1 { margin: 4mm 4mm 0; font-size: 22pt; line-height: 1.25; font-weight: bold; }
+  .cover .course { margin-top: 10mm; font-size: 14pt; line-height: 1.6; }
+  .cover .by { margin-top: 12mm; font-size: 13.5pt; }
+  .cover table.names { margin: 3mm auto 0; border-collapse: collapse; font-size: 14pt; width: auto; }
+  .cover table.names td { border: 0; padding: 0.6mm 6mm; text-align: left; }
+  .cover .guide { margin-top: 10mm; font-size: 13.5pt; line-height: 1.6; }
+  .cover .foot { margin-top: auto; font-size: 13.5pt; line-height: 1.6; }
+
+  .fm h2 { font-size: 16pt; font-weight: bold; text-align: center; margin: 0 0 6mm; text-transform: uppercase; }
+  .kw { margin-top: 3mm; }
+  .toc ol { list-style: none; padding: 0; margin: 0; }
+  .toc li { display: flex; align-items: baseline; line-height: 1.4; font-size: 11.5pt; margin: 0; text-align: left; }
+  .toc li.main { margin-top: 1.6mm; font-weight: bold; }
+  .toc li.subi { padding-left: 8mm; font-size: 11pt; }
+  .toc .t { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .toc a { color: inherit; text-decoration: none; }
+  .toc .dots { flex: 1; border-bottom: 1px dotted #000; margin: 0 2mm; transform: translateY(-4px); }
+  .toc .pg { min-width: 6mm; text-align: right; }
+  .lof li { font-size: 10.5pt; line-height: 1.3; }
+  .lof h3 { margin-top: 5mm; text-align: left; }
+
+  .chap { text-align: center; margin: 0 0 7mm; break-after: avoid; }
+  .chap .num { font-size: 14pt; font-weight: bold; }
+  .chap h2 { font-size: 16pt; font-weight: bold; margin: 1.5mm 0 0; text-transform: uppercase; }
+  h3 { font-size: 12.5pt; font-weight: bold; margin: 4.5mm 0 1.8mm; break-after: avoid; page-break-after: avoid; }
+  h4 { font-size: 12pt; font-weight: bold; font-style: italic; margin: 3mm 0 1mm; break-after: avoid; page-break-after: avoid; }
+  p { margin: 0 0 2.6mm; text-align: justify; }
+  ul, ol { margin: 0 0 2.6mm; padding-left: 7mm; }
+  li { margin-bottom: 1mm; text-align: justify; }
+  code { font-family: "Courier New", Courier, monospace; font-size: 10pt; }
+  a { color: #000; }
+  p:has(+ table), p:has(+ figure), p:has(+ ul), p:has(+ ol) { break-after: avoid; page-break-after: avoid; }
+
+  table { width: 100%; border-collapse: collapse; margin: 1.5mm 0 1.5mm; font-size: 10pt; line-height: 1.25;
+          break-inside: avoid; page-break-inside: avoid; }
+  thead { display: table-header-group; }
+  tr { break-inside: avoid; }
+  th, td { border: 0.75px solid #000; padding: 1.2mm 1.8mm; vertical-align: top; text-align: left; }
+  th { font-weight: bold; background: #efefef; }
+  td.n, th.n { text-align: right; white-space: nowrap; }
+  tr.b td { font-weight: bold; }
+  td code { font-size: 9.5pt; }
+  .tcap { font-size: 10pt; text-align: center; margin: 3.5mm 0 0.5mm; break-after: avoid; page-break-after: avoid; }
+  .src { break-before: avoid; font-size: 10pt; margin: 0 0 3.5mm; text-align: left; }
+
+  figure { margin: 3.5mm 0 4mm; break-inside: avoid; page-break-inside: avoid; text-align: center; }
+  figure img { max-width: 100%; }
+  figure img.w80 { width: 72%; } figure img.w70 { width: 62%; }
+  figure svg { width: 100%; height: auto; }
+  figcaption { font-size: 10pt; margin-top: 2mm; text-align: center; line-height: 1.3; }
+
+  .chat { border: 0.75px solid #000; margin: 0; padding: 2mm 3mm; font-size: 9.5pt; line-height: 1.25; text-align: left; }
+  figure.ex.split { break-inside: auto; }
+  .chat .who { font-weight: bold; margin: 1mm 0 0.6mm; }
+  .chat .who:first-child { margin-top: 0; }
+  .chat p { margin: 0 0 1.2mm; text-align: left; }
+  .chat ul, .chat ol { margin: 0 0 1.2mm; padding-left: 5mm; }
+  .chat li { margin-bottom: 0.3mm; text-align: left; }
+  .chat blockquote { margin: 1mm 0 1mm 3mm; padding-left: 2.5mm; border-left: 0.75px solid #000; }
+  .chat blockquote p { margin: 0; }
+  .chat hr { border: 0; border-top: 0.75px solid #000; margin: 1.5mm 0; }
+  .chat table { font-size: 9.5pt; margin: 1mm 0 1.5mm; width: auto; }
+  .chat th, .chat td { padding: 0.5mm 1.8mm; }
+  .chat .gap { font-style: italic; margin: 1mm 0; }
+  .chat .tag { margin-top: 1.2mm; font-size: 9pt; font-style: italic; }
+  .chat code { font-size: 9.5pt; }
+  .chat h5 { margin: 1.2mm 0 0.5mm; font-size: 10.5pt; }
+
+  pre.code { font-family: "Courier New", Courier, monospace; font-size: 8.8pt; line-height: 1.28; white-space: pre-wrap;
+             border: 0.75px solid #000; padding: 2mm 2.6mm; margin: 0; text-align: left; }
+  pre.code .ln { display: inline-block; width: 8mm; color: #555; }
+  .refs ol { padding-left: 8mm; }
+  .refs li { font-size: 10pt; line-height: 1.2; margin-bottom: 0.6mm; text-align: left; }
+</style>
+</head>
+<body>
+
+<!-- ============================== FRONT PAGE ============================== -->
+<section class="cover">
+  <img class="logo" src="assets/vit_logo.svg" alt="Vellore Institute of Technology">
+  <div class="lead">A Project Report on</div>
+  <h1>OS Tutor: A Fine-Tuned, Retrieval-Grounded and Simulator-Verified Tutor for Operating Systems</h1>
+  <div class="course"><b>Course Code:</b> BCSE303L<br><b>Course Name:</b> Operating Systems</div>
+  <div class="by">Submitted by</div>
+  <table class="names">
+    <tr><td>Divyakush Punjabi</td><td>24BCB0126</td></tr>
+  </table>
+  <div class="guide">Submitted to<br><b>Prof. Jagalingam</b><br>Course Faculty</div>
+  <div class="foot">School of Computer Science and Engineering (SCOPE)<br>
+    Slot: B1+TB1 &nbsp;|&nbsp; Fall Semester 2026–27<br>October 2026</div>
+</section>
+
+<!-- ============================== ABSTRACT ============================== -->
+<section class="pb fm">
+<h2>Abstract</h2>
+<p>Students learning Operating Systems face two kinds of material. One is conceptual: why a design exists and what it costs. The other is procedural: schedules, page-replacement traces, Banker's-algorithm tables and disk-head movements, where one wrong step spoils the answer. General-purpose language models handle the first kind well. On the second they fail in a characteristic way: they state the rule correctly and then execute it wrongly. On our 57-item problem suite, every one of the fine-tuned model's 7 scheduling failures had correct arithmetic on a wrong schedule.</p>
+<p>This report presents OS Tutor, a complete teaching system built around that observation. A 4-billion-parameter model (Qwen3-4B-Instruct-2507) was fine-tuned with QLoRA on 11,760 curated and licence-checked training rows, produced by an eleven-stage data pipeline with 19 release gates. The model explains, teaches Socratically, reads problems and writes shell commands. Each of its failure modes is guarded by a separate layer. Verified simulators compute the answers to the seven kinds of numerical problem they cover. A hybrid retrieval (RAG) layer grounds explanations in 2,970 openly licensed documents and cites them. A fact checker corrects known misconceptions. In tutor mode, a private simulator check stops any reply that would give the answer away or state a wrong one. The whole system runs on one laptop GPU.</p>
+<p>Every claim was measured with paired, significance-tested evaluations. The system solves 57 of 57 hand-written problems, against 30 of 57 for the untuned model. On a 600-item out-of-distribution holdout it scores 99.8%. Retrieval raised short-answer accuracy from 68.1% to 86.1% (p = 0.007), with zero invented citations, and no statistically detectable forgetting of general knowledge was found (MMLU, p = 0.68). End-to-end testing found five faults: a tutor reply that revealed a wrong count, a disk-size misreading, false alarms in the fact checker, an incorrect shell command and an answered off-topic question. Each was fixed and re-measured, and Section 6 reports the results before and after.</p>
+<p class="kw"><b>Keywords:</b> large language models, QLoRA, retrieval-augmented generation, intelligent tutoring systems, tool-augmented reasoning, operating systems education, evaluation methodology.</p>
+
+<p class="tcap"><span>Table 0.1</span> Key results</p>
+<table>
+  <thead><tr><th>Measure</th><th class="n">Result</th><th>Evidence</th></tr></thead>
+  <tbody>
+    <tr><td>Hand-written OS problems solved exactly</td><td class="n">57/57</td><td>Untuned base: 30/57</td></tr>
+    <tr><td>Out-of-distribution holdout (600 problems)</td><td class="n">99.8%</td><td>Disk items 74/80 → 80/80 after the range fix</td></tr>
+    <tr><td>Short-answer accuracy with retrieval</td><td class="n">86.1%</td><td>68.1% without; p = 0.007</td></tr>
+    <tr><td>Invented citations in grounded answers</td><td class="n">0</td><td>69/72 answers cite a source</td></tr>
+    <tr><td>Tutor replies that keep the answer back for the student</td><td class="n">30/30</td><td>15/30 before the tutor check</td></tr>
+    <tr><td>Fact-checker precision on probes</td><td class="n">2/2</td><td>1/3 before the fix</td></tr>
+    <tr><td>Fact-checker recall on probes</td><td class="n">2/2</td><td>1/2 before the fix</td></tr>
+    <tr><td>Retrieval latency (95th percentile, CPU)</td><td class="n">9.2–21.2 ms</td><td>Budget 500 ms</td></tr>
+    <tr><td>Decode speed on an 8 GB laptop GPU</td><td class="n">42.9 tok/s</td><td>Target ≥ 20 tok/s</td></tr>
+    <tr><td>Automated checks</td><td class="n">355</td><td>Five suites, all passing</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============================== CONTENTS ============================== -->
+<section class="pb fm toc">
+<h2>Table of Contents</h2>
+<ol>
+  <li class="main"><a href="#c1"><span class="t">1&nbsp;&nbsp;Introduction</span></a><span class="dots"></span><span class="pg" data-for="c1">0</span></li>
+  <li class="subi"><span class="t">1.1 Background and motivation</span><span class="dots"></span><span class="pg" data-for="c1-1">0</span></li>
+  <li class="subi"><span class="t">1.2 The central observation</span><span class="dots"></span><span class="pg" data-for="c1-2">0</span></li>
+  <li class="subi"><span class="t">1.3 What was built</span><span class="dots"></span><span class="pg" data-for="c1-3">0</span></li>
+  <li class="subi"><span class="t">1.4 Contributions and report organisation</span><span class="dots"></span><span class="pg" data-for="c1-4">0</span></li>
+  <li class="main"><a href="#c2"><span class="t">2&nbsp;&nbsp;Literature Review</span></a><span class="dots"></span><span class="pg" data-for="c2">0</span></li>
+  <li class="subi"><span class="t">2.1 Review method</span><span class="dots"></span><span class="pg" data-for="c2-1">0</span></li>
+  <li class="subi"><span class="t">2.2 – 2.6 Five key papers</span><span class="dots"></span><span class="pg" data-for="c2-2">0</span></li>
+  <li class="subi"><span class="t">2.7 Comparative summary and research gap</span><span class="dots"></span><span class="pg" data-for="c2-7">0</span></li>
+  <li class="main"><a href="#c3"><span class="t">3&nbsp;&nbsp;Problem Statement</span></a><span class="dots"></span><span class="pg" data-for="c3">0</span></li>
+  <li class="main"><a href="#c4"><span class="t">4&nbsp;&nbsp;Objectives</span></a><span class="dots"></span><span class="pg" data-for="c4">0</span></li>
+  <li class="main"><a href="#c5"><span class="t">5&nbsp;&nbsp;Methodology</span></a><span class="dots"></span><span class="pg" data-for="c5">0</span></li>
+  <li class="subi"><span class="t">5.1 Design principle and system architecture</span><span class="dots"></span><span class="pg" data-for="c5-1">0</span></li>
+  <li class="subi"><span class="t">5.2 Teaching modes and request routing</span><span class="dots"></span><span class="pg" data-for="c5-2">0</span></li>
+  <li class="subi"><span class="t">5.3 Training dataset</span><span class="dots"></span><span class="pg" data-for="c5-3">0</span></li>
+  <li class="subi"><span class="t">5.4 Data preprocessing pipeline</span><span class="dots"></span><span class="pg" data-for="c5-4">0</span></li>
+  <li class="subi"><span class="t">5.5 Model selection and QLoRA fine-tuning</span><span class="dots"></span><span class="pg" data-for="c5-5">0</span></li>
+  <li class="subi"><span class="t">5.6 Verified solver</span><span class="dots"></span><span class="pg" data-for="c5-6">0</span></li>
+  <li class="subi"><span class="t">5.7 Retrieval-augmented generation</span><span class="dots"></span><span class="pg" data-for="c5-7">0</span></li>
+  <li class="subi"><span class="t">5.8 Checks in the gateway</span><span class="dots"></span><span class="pg" data-for="c5-8">0</span></li>
+  <li class="subi"><span class="t">5.9 Evaluation methodology</span><span class="dots"></span><span class="pg" data-for="c5-9">0</span></li>
+  <li class="subi"><span class="t">5.10 Engineering quality and reproducibility</span><span class="dots"></span><span class="pg" data-for="c5-10">0</span></li>
+  <li class="main"><a href="#c6"><span class="t">6&nbsp;&nbsp;Results and Discussion</span></a><span class="dots"></span><span class="pg" data-for="c6">0</span></li>
+  <li class="subi"><span class="t">6.1 Prompts</span><span class="dots"></span><span class="pg" data-for="c6-1">0</span></li>
+  <li class="subi"><span class="t">6.2 Evaluation outputs</span><span class="dots"></span><span class="pg" data-for="c6-2">0</span></li>
+  <li class="subi"><span class="t">6.3 Training</span><span class="dots"></span><span class="pg" data-for="c6-3">0</span></li>
+  <li class="subi"><span class="t">6.4 Procedural accuracy and ablation</span><span class="dots"></span><span class="pg" data-for="c6-4">0</span></li>
+  <li class="subi"><span class="t">6.5 Out-of-distribution generalisation</span><span class="dots"></span><span class="pg" data-for="c6-5">0</span></li>
+  <li class="subi"><span class="t">6.6 Catastrophic forgetting</span><span class="dots"></span><span class="pg" data-for="c6-6">0</span></li>
+  <li class="subi"><span class="t">6.7 Retrieval quality and latency</span><span class="dots"></span><span class="pg" data-for="c6-7">0</span></li>
+  <li class="subi"><span class="t">6.8 Retrieval end to end</span><span class="dots"></span><span class="pg" data-for="c6-8">0</span></li>
+  <li class="subi"><span class="t">6.9 Issues found in testing and their fixes</span><span class="dots"></span><span class="pg" data-for="c6-9">0</span></li>
+  <li class="subi"><span class="t">6.10 Objectives scorecard and discussion</span><span class="dots"></span><span class="pg" data-for="c6-10">0</span></li>
+  <li class="main"><a href="#c7"><span class="t">7&nbsp;&nbsp;Conclusion</span></a><span class="dots"></span><span class="pg" data-for="c7">0</span></li>
+  <li class="main"><a href="#c8"><span class="t">8&nbsp;&nbsp;Limitations</span></a><span class="dots"></span><span class="pg" data-for="c8">0</span></li>
+  <li class="main"><a href="#c9"><span class="t">9&nbsp;&nbsp;Future Work</span></a><span class="dots"></span><span class="pg" data-for="c9">0</span></li>
+  <li class="main"><a href="#refs"><span class="t">References</span></a><span class="dots"></span><span class="pg" data-for="refs">0</span></li>
+</ol>
+</section>
+
+
+<!-- ============================== 1 INTRODUCTION ============================== -->
+<section class="pb" id="c1">
+<div class="chap"><h2>1.&nbsp;&nbsp;Introduction<span class="mk">QQc1QQ</span></h2></div>
+
+<h3>1.1 Background and motivation<span class="mk">QQc1-1QQ</span></h3>
+<p>Operating Systems is one of the core courses of a computer-science degree, and one of the hardest to learn from a textbook alone. The subject has two layers. The conceptual layer covers why virtual memory exists, what a context switch costs and why locks can deadlock. The procedural layer is a set of algorithms that students carry out by hand: CPU schedules and Gantt charts, page-replacement traces, Banker's-algorithm safety checks, disk-head movement, memory allocation and address translation. Examinations test both, and the procedural layer is unforgiving: one misplaced process in a Round Robin queue changes every number that follows.</p>
+<p>One-to-one tutoring is the most effective form of instruction known. Bloom's classic study found that tutored students performed about two standard deviations above students taught conventionally [1]. One tutor per student does not scale, so large language models (LLMs) are an obvious candidate. They are fluent, always available and patient. Their risks in education are equally well documented [2]. They state falsehoods confidently, they hand over answers when a student needs to think, and the large commercial ones send student data to external services. The course brief asked for an LLM "specifically for learning and teaching Operating System concepts" and listed the tools students already use (ChatGPT, Claude, Gemini, Copilot, DeepSeek-R1, Qwen 3 and Llama 3.3). Each is useful, and each needs its answers checked.</p>
+
+<h3>1.2 The central observation<span class="mk">QQc1-2QQ</span></h3>
+<p>Before deciding what to build, we measured how a capable small model fails, and the result shaped the whole project. Of the fine-tuned model's 7 failures on scheduling problems in our 57-item suite, all 7 had perfect arithmetic and a wrong schedule. The model could recite the Round Robin rule exactly. It then placed a newly arrived process behind the pre-empted one, or forgot that a process had finished, and every number that followed was wrong. Scheduling had the most training rows of any family (1,733) and still the worst accuracy (42%), so more data was not the fix.</p>
+<p>The design principle follows directly. A small language model is reliable at reading a problem and explaining a rule, and unreliable at executing a long procedure. In OS Tutor, therefore, the model explains and the simulators compute. Every other layer applies the same idea: each known failure mode is assigned to a component that cannot make that mistake.</p>
+
+<h3>1.3 What was built<span class="mk">QQc1-3QQ</span></h3>
+<p>OS Tutor is a complete, locally hosted teaching system, not just a fine-tuned checkpoint. A student opens a chat interface (Open WebUI) and asks a question in plain English. A gateway written in Python reads the question and routes it:</p>
+<ul>
+  <li>A worked problem of a supported kind is solved by a verified simulator.</li>
+  <li>A concept question is answered by the fine-tuned model, grounded in passages that it cites, and fact-checked.</li>
+  <li>A student who shows an attempt is taught Socratically, and the reply is checked so that it never gives the answer away.</li>
+  <li>A shell question gets a command with its flags explained, checked against known pitfalls.</li>
+</ul>
+<p>The system runs on one laptop with an 8 GB GPU, no student question leaves the machine, and the stack costs nothing to run.</p>
+<p class="tcap"><span>Table 1.1</span> Components of the system</p>
+<table>
+  <thead><tr><th style="width:30%">Component</th><th>What it contributes</th><th style="width:25%">Key figure</th></tr></thead>
+  <tbody>
+    <tr><td>Training dataset <code>ostutor-sft</code> v3.0.0</td><td>Curated, decontaminated, licence-checked rows covering five behaviours</td><td>11,760 rows; 19/19 gates</td></tr>
+    <tr><td>Fine-tuned model (QLoRA adapter v3)</td><td>Output formats, Socratic tutoring and shell commands; general ability retained</td><td>MMLU 80.25% → 79.50% (p = 0.68)</td></tr>
+    <tr><td>Verified solver (7 simulator kinds)</td><td>Exact answers for scheduling, paging, disk, Banker's safety and request, allocation and address translation</td><td>57/57 suite; 99.8% OOD</td></tr>
+    <tr><td>Retrieval layer (hybrid RAG)</td><td>Cited passages from a course corpus (105 documents) or an open corpus (2,970 documents); says when a topic is not covered</td><td>+18.0 pp short answers; 0 invented citations</td></tr>
+    <tr><td>Gateway (router and checks)</td><td>Five teaching modes, fact checker, tutor check, shell check, off-topic refusal, request for missing inputs</td><td>76 gateway checks; 28/28 routing</td></tr>
+  </tbody>
+</table>
+
+<h3>1.4 Contributions and report organisation<span class="mk">QQc1-4QQ</span></h3>
+<ol>
+  <li><b>An architecture that separates explaining from computing.</b> The solver adds 19–23 problems with zero losses (p &lt; 10⁻⁵), and the deployed system is perfect on the suite.</li>
+  <li><b>A measured, reproducible data pipeline.</b> It tests each cleaning rule against the data before adopting it, decontaminates by problem parameters as well as by n-grams, and fails the build if any of 19 release gates fails.</li>
+  <li><b>A grounded retrieval layer built for teaching.</b> It records provenance and licence per passage, fits abstention thresholds on held-out data, and gives citations a student can find.</li>
+  <li><b>A tutor whose replies are checked before they are shown.</b> A private simulator run judges the student's attempt, and a reply that would reveal the answer or state a wrong one is redrafted.</li>
+  <li><b>An evaluation method that audits itself.</b> Every comparison is paired and significance-tested on deterministic decoding, and every fault found in testing was fixed and re-measured.</li>
+</ol>
+<p>Section 2 reviews the literature. Sections 3 and 4 state the problem and the measurable objectives. Section 5 describes the methodology. Section 6 presents the prompts, real outputs, benchmark results and the faults fixed during testing. Sections 7–9 give the conclusion, the limitations and future work.</p>
+</section>
+
+<!-- ============================== 2 LITERATURE REVIEW ============================== -->
+<section class="pb" id="c2">
+<div class="chap"><h2>2.&nbsp;&nbsp;Literature Review<span class="mk">QQc2QQ</span></h2></div>
+
+<h3>2.1 Review method<span class="mk">QQc2-1QQ</span></h3>
+<p>The review covers the four questions the design had to answer:</p>
+<ul>
+  <li>How can a model be grounded in sources it can cite?</li>
+  <li>How can a small model be fine-tuned on free hardware without losing what it already knows?</li>
+  <li>How can a model be made to compute exactly?</li>
+  <li>What does a deployed AI tutor need to do differently from a chatbot?</li>
+</ul>
+<p>For each question we chose the most directly applicable peer-reviewed paper and verified the reference. Each paper is summarised by its problem, method, findings and limitations, and by what OS Tutor takes from it.</p>
+
+<h3>2.2 Paper 1: Retrieval-augmented generation<span class="mk">QQc2-2QQ</span></h3>
+<p><i>P. Lewis et al., "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks," NeurIPS 2020 [3].</i></p>
+<p><b>Problem.</b> Knowledge stored only in a model's parameters is hard to update, cannot be inspected, and leads to hallucination on knowledge-intensive tasks. <b>Method.</b> A pre-trained sequence-to-sequence generator is combined with a dense passage retriever over a Wikipedia index. The retrieved passages are treated as a latent variable, either once for the whole output (RAG-Sequence) or per token (RAG-Token). <b>Findings.</b> State-of-the-art results on three open-domain question-answering tasks, with generations judged more specific, diverse and factual than a parametric-only baseline. The knowledge can be updated by replacing the index. <b>Limitations.</b> The query encoder and the generator are fine-tuned jointly on task data, there is no mechanism to abstain when retrieval finds nothing relevant, and the reader is shown no citation. <b>Use in OS Tutor.</b> We condition answers on retrieved text with a frozen, fine-tuned model and no joint training. We add a calibrated abstain gate and visible [S1]-style citations, because in teaching a citation the student can check matters as much as the accuracy gain.</p>
+
+<h3>2.3 Paper 2: Quantised low-rank fine-tuning (QLoRA)<span class="mk">QQc2-3QQ</span></h3>
+<p><i>T. Dettmers, A. Pagnoni, A. Holtzman and L. Zettlemoyer, "QLoRA: Efficient Finetuning of Quantized LLMs," NeurIPS 2023 [4]; building on E. J. Hu et al., "LoRA," ICLR 2022 [5].</i></p>
+<p><b>Problem.</b> Full fine-tuning of a multi-billion-parameter model needs far more GPU memory than academic or free hardware provides. <b>Method.</b> LoRA freezes the pre-trained weights and trains small low-rank update matrices, with no extra inference latency once merged. QLoRA back-propagates through a frozen 4-bit base, using a 4-bit NormalFloat data type, double quantisation and paged optimisers. <b>Findings.</b> A 65B model can be fine-tuned on a single 48 GB GPU while preserving 16-bit fine-tuning quality; the resulting Guanaco models reach 99.3% of ChatGPT's level on the Vicuna benchmark. <b>Limitations.</b> The evaluation is dominated by chat quality judged by other models, and narrow procedural skill and retained general ability are not the focus. <b>Use in OS Tutor.</b> The training method itself: QLoRA through Unsloth with r = 32 and α = 64 on all linear layers. It made 16,384-token training of a 4B model possible on Kaggle's free Tesla T4 GPUs.</p>
+
+<h3>2.4 Paper 3: What LoRA learns, and what it forgets<span class="mk">QQc2-4QQ</span></h3>
+<p><i>D. Biderman et al., "LoRA Learns Less and Forgets Less," Transactions on Machine Learning Research, 2024 [6].</i></p>
+<p><b>Problem.</b> Practitioners choose LoRA for its efficiency without knowing how it trades learning the new domain against forgetting the old, the classic problem of catastrophic forgetting [13]. <b>Method.</b> LoRA is compared with full fine-tuning on programming and mathematics, in instruction fine-tuning and in continued pre-training, with forgetting measured on tasks outside the target domain. <b>Findings.</b> In standard low-rank settings LoRA substantially underperforms full fine-tuning on the target domain, but it better preserves the base model's performance outside that domain, and it limits forgetting more than weight decay or dropout. Full fine-tuning learns weight perturbations of 10–100 times higher rank than typical LoRA configurations. <b>Limitations.</b> Two domains, larger models than ours, and no study of replaying general data during training. <b>Use in OS Tutor.</b> It justified choosing LoRA over full fine-tuning, combined with a 16% general-instruction replay share. Paired tests found no detectable loss on general MMLU (80.25% against 79.50%, p = 0.68).</p>
+
+<h3>2.5 Paper 4: Program-aided language models<span class="mk">QQc2-5QQ</span></h3>
+<p><i>L. Gao et al., "PAL: Program-aided Language Models," ICML 2023, PMLR 202, pp. 10764–10799 [7].</i></p>
+<p><b>Problem.</b> Chain-of-thought prompting lets a model decompose a problem correctly, but it still makes arithmetic and logical errors while carrying out the steps. <b>Method.</b> The model writes a program as its intermediate reasoning, and a Python interpreter executes it. Understanding is left to the model and computation to the interpreter. <b>Findings.</b> PAL outperforms chain-of-thought across 13 mathematical, symbolic and algorithmic tasks. On GSM8K, PAL with Codex exceeds PaLM-540B with chain-of-thought by 15 points of top-1 accuracy. <b>Limitations.</b> A plausible but wrong program runs without error and gives a confident wrong answer, and nothing checks that the program matches the question. <b>Use in OS Tutor.</b> The same division of labour, made stricter for a 4B model. The model emits only typed JSON parameters. Every number must appear in the question (a grounding check). Pre-written, unit-tested simulators do the computing. A missing input is asked for, never guessed.</p>
+
+<h3>2.6 Paper 5: A deployed AI tutor in a CS course<span class="mk">QQc2-6QQ</span></h3>
+<p><i>R. Liu, C. Zenke, C. Liu, A. Holmes, P. Thornton and D. J. Malan, "Teaching CS50 with AI," Proc. 55th ACM SIGCSE, pp. 750–756, 2024 [8].</i></p>
+<p><b>Problem.</b> Approximating a 1:1 teacher-to-student ratio in a very large course without letting students hand their thinking to a general chatbot. <b>Method.</b> Course-specific AI tools for Harvard's CS50 (the "CS50 Duck" chatbot, a code explainer and a style advisor), integrated into the course's IDE and forum and guard-railed to guide rather than solve. They were rolled out to about 70 summer students, then thousands online and several hundred on campus. <b>Findings.</b> Students received the tools positively and described having "a personal tutor". <b>Limitations.</b> The tools rely on a commercial model accessed through an API, so student data leaves the institution. The evidence is mainly student reports, and the guardrails are prompt-based. <b>Use in OS Tutor.</b> The stance that a tutor leads students to the answer rather than giving it. We enforce this in code: a shown attempt always routes to tutor mode, and every tutor reply is checked against a private simulator run before it is shown. The system stays local and is measured with numbers.</p>
+
+<h3>2.7 Comparative summary and research gap<span class="mk">QQc2-7QQ</span></h3>
+<p class="tcap"><span>Table 2.1</span> What each reviewed paper offers, its gap for OS teaching, and OS Tutor's response</p>
+<table>
+  <thead><tr><th style="width:15%">Paper</th><th style="width:27%">Key strength</th><th style="width:28%">Gap for an OS tutor</th><th>OS Tutor's response</th></tr></thead>
+  <tbody>
+    <tr><td>RAG [3]</td><td>Grounds generation in updatable text</td><td>No abstention; no citation a student can check</td><td>Calibrated abstain gate, visible citations, provenance per document</td></tr>
+    <tr><td>QLoRA / LoRA [4, 5]</td><td>Fine-tuning on a single GPU</td><td>Little on procedural correctness or forgetting</td><td>Paired forgetting tests, replay data, ablation against the base</td></tr>
+    <tr><td>LoRA forgets less [6]</td><td>Quantifies the learning–forgetting trade-off</td><td>Not measured at 4B or with replay</td><td>Measured on 400 MMLU, 300 adjacent-CS and 70 OS items, paired</td></tr>
+    <tr><td>PAL [7]</td><td>Off-loads computation to an interpreter</td><td>Generated code unchecked; inputs may be guessed</td><td>Typed extraction, grounding check, tested simulators, missing inputs asked for</td></tr>
+    <tr><td>CS50 AI [8]</td><td>A tutor deployed at scale that guides rather than solves</td><td>Cloud model; prompt-based guardrails; limited measurement</td><td>Local 4B model; routing and reply checks in code; significance tests</td></tr>
+  </tbody>
+</table>
+<p><b>Research gap.</b> No reviewed work combines the four properties an OS tutor needs: exact procedural answers, explanations that cite checkable sources, teaching that withholds answers, and deployment on hardware a student or department already owns. None measures its parts separately with paired significance tests to show which part is responsible for which gain. OS Tutor is designed and evaluated to fill that gap.</p>
+</section>
+
+<!-- ============================== 3 PROBLEM STATEMENT ============================== -->
+<section class="pb" id="c3">
+<div class="chap"><h2>3.&nbsp;&nbsp;Problem Statement<span class="mk">QQc3QQ</span></h2></div>
+<p>Design, build and evaluate a language-model-based tutor for undergraduate Operating Systems that meets four requirements, with every claimed capability backed by a reproducible measurement:</p>
+<ol type="a">
+  <li>It gives exactly correct worked solutions to the course's numerical problems.</li>
+  <li>It explains concepts accurately, with sources a student can verify.</li>
+  <li>It teaches by guiding rather than answering when a student shows an attempt.</li>
+  <li>It runs privately on a single consumer GPU, trained only on free compute and on data whose licence permits it.</li>
+</ol>
+<p>The problem breaks down into five sub-problems, each tied to an observed failure or a given constraint:</p>
+<p class="tcap"><span>Table 3.1</span> Sub-problems</p>
+<table>
+  <thead><tr><th style="width:6%">#</th><th style="width:28%">Sub-problem</th><th>Evidence or constraint</th></tr></thead>
+  <tbody>
+    <tr><td>P1</td><td>Procedural unreliability</td><td>The untuned 4B model solves 30 of 57 hand-written problems. All 7 of the fine-tuned model's scheduling failures executed a correctly stated rule wrongly.</td></tr>
+    <tr><td>P2</td><td>Unverifiable explanations</td><td>An unaided answer gives the student nothing to check it against; the fine-tuned 4B model's short-answer accuracy is 68.1% without help.</td></tr>
+    <tr><td>P3</td><td>Answer-giving instead of teaching</td><td>A chatbot asked "is my answer right?" tends to give the right one. A tutor must diagnose the misconception and ask the question that exposes it.</td></tr>
+    <tr><td>P4</td><td>Resource and privacy constraints</td><td>Training on Kaggle's free tier (2 × Tesla T4, 16 GB each); serving on an RTX 4060 Laptop GPU (8 GB) at ≥ 20 tokens/s; no student data sent to external services.</td></tr>
+    <tr><td>P5</td><td>Trustworthy measurement</td><td>Small evaluation sets, non-deterministic decoding and automatic graders can each create or hide an effect; claims must survive paired significance tests.</td></tr>
+  </tbody>
+</table>
+<p>The course brief recommended retrieval with an instruction-tuned model, or fine-tuning, and suggested five contributions. This project does both:</p>
+<p class="tcap"><span>Table 3.2</span> Scope against the course brief</p>
+<table>
+  <thead><tr><th style="width:42%">Contribution suggested by the brief</th><th style="width:16%">Status</th><th>How</th></tr></thead>
+  <tbody>
+    <tr><td>Domain-specific fine-tuning</td><td>Delivered</td><td>QLoRA adapter v3 on 11,760 curated rows</td></tr>
+    <tr><td>Retrieval over institutional materials</td><td>Delivered</td><td>Course corpus (105 documents) and open corpus (2,970 documents)</td></tr>
+    <tr><td>Personalised feedback</td><td>Delivered</td><td>Tutor mode diagnoses the student's own attempt, checked by a simulator</td></tr>
+    <tr><td>Generation of labs, MCQs and viva questions</td><td>Extension</td><td>Section 9</td></tr>
+    <tr><td>Adaptive difficulty</td><td>Extension</td><td>Section 9</td></tr>
+  </tbody>
+</table>
+<p>We chose a 4B base rather than the 8B–70B range the brief suggests. Larger models cannot be trained at 16k-token sequence length on free T4 GPUs, and cannot be served fast enough on an 8 GB laptop card. The architecture makes up the difference, so the small model is never asked to do what it cannot do reliably.</p>
+</section>
+
+<!-- ============================== 4 OBJECTIVES ============================== -->
+<section class="pb" id="c4">
+<div class="chap"><h2>4.&nbsp;&nbsp;Objectives<span class="mk">QQc4QQ</span></h2></div>
+<p>Each objective was given a measurable target before the corresponding measurement was run. Section 6.10 reports each target next to its result.</p>
+<p class="tcap"><span>Table 4.1</span> Objectives and targets</p>
+<table>
+  <thead><tr><th style="width:6%">#</th><th style="width:38%">Objective</th><th style="width:30%">Success measure</th><th>Target</th></tr></thead>
+  <tbody>
+    <tr><td>O1</td><td>Build a reproducible, decontaminated, licence-clean training dataset covering every behaviour the tutor needs</td><td>Release gates; SHA-256 recorded for every split</td><td>All gates pass; 0 non-commercial rows</td></tr>
+    <tr><td>O2</td><td>Fine-tune a 4B model on free hardware without catastrophic forgetting</td><td>Paired accuracy against the base on MMLU, adjacent CS and OS theory</td><td>No significant loss</td></tr>
+    <tr><td>O3</td><td>Give exactly correct worked solutions to the course's numerical problems</td><td>Simulator-exact accuracy, 57-item suite and 600-item holdout</td><td>57/57 on the suite</td></tr>
+    <tr><td>O4</td><td>Never guess a missing input</td><td>Behaviour when a needed value is omitted</td><td>Ask for it; never assume</td></tr>
+    <tr><td>O5</td><td>Ground explanations in cited sources, and say when the sources do not cover a topic</td><td>Recall@5; off-topic handling; citation rate; invented citations</td><td>≥ 85%; ≥ 90%; ≥ 90%; 0</td></tr>
+    <tr><td>O6</td><td>Improve factual accuracy with retrieval without harming theory accuracy</td><td>Short-answer and 200-item MCQ accuracy, paired</td><td>Better; MCQ not worse</td></tr>
+    <tr><td>O7</td><td>Teach rather than answer when a student shows an attempt</td><td>Routing cases correct; replies keeping the answer back</td><td>All; all</td></tr>
+    <tr><td>O8</td><td>Run the whole system privately on one laptop GPU</td><td>Retrieval p95 latency; decode speed; data leaving the machine</td><td>≤ 500 ms; ≥ 20 tok/s; none</td></tr>
+  </tbody>
+</table>
+<p>The primary objective is a tutor whose numbers are always right, whose explanations can be checked and whose teaching does not give answers away, with each property proved by a measurement that another team could rerun from the repository and reproduce.</p>
+</section>
+
+<!-- ============================== 5 METHODOLOGY ============================== -->
+<section class="pb" id="c5">
+<div class="chap"><h2>5.&nbsp;&nbsp;Methodology<span class="mk">QQc5QQ</span></h2></div>
+
+<h3>5.1 Design principle and system architecture<span class="mk">QQc5-1QQ</span></h3>
+<p>The architecture gives each known failure mode to a component that cannot commit it (Figure 5.1). Everything except the language model runs on the CPU, and the model server holds a single copy of the weights shared by all modes.</p>
+<figure>
+<svg viewBox="0 0 700 342" xmlns="http://www.w3.org/2000/svg" font-family="Times New Roman, Times, serif" font-size="10.5">
+  <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#000"/></marker></defs>
+  <rect x="140" y="6" width="418" height="332" fill="#fff" stroke="#000" stroke-dasharray="4 3"/>
+  <text x="150" y="22" font-weight="700">Gateway (CPU): serve/gateway.py</text>
+  <g stroke="#000" stroke-width="1" fill="#fff">
+    <rect x="6" y="144" width="112" height="56"/><rect x="152" y="140" width="96" height="64"/>
+    <rect x="268" y="44" width="84" height="44"/><rect x="364" y="44" width="84" height="44"/><rect x="460" y="44" width="88" height="44" stroke-width="2"/>
+    <rect x="268" y="118" width="84" height="44"/><rect x="364" y="118" width="84" height="44"/><rect x="460" y="118" width="88" height="44"/>
+    <rect x="268" y="172" width="84" height="28" stroke-dasharray="2 2"/>
+    <rect x="268" y="220" width="280" height="34"/><rect x="268" y="274" width="280" height="26"/>
+    <rect x="152" y="308" width="396" height="24" stroke-dasharray="3 2"/>
+    <rect x="578" y="126" width="116" height="88"/>
+  </g>
+  <g text-anchor="middle">
+    <text x="62" y="167" font-weight="700">Student</text><text x="62" y="181" font-size="9.5">Open WebUI chat</text>
+    <text x="200" y="162" font-weight="700">Router (code)</text>
+    <text x="200" y="176" font-size="9">1. shown attempt?</text><text x="200" y="187" font-size="9">2. classify kind</text><text x="200" y="198" font-size="9">3. lexical fallback</text>
+    <text x="310" y="62">Extract JSON</text><text x="310" y="76" font-size="9">base model, LoRA 0</text>
+    <text x="406" y="62">Grounding check</text><text x="406" y="76" font-size="9">numbers in question?</text>
+    <text x="504" y="62" font-weight="700">Verified simulator</text><text x="504" y="76" font-size="9">exact steps + answer</text>
+    <text x="310" y="136">Hybrid retrieval</text><text x="310" y="150" font-size="9">BM25 + MiniLM, RRF</text>
+    <text x="406" y="136">Fine-tuned model</text><text x="406" y="150" font-size="9">cites [S1]…[S4]</text>
+    <text x="504" y="136">Fact checker</text><text x="504" y="150" font-size="9">10 misconception rules</text>
+    <text x="310" y="184" font-size="9">Knowledge base</text><text x="310" y="195" font-size="8.5">18,515 chunks, gate</text>
+    <text x="408" y="234">Fine-tuned model, Socratic prompt</text><text x="408" y="247" font-size="9">reply checked against a private simulator run</text>
+    <text x="408" y="291">Fine-tuned model; command checked for pitfalls</text>
+    <text x="350" y="324" font-size="9">history scrub · tag filter · missing inputs asked for · off-topic declined · loop guard · sources</text>
+    <text x="636" y="146" font-weight="700">llama-server (GPU)</text>
+    <text x="636" y="161" font-size="9">Qwen3-4B-Instruct Q8_0</text><text x="636" y="173" font-size="9">+ LoRA v3 at runtime</text>
+    <text x="636" y="185" font-size="9">RTX 4060 Laptop, 8 GB</text><text x="636" y="197" font-size="9">one copy for all modes</text>
+  </g>
+  <g font-size="9" font-weight="700" letter-spacing="1">
+    <text x="268" y="38">SOLVE</text><text x="268" y="112">EXPLAIN / ANALYZE</text><text x="268" y="214">TUTOR</text><text x="268" y="268">SHELL</text>
+  </g>
+  <g stroke="#000" stroke-width="1" fill="none" marker-end="url(#ar)">
+    <path d="M118,172 H150"/>
+    <path d="M248,152 C260,120 252,70 266,66"/><path d="M248,164 C258,150 256,142 266,140"/>
+    <path d="M248,186 C260,206 254,236 266,236"/><path d="M248,196 C262,250 254,287 266,287"/>
+    <path d="M352,66 H362"/><path d="M448,66 H458"/><path d="M352,140 H362"/><path d="M448,140 H458"/>
+    <path d="M310,172 V164"/>
+    <path d="M548,140 C562,140 562,150 576,152"/><path d="M548,236 C566,236 562,200 576,196"/>
+  </g>
+  <path d="M406,89 V116" stroke="#000" stroke-width="1" fill="none" stroke-dasharray="3 2" marker-end="url(#ar)"/>
+  <text x="412" y="100" font-size="8.5">ungrounded → model fallback</text>
+  <text x="412" y="110" font-size="8.5">input missing → ask the student</text>
+</svg>
+<figcaption><span>Figure 5.1</span> System architecture and request flow</figcaption>
+</figure>
+<p class="tcap"><span>Table 5.1</span> Deployment stack</p>
+<table>
+  <thead><tr><th style="width:15%">Layer</th><th>Component</th><th style="width:27%">Runs on</th></tr></thead>
+  <tbody>
+    <tr><td>Weights</td><td>llama.cpp server [21], build b11050: Qwen3-4B-Instruct-2507 Q8_0 GGUF with the v3 LoRA (f16) applied at runtime</td><td>NVIDIA RTX 4060 Laptop (8 GB)</td></tr>
+    <tr><td>Logic</td><td><code>serve/gateway.py</code> (FastAPI): OpenAI-compatible API, routing, solver, retrieval and checks</td><td>CPU</td></tr>
+    <tr><td>Retrieval</td><td><code>ostutor/rag/</code>: extraction, manifest validation, chunking, BM25, MiniLM, fusion, gate, citations</td><td>CPU</td></tr>
+    <tr><td>Interface</td><td>Open WebUI 0.11.3 [23], unmodified; six selectable models (auto and five modes)</td><td>CPU, browser</td></tr>
+  </tbody>
+</table>
+
+<h3>5.2 Teaching modes and request routing<span class="mk">QQc5-2QQ</span></h3>
+<p>The student can pick a mode or leave the choice to the auto router. The router is code, not a prompted model, so its decisions are deterministic and testable. Its order of precedence is fixed. A lexical detector for a shown attempt ("I got 13… is that right?") sends the question to tutor mode. Otherwise the solver's extraction call classifies the question: solvable kinds go to Solve, and questions not about operating systems are declined. Lexical fallbacks handle the rest. The router suite has 28 labelled cases and allows zero misroutes of shown attempts.</p>
+<p class="tcap"><span>Table 5.2</span> The five teaching modes</p>
+<table>
+  <thead><tr><th style="width:12%">Mode</th><th style="width:22%">Purpose</th><th>Layers active</th><th style="width:25%">Output</th></tr></thead>
+  <tbody>
+    <tr><td>Solve</td><td>Worked numerical problems</td><td>Extraction → grounding → simulator; missing inputs asked for; model answers labelled "not computed by a simulator"</td><td>Numbered, auditable steps; final answer last</td></tr>
+    <tr><td>Explain</td><td>Concepts and definitions</td><td>Retrieval → fine-tuned model → fact checker</td><td>Explanation with an example and citations</td></tr>
+    <tr><td>Analyze</td><td>Trade-offs and design</td><td>Solver if solvable; else retrieval → model → fact checker</td><td>Givens, mechanisms, trade-offs, recommendation</td></tr>
+    <tr><td>Tutor</td><td>Student shows an attempt</td><td>Fine-tuned model; reply checked against a private simulator run</td><td>Diagnosis and one leading question</td></tr>
+    <tr><td>Shell</td><td>Linux commands</td><td>Fine-tuned model; command checker</td><td>Command, then each flag explained</td></tr>
+  </tbody>
+</table>
+
+<h3>5.3 Training dataset<span class="mk">QQc5-3QQ</span></h3>
+<p>The training set, <code>ostutor-sft</code> v3.0.0, is built by one command (<code>python -m ostutor.build</code>, seed 42, about six minutes). Each of its five categories teaches one behaviour (Figure 5.2, Table 5.3).</p>
+<figure><img class="w70" src="fig/dataset_mix.png" alt="dataset mix">
+<figcaption><span>Figure 5.2</span> Composition of the 11,760 training rows (source: DATASET_CARD.md)</figcaption></figure>
+<p class="tcap"><span>Table 5.3</span> Training categories and sources</p>
+<table>
+  <thead><tr><th style="width:14%">Category</th><th class="n" style="width:9%">Rows</th><th>Content</th><th style="width:30%">Source</th></tr></thead>
+  <tbody>
+    <tr><td>Procedural</td><td class="n">7,526</td><td>Worked numericals in 39 question types and 8 families, each decision written as a rule plus its comparison; clarification items where an input is missing</td><td>Our own verified simulators</td></tr>
+    <tr><td>Replay</td><td class="n">1,884</td><td>General instructions, the anti-forgetting anchor, chosen by surprise under the base model [12]</td><td>Tülu 3 SFT mixture [11], SmolTalk2</td></tr>
+    <tr><td>Tutoring</td><td class="n">938</td><td>Socratic replies to a student's wrong attempt</td><td>MathDial teacher moves [10]; own OS dialogues</td></tr>
+    <tr><td>Shell</td><td class="n">707</td><td>Natural language to bash; every command passes <code>bash -n</code></td><td>tldr, NL2Bash (MIT), InterCode, NL2SH-ALFA</td></tr>
+    <tr><td>Conceptual</td><td class="n">705</td><td>Concept explanations</td><td>Self-distilled answers to a 295-question bank, plus hand-written gold</td></tr>
+  </tbody>
+</table>
+<p class="src">Plus 240 validation and 600 out-of-distribution rows. Licences: MIT 8,991; ODC-BY-1.0 959; mixed-permissive 925; CC-BY-4.0 885. Three sources were excluded on licence grounds. SHA-256 of the training split: f56a7113…477d.</p>
+<p>Simulator-generated problems are used for procedures because they are correct by construction and can be produced in any number. Scraped worked solutions carry their authors' arithmetic slips, and nothing checks them.</p>
+
+<h3>5.4 Data preprocessing pipeline<span class="mk">QQc5-4QQ</span></h3>
+<p><code>ostutor/build.py</code> runs eleven stages. Each writes its statistics to <code>reports/manifest.json</code>, and a cleaning rule is adopted only after the analysis stage has tested it against the data.</p>
+<figure><img class="w70" src="fig/funnel.png" alt="pipeline funnel">
+<figcaption><span>Figure 5.3</span> Rows remaining after each stage (source: reports/manifest.json)</figcaption></figure>
+<p class="tcap"><span>Table 5.4</span> The eleven stages</p>
+<table>
+  <thead><tr><th class="n" style="width:6%">#</th><th style="width:19%">Stage</th><th>What it does</th></tr></thead>
+  <tbody>
+    <tr><td class="n">1</td><td>Ingest</td><td>31 source files with line-level provenance on every row → 80,732 rows</td></tr>
+    <tr><td class="n">2</td><td>Analyse</td><td>Tests each candidate cleaning rule against the data before adoption</td></tr>
+    <tr><td class="n">3</td><td>Clean and scrub</td><td>Drops refusals, repetition, bash syntax errors and answer-revealing tutor turns; redacts personal data → 70,170</td></tr>
+    <tr><td class="n">4</td><td>Deduplicate</td><td>−656 exact (blake2b), −1,133 near-duplicates (MinHash LSH [16], Jaccard 0.80) → 68,381</td></tr>
+    <tr><td class="n">5</td><td>Decontaminate</td><td>−643 against 4,836 evaluation items: distinctive 13-grams for prose, parameter fingerprints for generated problems → 67,738</td></tr>
+    <tr><td class="n">6–7</td><td>Score, select</td><td>Quality floor, identity dedup, k-centre diversity, weighted family waterfill → 12,000</td></tr>
+    <tr><td class="n">8</td><td>Render</td><td>The model's own chat template, one system prompt per mode</td></tr>
+    <tr><td class="n">9–10</td><td>Split, order, verify</td><td>11,760 train, 240 validation, 600 holdout; at most 4 consecutive rows per category; spaced replay [14]; invariants re-checked</td></tr>
+    <tr><td class="n">11</td><td>Release gates</td><td>19 gates (no secrets, no non-commercial rows, schema, token p99 ≤ 16,384, mixture drift, diversity and others): 19/19 pass</td></tr>
+  </tbody>
+</table>
+<p>The analysis stage corrected two rules. A naive "any shared 13-gram" decontamination removed 58% of procedural rows, because training and evaluation problems share template text, so an evaluation n-gram now counts only if it is rare in training. A tutoring rule requiring at least four messages had silently discarded all 1,508 OS tutoring rows; it was fixed, and a release gate now requires at least 300.</p>
+
+<h3>5.5 Model selection and QLoRA fine-tuning<span class="mk">QQc5-5QQ</span></h3>
+<p>The base model is Qwen3-4B-Instruct-2507 [9] (Apache-2.0), in its non-thinking variant. It shows numbered steps, which students need, rather than hidden reasoning. It fits 16k-token QLoRA training on a T4 and serves at more than 40 tokens per second on an 8 GB card. Training ran on Kaggle's free tier on two Tesla T4 GPUs: 735 optimiser steps in about 3.5 hours.</p>
+<p class="tcap"><span>Table 5.5</span> Fine-tuning configuration</p>
+<table>
+  <thead><tr><th style="width:23%">Setting</th><th style="width:33%">Value</th><th>Reason</th></tr></thead>
+  <tbody>
+    <tr><td>Method</td><td>QLoRA via Unsloth [22], 4-bit base</td><td>Fits 16,384-token sequences in 16 GB</td></tr>
+    <tr><td>LoRA</td><td>r = 32, α = 64, all linear layers, dropout 0.05</td><td>Bounded weight drift; LoRA forgets less [6]</td></tr>
+    <tr><td>Schedule</td><td>LR 1e-4, cosine, 3% warm-up, one epoch</td><td>A second epoch (v2.2) memorised and made the model worse</td></tr>
+    <tr><td>Sequence length</td><td>16,384, no packing</td><td>Longest row 11,648 tokens; packing would break the ordering</td></tr>
+    <tr><td>Precision, optimiser</td><td>fp16, 8-bit AdamW, NEFTune α = 5 [24]</td><td>The T4 has no bf16</td></tr>
+    <tr><td>Loss, selection</td><td>Assistant tokens only; best validation loss</td><td>Learn to answer, not to echo</td></tr>
+  </tbody>
+</table>
+
+<h3>5.6 Verified solver<span class="mk">QQc5-6QQ</span></h3>
+<p>The model never carries out a procedure. It reads the question into typed JSON, using the untuned base (LoRA scale 0), which reads more reliably: 84% extraction accuracy against 79% for the adapter. Every extracted number must appear in the question. This grounding check once caught an invented Banker's Available vector [10, 5, 7] for a problem that stated [3, 3, 2]. A cylinder range such as "0–299" is read as 300 cylinders (Section 6.9). Grounded parameters go to one of seven simulators: CPU scheduling with seven algorithms, page replacement, disk scheduling, Banker's safety, Banker's request, free-space allocation and address translation. Each writes the full numbered solution, and the simulators are unit-tested against canonical textbook answers. When an input is missing, for example a Round Robin quantum, the gateway asks for it and reads the reply together with the original question.</p>
+<figure><img src="shots/code_grounding.png" alt="grounding check">
+<figcaption><span>Figure 5.4</span> <code>ostutor/solver.py</code>: the grounding check that makes delegation trustworthy</figcaption></figure>
+
+<h3>5.7 Retrieval-augmented generation<span class="mk">QQc5-7QQ</span></h3>
+<p>Two corpora were built, and one is selected per deployment. The course corpus holds 105 documents and 2,783 chunks. It combines the faculty's 42 course documents (slides, assigned OSTEP chapters [18], handouts and lab material), Hailperin's <i>Operating Systems and Middleware</i> [19] and 55 Wikipedia articles. The open corpus uses only openly licensed text: from a pool of 3,291 documents, 2,970 documents and 18,515 chunks were kept (Hailperin, Wienand's <i>Computer Science from the Bottom Up</i> [20], 1,054 Wikipedia articles from 24 OS categories, a Wikibook and 1,848 Stack Exchange threads). A manifest records source, licence and SHA-256 for every document, and ingestion refuses the corpus if any entry is missing or changed.</p>
+<p>The filters for the open corpus were fixed before any retrieval experiment. A chunk is dropped if:</p>
+<ul>
+  <li>fewer than 60% of its characters are letters;</li>
+  <li>more than half its lines are code;</li>
+  <li>its relevance falls below the 5th percentile of the textbooks' own chunks (cosine 0.307 to the nearest of 40 ACM CS2013 OS topics [26]);</li>
+  <li>it is a near-duplicate (MinHash, Jaccard ≥ 0.7).</li>
+</ul>
+<p class="tcap"><span>Table 5.6</span> Retrieval pipeline</p>
+<table>
+  <thead><tr><th style="width:19%">Step</th><th>Choice</th><th style="width:32%">Reason</th></tr></thead>
+  <tbody>
+    <tr><td>Extract</td><td>Slides as "Slide N: title"; headings kept; running headers removed; Unicode NFKC</td><td>Citations must name a findable place</td></tr>
+    <tr><td>Chunk</td><td>Split by heading; ≤ 180 words with 30-word overlap; title and heading path kept</td><td>One idea per chunk</td></tr>
+    <tr><td>Lexical index</td><td>BM25 [15], k₁ = 1.5, b = 0.75</td><td>Exact OS terms matter</td></tr>
+    <tr><td>Dense index</td><td>all-MiniLM-L6-v2 [25], local only</td><td>Paraphrase; CPU; private</td></tr>
+    <tr><td>Fusion</td><td>Reciprocal rank fusion [17], k = 60; top 4</td><td>No score calibration needed</td></tr>
+    <tr><td>Abstain gate</td><td>Max cosine or max BM25 above a threshold fitted on the dev half (course corpus: cosine 0.59 or BM25 18.5; open corpus: cosine 0.52 or BM25 24.0)</td><td>A least-bad passage would be cited as support</td></tr>
+    <tr><td>Prompt</td><td>Trained prompt unchanged, then passages [S1]…[S4], then a rule never to invent a citation</td><td>The adapter sees the prompt it learned</td></tr>
+    <tr><td>Follow-ups</td><td>A short message that refers back is retrieved with the previous question</td><td>"Does LRU suffer from it?" alone retrieves nothing</td></tr>
+  </tbody>
+</table>
+<figure><img src="shots/code_retrieve.png" alt="hybrid retrieval">
+<figcaption><span>Figure 5.5</span> <code>ostutor/rag/retrieve.py</code>: BM25 and dense rankings, the abstain gate and reciprocal rank fusion</figcaption></figure>
+
+<h3>5.8 Checks in the gateway<span class="mk">QQc5-8QQ</span></h3>
+<ul>
+  <li><b>Fact checker.</b> It checks prose against ten known misconceptions. A negation counts only within or just before the claim, and question-form headings are not read as claims. A non-streamed answer is redrafted, and a streamed answer gets the correct fact appended once the stream ends.</li>
+  <li><b>Tutor check.</b> The simulator solves the student's problem privately. A verified correct attempt is confirmed by the gateway directly; for a wrong attempt the model is told only that it is wrong, never the answer. A reply that states the answer, asserts any result the student did not write, or works the problem out step by step is redrafted once; if the redraft also fails, the student receives a fixed Socratic hint for that problem kind.</li>
+  <li><b>Command checker.</b> Shell commands are checked for known pitfalls before they are shown. A mechanical fix (for example sorting human-readable sizes with <code>sort -h</code>) is applied and explained, and risky commands carry a caution.</li>
+  <li><b>Scope.</b> A question that is not about operating systems is declined with a short explanation, without calling the model.</li>
+  <li><b>History hygiene, isolation and labelling.</b> Gateway tags and footers are scrubbed from the history and from model output. A worked problem is answered on its own, without earlier problems in the chat. An answer no simulator produced is labelled as such.</li>
+</ul>
+<figure><img src="shots/code_gateway_layers.png" alt="gateway layers">
+<figcaption><span>Figure 5.6</span> <code>serve/gateway.py</code>: layer 1 is the simulator, layer 2 retrieval, layer 3 the fact checker</figcaption></figure>
+<figure><img src="shots/code_tutor_check.png" alt="tutor reply check">
+<figcaption><span>Figure 5.7</span> <code>serve/gateway.py</code>: the check every tutor reply passes before it is shown</figcaption></figure>
+
+<h3>5.9 Evaluation methodology<span class="mk">QQc5-9QQ</span></h3>
+<p>Every comparison is paired: the same items are scored under two configurations. For a paired yes/no outcome with few discordant items, the right test is the exact two-sided McNemar test [27], and every p-value in Section 6 uses it. Decoding is greedy, and evaluation requests disable the server's prompt cache, which had made greedy decoding non-deterministic. One adapter is loaded per server, enforced by a guard. Each run records commit, model hashes, server arguments and decoding settings.</p>
+<p class="tcap"><span>Table 5.7</span> Evaluation sets</p>
+<table>
+  <thead><tr><th style="width:30%">Set</th><th class="n" style="width:9%">Items</th><th>Measures</th><th style="width:24%">Graded by</th></tr></thead>
+  <tbody>
+    <tr><td>Hand-written OS problem suite</td><td class="n">57</td><td>Procedural correctness, 19 kinds</td><td>Simulator-exact grader</td></tr>
+    <tr><td>Out-of-distribution holdout</td><td class="n">600</td><td>Unseen problem framings</td><td>Simulator-exact</td></tr>
+    <tr><td>General knowledge (MMLU [28])</td><td class="n">400</td><td>Catastrophic forgetting outside computer science</td><td>Log-likelihood of the four options</td></tr>
+    <tr><td>Adjacent computer science (MMLU CS subjects)</td><td class="n">300</td><td>Forgetting or transfer in nearby subjects</td><td>Log-likelihood of the four options</td></tr>
+    <tr><td>OS theory MCQ</td><td class="n">70</td><td>Declarative OS knowledge (forgetting test)</td><td>Log-likelihood of the four options</td></tr>
+    <tr><td>OS theory MCQ, expanded</td><td class="n">200</td><td>The 70 items plus 130 new ones (retrieval test)</td><td>Generated option letter</td></tr>
+    <tr><td>Retrieval questions</td><td class="n">164</td><td>124 in scope, 40 not covered; dev and test halves</td><td>Recall@k, MRR, abstention</td></tr>
+    <tr><td>Short-answer questions</td><td class="n">144</td><td>Factual recall over 12 topics; dev and test halves</td><td>Accepted answer present</td></tr>
+    <tr><td>Tutor attempts</td><td class="n">30</td><td>24 wrong and 6 right attempts over four problem kinds</td><td>Rules plus reading by hand</td></tr>
+    <tr><td>Fact-checker probes</td><td class="n">10</td><td>One question per misconception rule</td><td>Reading by hand</td></tr>
+  </tbody>
+</table>
+<p>All thresholds were fitted on the dev half and reported once on the test half, and every training row was decontaminated against all 4,836 evaluation items that existed when the dataset was built.</p>
+
+<h3>5.10 Engineering quality and reproducibility<span class="mk">QQc5-10QQ</span></h3>
+<p class="tcap"><span>Table 5.8</span> Automated test suites (CPU only, no model server needed)</p>
+<table>
+  <thead><tr><th style="width:32%">Suite</th><th class="n" style="width:10%">Checks</th><th>Covers</th></tr></thead>
+  <tbody>
+    <tr><td><code>tools/test_pipeline.py</code></td><td class="n">124</td><td>Simulators against textbook answers; cleaning, deduplication, decontamination, gates</td></tr>
+    <tr><td><code>serve/test_gateway.py</code></td><td class="n">76</td><td>Routing, layers, missing inputs, history scrub, tutor check, command check, scope, fact checker</td></tr>
+    <tr><td><code>tools/test_rag.py</code></td><td class="n">69</td><td>Manifest refusal, extraction, chunking, retrieval, gate, citations, follow-ups</td></tr>
+    <tr><td><code>tools/test_g0.py</code></td><td class="n">58</td><td>Statistics, extraction scoring, disk range reading, grader regressions, adapter guard</td></tr>
+    <tr><td><code>tools/test_router.py</code></td><td class="n">28</td><td>Labelled routing cases; 0 misroutes of attempts allowed</td></tr>
+    <tr class="b"><td>Total</td><td class="n">355</td><td>All passing</td></tr>
+  </tbody>
+</table>
+<p>The released dataset files are stored with their SHA-256 hashes, and the dataset-building code path is unchanged by the final fixes: the fact checker's original reading is kept for the build, and the old and new code give identical results on all 19,911 texts compared. A decision log (<code>docs/DECISIONS.md</code>) records each significant decision with its alternatives and evidence, and every number in this report names the result file it comes from.</p>
+</section>
+
+<!-- ============================== 6 RESULTS ============================== -->
+<section class="pb" id="c6">
+<div class="chap"><h2>6.&nbsp;&nbsp;Results and Discussion<span class="mk">QQc6QQ</span></h2></div>
+
+<h3>6.1 Prompts<span class="mk">QQc6-1QQ</span></h3>
+<p>The adapter learned each behaviour under one exact system prompt, kept in <code>ostutor/config.py</code>. The gateway sends these prompts word for word, because a reworded prompt is one the adapter never saw. Rules a small model might ignore are enforced by the gateway in code.</p>
+<p class="tcap"><span>Table 6.1</span> Trained system prompts (verbatim)</p>
+<table>
+  <thead><tr><th style="width:11%">Mode</th><th>System prompt</th></tr></thead>
+  <tbody>
+    <tr><td>Solve</td><td>You are an Operating Systems tutor. Solve the problem with numbered, auditable steps. Show every intermediate state. State the final answer last. If the question does not state an input the answer depends on, do not assume a value: say which input is missing and ask for it instead.</td></tr>
+    <tr><td>Explain</td><td>You are an Operating Systems tutor. Explain the concept clearly and precisely, using a concrete example.</td></tr>
+    <tr><td>Tutor</td><td>You are an Operating Systems tutor. Guide the student with hints and questions rather than solutions. When the student shows an attempt, diagnose the misconception behind it and ask a question that leads them to the error. Never state the correct final answer - the student must reach it.</td></tr>
+    <tr><td>Analyze</td><td>You are a senior Operating Systems engineer teaching a student to reason about system behaviour. Work in this order: (1) state what the question gives you and any assumption you must make; (2) identify the mechanisms involved and what each one costs; (3) weigh the trade-offs, quantifying with a concrete calculation wherever the numbers allow; (4) give a clear recommendation or conclusion, and say what evidence would change it. Be precise about what is certain and what depends on the workload. If an input the analysis depends on is missing, say which and ask for it.</td></tr>
+    <tr><td>Shell</td><td>You are a Linux systems instructor. Give the correct shell command and explain each flag.</td></tr>
+  </tbody>
+</table>
+<p>Three gateway prompts surround these. The extraction prompt asks the untuned base for "ONLY a JSON object of its parameters" in one of seven typed schemas (for example <code>{"kind":"paging","policy":"FIFO|LRU|OPT|CLOCK","frames":&lt;int&gt;,"refs":[…]}</code>), or a label such as concept, analysis, shell or offtopic. The retrieval prompt appends the passages as [S1]…[S4] with the rule "Where your answer relies on these reference passages, cite them as [S1], [S2] and so on. … Never invent a citation." For a wrong attempt, the rule appended after the tutor prompt reads: "Before you reply: The student's final answer has been checked and is incorrect. Do not tell them the correct value. Name the idea behind their first mistake and ask one question that leads them to it. Do not solve the problem for them: write no step-by-step trace, schedule or table, and state no final answer or total. Keep it short and end with one question." A verified correct attempt is confirmed by the gateway itself, without a model call.</p>
+
+<h3>6.2 Evaluation outputs<span class="mk">QQc6-2QQ</span></h3>
+<p>The examples below are unedited replies from the running system (open corpus, greedy decoding), recorded through its API on 24 October 2026. Where a long reply is shortened, the omission is marked "[…]". The italic line at the end of each reply is the route the gateway recorded.</p>
+@@CHAT:auto_rr|Auto mode routed to Solve: Round Robin with arrivals|10|14@@
+<p>The router sent the problem to Solve, and the scheduling simulator produced every step, including the queue rule that the model alone got wrong. The average waiting time of 4.5 is exact.</p>
+@@CHAT:solve_missing|Solve mode: the same problem without a time quantum|0|0@@
+<p>The gateway asked for the missing quantum instead of letting the model assume one. When the student replied "The time quantum is 2.", the reply was read with the original question and the verified solution of Figure 6.1 followed.</p>
+@@CHAT:explain_followup|Explain mode: a follow-up question, answered with cited sources|0|0@@
+<p>The follow-up names no topic, and on its own it retrieves nothing from either corpus. Retrieved together with the previous question, it gives a correct, cited answer: LRU is a stack algorithm and is immune to Belady's anomaly. Each cited statement appears in its passage: [S2] is Hailperin's section on replacement policy, which states that "both OPT and LRU are immune from Belady's anomaly, as are all other members of the class of stack algorithms".</p>
+@@CHAT:auto_banker|Auto mode routed to Solve: Banker's safety algorithm|8|9@@
+@@CHAT:auto_tutor_fcfs|Auto mode routed to Tutor: a student shows a wrong attempt|0|0@@
+<p>The router recognised the attempt, and the private simulator run judged it wrong (the correct average is 4.0). The reply points the student to the step to recheck without revealing the value. Section 6.9.1 shows a reply of the kind this check now stops.</p>
+@@CHAT:shell|Shell mode: a command checked before it is shown|0|0@@
+@@CHAT:disk_range|Solve mode: a disk stated as a cylinder range|6|9@@
+@@CHAT:auto_offtopic|Auto mode: an off-topic question|0|0@@
+
+<h3>6.3 Training<span class="mk">QQc6-3QQ</span></h3>
+<figure><img class="w80" src="fig/loss.png" alt="loss curves">
+<figcaption><span>Figure 6.9</span> Training and validation loss of the v3 run (source: outputs/ostutor-lora-v3/ostutor-lora/train_metrics.json)</figcaption></figure>
+<p>Validation loss fell at each of the 12 periodic evaluations, from 0.4413 at step 59 to 0.2713 at step 708, and the end-of-epoch evaluation at step 735 confirmed 0.2713, so training was healthy. The training-loss curve rises late in the epoch because the engineered ordering changes the batch mix, and validation kept falling throughout. A low teacher-forced loss does not show that a model can solve problems: the out-of-distribution loss reached 0.0139, yet the adapter alone solves 34 of 57 suite problems. Loss is therefore reported only as a training-health signal, and capability is measured separately below.</p>
+
+<h3>6.4 Procedural accuracy and ablation<span class="mk">QQc6-4QQ</span></h3>
+<p>All six configurations were measured on the served path (llama.cpp, one adapter per server, greedy decoding) over the 57-item suite.</p>
+<figure><img class="w80" src="fig/ablation.png" alt="ablation">
+<figcaption><span>Figure 6.10</span> Problems solved exactly by configuration (source: reports/g0/20261012-1429/regraded.md)</figcaption></figure>
+<p class="tcap"><span>Table 6.2</span> Paired significance of each component (exact McNemar test)</p>
+<table>
+  <thead><tr><th>What is tested</th><th>A → B</th><th class="n">Right → wrong</th><th class="n">Wrong → right</th><th class="n">p</th></tr></thead>
+  <tbody>
+    <tr class="b"><td>Solver, on v3</td><td>34 → 57</td><td class="n">0</td><td class="n">23</td><td class="n">&lt; 10⁻⁶</td></tr>
+    <tr><td>Solver, on the base</td><td>30 → 49</td><td class="n">0</td><td class="n">19</td><td class="n">4 × 10⁻⁶</td></tr>
+    <tr><td>Adapter, with the solver</td><td>49 → 57</td><td class="n">0</td><td class="n">8</td><td class="n">0.0078</td></tr>
+    <tr><td>Adapter, without the solver</td><td>30 → 34</td><td class="n">11</td><td class="n">15</td><td class="n">0.557</td></tr>
+    <tr><td>v2.2 → v3, no solver</td><td>19 → 34</td><td class="n">2</td><td class="n">17</td><td class="n">0.0007</td></tr>
+  </tbody>
+</table>
+<p class="src">Source: reports/g0/20261012-1429/regraded.md.</p>
+<p>The solver is the main lever: it adds 19 to 23 problems with zero losses. The fine-tuned adapter contributes the 8 problems the solver declines, also with no losses (p = 0.0078). Without the solver, the adapter's +4 cannot be told apart from noise, which is why the system is built as a tool-using tutor rather than as a bigger fine-tune. v3 also corrected v2.2, an earlier adapter whose second epoch made it significantly worse than the base.</p>
+
+<h3>6.5 Out-of-distribution generalisation<span class="mk">QQc6-5QQ</span></h3>
+<figure><img class="w80" src="fig/ood.png" alt="ood">
+<figcaption><span>Figure 6.11</span> End-to-end correctness on the 600-item holdout, by kind (sources: reports/g0/20261012-1429/ood.json; disk items re-run in reports/final_review/disk.json)</figcaption></figure>
+<p>The system answers 599 of the 600 holdout problems correctly (99.8%). It extracts the parameters exactly for 594 (99.0%) and delegates 99.2% of the problems to a simulator. Six of the seven kinds are perfect, including all 80 disk problems after the range fix of Section 6.9.2 (74 before). The one remaining error is a scheduling problem that the extractor did not delegate, so the model answered it.</p>
+
+<h3>6.6 Catastrophic forgetting<span class="mk">QQc6-6QQ</span></h3>
+<figure><img class="w80" src="fig/forgetting.png" alt="forgetting">
+<figcaption><span>Figure 6.12</span> Base model against fine-tuned v3 on the same items (source: reports/forgetting_v3_paired.json)</figcaption></figure>
+<p>No effect is statistically detectable in either direction. General knowledge is retained (80.25% → 79.50%, 13 items lost and 10 gained, p = 0.68). The adjacent-CS gain (+2.66 pp) and the OS-theory change (−4.29 pp, which hinges on 5 discordant questions) are both within noise. On the larger 200-item theory set the fine-tuned model matches the base (186 against 185, Figure 6.16). Objective O2 is met.</p>
+
+<h3>6.7 Retrieval quality and latency<span class="mk">QQc6-7QQ</span></h3>
+<p class="tcap"><span>Table 6.3</span> Retrieval on the course corpus (124 in-scope questions; a hit is the labelled passage)</p>
+<table>
+  <thead><tr><th>Retriever</th><th class="n">Recall@1</th><th class="n">Recall@5</th><th class="n">Doc. recall@5</th><th class="n">MRR@10</th><th class="n">p95 latency</th></tr></thead>
+  <tbody>
+    <tr><td>BM25 only</td><td class="n">46.8%</td><td class="n">75.8%</td><td class="n">88.7%</td><td class="n">0.586</td><td class="n">0.72 ms</td></tr>
+    <tr><td>Dense only (MiniLM)</td><td class="n">46.0%</td><td class="n">75.0%</td><td class="n">84.7%</td><td class="n">0.585</td><td class="n">8.17 ms</td></tr>
+    <tr class="b"><td>Hybrid, RRF (served)</td><td class="n">46.0%</td><td class="n">79.0%</td><td class="n">87.9%</td><td class="n">0.615</td><td class="n">9.21 ms</td></tr>
+  </tbody>
+</table>
+<p class="src">Source: reports/rag/corpus_eval.md. A larger embedder (multilingual-e5-base) reached 81.5% recall@5, not significantly better (p = 0.65), at three times the latency.</p>
+<p>Hybrid retrieval gives the best recall@5 and MRR at 9.21 ms (95th percentile), far inside the 500 ms budget. On the larger open corpus the 95th percentile is 21.2 ms (reports/final_review/open_latency.json, 308 queries, three passes). The gate gave notes to 59 of 62 in-scope test questions and withheld them from 18 of 20 off-topic ones. The two corpora share no labelled passages, so they were compared by answer recall: whether a retrieved passage contains an accepted answer to one of the 144 short-answer questions (Figure 6.13).</p>
+<figure><img class="w80" src="fig/corpus_recall.png" alt="corpus recall">
+<figcaption><span>Figure 6.13</span> Answer recall on the test half, by corpus and with each open source removed (source: reports/rag/compare_test.md)</figcaption></figure>
+<p>The open corpus retrieves an answer for 83.3% of the test questions, against 73.6% for the course corpus. Over all 144 questions the difference is significant (83.3% against 74.3%, p = 0.024), and at recall@10 the gap widens to 94.4% against 76.4%. Removing Wikipedia costs 18 points (p = 0.002), and the quality filters cost nothing: the unfiltered pool, 17% larger, scores within one question.</p>
+<p>A cross-encoder re-ranker (mxbai-rerank-xsmall-v1 [29], int8 on the CPU) was evaluated on the same test half. It raised answer recall@1 from 52.8% to 72.2% and recall@4 from 81.9% to 87.5%, above the 85% target, at a 95th-percentile cost of 310 ms (Figure 6.14). Correct answers stayed level (62 against 61 of 72, p = 1.0), so the served configuration keeps the faster hybrid retriever, and the re-ranker is available where retrieval quality itself is the goal.</p>
+<figure><img class="w80" src="fig/reranker.png" alt="reranker">
+<figcaption><span>Figure 6.14</span> Re-ranker: retrieval quality and answer accuracy (source: re-ranker experiment logs, 23 October 2026)</figcaption></figure>
+
+<h3>6.8 Retrieval end to end<span class="mk">QQc6-8QQ</span></h3>
+<figure><img class="w80" src="fig/short_answers.png" alt="short answers">
+<figcaption><span>Figure 6.15</span> Short-answer accuracy on the test half (sources: reports/rag/e2e-20261013-1339, reports/rag/e2e-short-course)</figcaption></figure>
+<p class="tcap"><span>Table 6.4</span> Effect of retrieval on the fine-tuned model's short answers (exact McNemar)</p>
+<table>
+  <thead><tr><th>Comparison (v3)</th><th class="n">Right → wrong</th><th class="n">Wrong → right</th><th class="n">p</th></tr></thead>
+  <tbody>
+    <tr class="b"><td>No retrieval → open corpus, test half (68.1% → 86.1%)</td><td class="n">4</td><td class="n">17</td><td class="n">0.0072</td></tr>
+    <tr><td>No retrieval → open corpus, all 144 (70.8% → 85.4%)</td><td class="n">9</td><td class="n">30</td><td class="n">0.0011</td></tr>
+    <tr><td>No retrieval → course corpus, test half (68.1% → 81.9%)</td><td class="n">4</td><td class="n">14</td><td class="n">0.0309</td></tr>
+    <tr><td>Course corpus → open corpus, all 144</td><td class="n">11</td><td class="n">10</td><td class="n">1.000</td></tr>
+  </tbody>
+</table>
+<p class="src">Source: reports/rag/short_e2e-short-course_vs_e2e-20261013-1339.md.</p>
+<figure><img class="w70" src="fig/mcq.png" alt="mcq">
+<figcaption><span>Figure 6.16</span> 200-item theory MCQ, four configurations (source: reports/rag/e2e-20261012-2239/summary.md)</figcaption></figure>
+<p class="tcap"><span>Table 6.5</span> Grounding and speed of explain answers</p>
+<table>
+  <thead><tr><th>Measure</th><th class="n">Course corpus</th><th class="n">Open corpus</th></tr></thead>
+  <tbody>
+    <tr><td>Answers citing at least one passage, when given passages</td><td class="n">50/59</td><td class="n">69/72</td></tr>
+    <tr class="b"><td>Invented citations</td><td class="n">0</td><td class="n">0</td></tr>
+    <tr><td>Cited sentences supported, base-model judge</td><td class="n">117/143 (81.8%)</td><td class="n">110/138 (79.7%)</td></tr>
+    <tr><td>Cited claims fully supported, strict manual check of 40</td><td class="n">24/40 (60%)</td><td class="n">25/38 (66%)</td></tr>
+    <tr><td>Decode speed, median (target ≥ 20 tok/s)</td><td class="n">42.9 tok/s</td><td class="n">42.0 tok/s</td></tr>
+    <tr><td>Decode speed, slowest answer</td><td class="n">41.6 tok/s</td><td class="n">39.2 tok/s</td></tr>
+  </tbody>
+</table>
+<p>Retrieval gives a clear, significant gain on recall questions: +18 points on the test half with the open corpus, where the model must produce a term rather than recognise it among options. On the MCQ every configuration lies between 92.0% and 93.0%, so there is little left for passages to fix. The two corpora give the same answer accuracy (123 and 124 of 144). The open corpus covers more ground and can be shared freely, while the course corpus cites the course's own slides. No answer cited a passage that does not exist. On a strict reading, 60–66% of cited claims are supported in full, the rest mostly add the model's own elaboration, or an example the passage does not contain, to a correctly cited passage.</p>
+
+<h3>6.9 Issues found in testing and their fixes<span class="mk">QQc6-9QQ</span></h3>
+<p>End-to-end testing of the deployed system, through the chat interface and the evaluation sets above, found five faults. Each was diagnosed to its root cause, fixed in code and covered by automated tests. The tutor, disk and off-topic fixes were re-measured on the live model; the fact checker was re-scored on the saved probe answers, and the shell fix was checked on the recorded command. Table 6.6 summarises them, and the subsections give the evidence.</p>
+<p class="tcap"><span>Table 6.6</span> Faults found in testing: cause, fix and measured result</p>
+<table>
+  <thead><tr><th style="width:17%">Fault</th><th style="width:25%">Root cause</th><th style="width:30%">Fix</th><th>Before → after</th></tr></thead>
+  <tbody>
+    <tr><td>Tutor revealed a (wrong) count</td><td>Tutor mode was isolated from the solver, so nothing checked its reply</td><td>Private simulator check; reply rules; redraft; safe hint</td><td>Replies that keep the answer back 15/30 → 30/30; correct students confirmed 0/6 → 6/6</td></tr>
+    <tr><td>Disk size misread</td><td>"0–299" read as 299 cylinders; the grounding check passes it because 299 is in the text</td><td>Range read in <code>normalise()</code>: size = top + 1</td><td>Disk items 74/80 → 80/80; extraction 71/80 → 80/80; none lost</td></tr>
+    <tr><td>Fact-checker false alarms and a miss</td><td>Negation was searched sentence-wide; question headings were read as claims</td><td>Negation scoped to the claim; questions skipped; hedges after the claim respected</td><td>Precision 1/3 → 2/2; recall 1/2 → 2/2 (10 probes); 70 broad answers: 0 flags</td></tr>
+    <tr><td>Shell command sorted sizes as text</td><td>Commands were model-generated and unchecked</td><td>Command checker with mechanical fixes and cautions</td><td>Recorded command corrected to <code>sort -k 5 -rh</code></td></tr>
+    <tr><td>Off-topic question answered</td><td>The classifier's off-topic verdict only added a note</td><td>Off-topic questions declined without a model call</td><td>Everyday questions declined 0/20 → 17/20; OS questions answered 267/268</td></tr>
+  </tbody>
+</table>
+
+<h4>6.9.1 Tutor replies</h4>
+<p>During testing, a student's FIFO attempt of 13 page faults was routed correctly to tutor mode. The model diagnosed the right misconception, but it then walked through the trace itself, ignored the three-frame limit and stated "So total page faults = 7"; the simulator gives 10. Figure 6.17 shows that original reply. The fix runs the simulator privately on the student's problem. The model is told only whether the attempt is right, and the reply is checked before it is shown. A reply that states the answer, asserts any result the student did not write, or contains a step-by-step trace is redrafted once, and otherwise replaced by a fixed hint for that problem kind. The check was measured on 30 attempts, 24 wrong and 6 right, with the old and new paths answering the same items (Table 6.7).</p>
+@@CHAT:tutor_before|Tutor reply before the fix (the reply the check now stops)|8|22|6.17@@
+<p class="tcap"><span>Table 6.7</span> Tutor replies before and after the check (30 attempts; source: reports/final_review/tutor.json)</p>
+<table>
+  <thead><tr><th>Reply property</th><th class="n">Before</th><th class="n">After</th></tr></thead>
+  <tbody>
+    <tr><td>Withholds the simulator's answer (24 wrong attempts)</td><td class="n">19/24</td><td class="n">24/24</td></tr>
+    <tr><td>States no result of its own</td><td class="n">24/30</td><td class="n">30/30</td></tr>
+    <tr><td>Leaves the working to the student (no step-by-step trace)</td><td class="n">21/30</td><td class="n">30/30</td></tr>
+    <tr class="b"><td>Keeps the answer back on all three counts</td><td class="n">15/30</td><td class="n">30/30</td></tr>
+    <tr><td>Does not agree with a wrong attempt</td><td class="n">24/24</td><td class="n">24/24</td></tr>
+    <tr><td>Confirms a correct attempt</td><td class="n">0/6</td><td class="n">6/6</td></tr>
+    <tr><td>Asks the student a question</td><td class="n">30/30</td><td class="n">30/30</td></tr>
+  </tbody>
+</table>
+<p>After the check, all 30 replies keep the answer back: none states the answer, asserts a result or works the problem out. 21 drafts passed as written, 3 were redrafted once, and the fixed hint was never needed. The six correct students are now told so by the gateway, with a question about their method; before, the model confirmed none of them. The private simulator judged 28 of the 30 attempts, and for the other two, where the solver could not read the problem, it returned "unknown" rather than a wrong verdict; those two replies were still checked and kept the answer back. The median reply took 11.3 s, including the private simulator run. We also read the 24 model-written hints by hand. Nineteen are accurate. Two contain a factual error: one says Round Robin generally gives lower waiting times than other policies, and one lists a SCAN service order wrongly. Two call a wrong answer "plausible", and one describes the SCAN return trip loosely. The check guarantees that no hint gives the answer away; the wording of the hint itself still comes from the model (Section 8).</p>
+
+<h4>6.9.2 Disk size from a cylinder range</h4>
+<p>In the holdout, six disk answers were wrong because a range such as "device spans 0–299" was extracted as a disk size of 299 rather than 300 cylinders, which changes the SCAN and C-SCAN head movement. The grounding check passes such a value, since 299 appears in the question. <code>normalise()</code> now detects a 0-based cylinder range and sets the size to its top plus one when the extractor returned the top. Re-run on the live model, the 80 disk items of the holdout went from 74 to 80 correct and from 71 to 80 exactly extracted, with no item lost (reports/final_review/disk.json). Figure 6.7 shows a range-stated problem answered by the simulator, and three new tests cover the range, a size already read correctly, and a stated size with no range.</p>
+
+<h4>6.9.3 Fact checker</h4>
+<p>The saved v3 answers to the ten probes were re-scored with the corrected checker. The two false alarms were question headings ("### Does a Cycle Always Indicate Deadlock?"), which are no longer read as claims. The miss, "Segmentation suffers from internal fragmentation but not external fragmentation", was hidden by the "not" of the second clause; negation now counts only within 30 characters before the claim. The checker now flags both answers that state a misconception and none of the eight that do not, and it still flags none of 70 broader theory answers. Four new tests cover the cases.</p>
+
+<h4>6.9.4 Shell commands and off-topic questions</h4>
+<p>The recorded command <code>find … -exec ls -lh {} \; | sort -k 5 -r</code> sorted human-readable sizes as text, so 9.5M would sort above 12M. The command checker corrects such a sort to <code>sort -k 5 -rh</code> and explains the change (Figure 6.6). It also quotes unquoted <code>find -name</code> patterns, and it adds a caution to recursive deletes from the root or home directory and to <code>chmod 777</code>. An off-topic question (Figure 6.8) is now declined without calling the model. On the live classifier, 17 of 20 everyday questions are declined. The other three (vaccines, photosynthesis and the offside rule) are answered with the notice that the reference corpus does not cover them. Of 268 OS questions (124 retrieval and 144 short-answer), one is declined, a computing-history question: "Which company's research lab first invented the desktop GUI?" (reports/final_review/offtopic.json).</p>
+
+<h3>6.10 Objectives scorecard and discussion<span class="mk">QQc6-10QQ</span></h3>
+<p class="tcap"><span>Table 6.8</span> Objectives: targets and measured results</p>
+<table>
+  <thead><tr><th style="width:6%">#</th><th>Measure</th><th class="n">Target</th><th class="n">Measured</th><th style="width:22%">Status</th></tr></thead>
+  <tbody>
+    <tr><td>O1</td><td>Dataset release gates</td><td class="n">all pass</td><td class="n">19/19</td><td>Met</td></tr>
+    <tr><td>O2</td><td>Forgetting on general MMLU</td><td class="n">not significant</td><td class="n">−0.75 pp, p = 0.68</td><td>Met</td></tr>
+    <tr><td>O3</td><td>Problem suite, full system</td><td class="n">57/57</td><td class="n">57/57</td><td>Met</td></tr>
+    <tr><td>O3</td><td>OOD holdout, 600 items</td><td class="n">—</td><td class="n">99.8%</td><td>Reported</td></tr>
+    <tr><td>O4</td><td>Missing input asked for, never assumed</td><td class="n">always</td><td class="n">tested and shown live</td><td>Met</td></tr>
+    <tr><td>O5</td><td>Recall@5 (open corpus, answer recall)</td><td class="n">≥ 85%</td><td class="n">83.3% served; 87.5% re-ranked</td><td>Met with re-ranker; served retriever kept for speed (Section 6.7)</td></tr>
+    <tr><td>O5</td><td>Off-topic questions withheld or declined</td><td class="n">≥ 90%</td><td class="n">course 18/20 (90%); open 14/20 (70%)</td><td>Met on the course corpus; on the open corpus the six that pass are adjacent CS topics, answered with cited sources</td></tr>
+    <tr><td>O5</td><td>Answers citing a passage (open corpus)</td><td class="n">≥ 90%</td><td class="n">95.8%</td><td>Met</td></tr>
+    <tr><td>O5</td><td>Invented citations</td><td class="n">0</td><td class="n">0</td><td>Met</td></tr>
+    <tr><td>O6</td><td>Short answers, v3 with vs without retrieval</td><td class="n">better</td><td class="n">86.1% vs 68.1%, p = 0.007</td><td>Met</td></tr>
+    <tr><td>O6</td><td>Theory MCQ (200), v3 with open retrieval vs base</td><td class="n">not worse</td><td class="n">93.0% vs 92.5%, p = 1.0</td><td>Met</td></tr>
+    <tr><td>O7</td><td>Routing cases correct; replies keeping the answer back</td><td class="n">all; all</td><td class="n">28/28; 30/30</td><td>Met</td></tr>
+    <tr><td>O8</td><td>Retrieval p95; decode speed</td><td class="n">≤ 500 ms; ≥ 20 tok/s</td><td class="n">9.2–21.2 ms; 39.2–42.9</td><td>Met</td></tr>
+  </tbody>
+</table>
+<p>Each layer guards a different failure and is measured on its own. The simulator guards procedures (+23 problems, no losses). Retrieval guards factual recall (+18 points) and makes answers traceable. The fact checker guards known misconceptions, and the tutor check keeps answers away from a student who is still working. The measurements also show where the gains come from. Fine-tuning contributes the 8 problems beyond the solver and the trained teaching formats. The large gains come from architecture (delegation, grounding and checking) and from auditing the evaluation itself.</p>
+</section>
+
+<!-- ============================== 7 CONCLUSION ============================== -->
+<section class="pb" id="c7">
+<div class="chap"><h2>7.&nbsp;&nbsp;Conclusion<span class="mk">QQc7QQ</span></h2></div>
+<p>This project set out to build an Operating Systems tutor whose numbers are always right, whose explanations can be checked and whose teaching does not give the answer away, on hardware a student or department already owns. The result is a complete, working system, and each of its central claims is backed by a paired, significance-tested measurement.</p>
+<ul>
+  <li><b>Exact procedural answers.</b> By separating reading from computing, the system solves all 57 hand-written problems (the untuned model solves 30) and 599 of 600 problems in framings it never saw. When an input is missing it asks for it instead of guessing.</li>
+  <li><b>Grounded, cited explanations.</b> Hybrid retrieval over a 2,970-document open corpus raised short-answer accuracy from 68.1% to 86.1% (p = 0.007). No answer cited a source that does not exist, and the tutor says plainly when its sources do not cover a question.</li>
+  <li><b>Teaching that withholds answers.</b> Every tutor reply is checked against a private simulator run before it is shown. On 30 student attempts, the share of replies that keep the answer back rose from 15/30 to 30/30, and every correct student was told so.</li>
+  <li><b>A specialised model that kept its general ability.</b> QLoRA fine-tuning on 11,760 curated rows, on free GPUs, produced no detectable forgetting.</li>
+  <li><b>Private and fast.</b> The whole stack runs on one 8 GB laptop GPU at about 43 tokens per second, and retrieval adds 9–21 ms at the 95th percentile.</li>
+  <li><b>Engineering discipline.</b> A reproducible data build with 19 release gates, 355 automated checks, a decision log, and every reported number traced to a result file. Every fault found in end-to-end testing was fixed and re-measured.</li>
+</ul>
+<p>The decisive gains came from architecture and measurement rather than from more data or a bigger model: delegating computation, grounding claims, checking replies before they are shown, and auditing the evaluation itself.</p>
+<p><b>Source code.</b> The complete source, dataset build, evaluation harness and the scripts that produce this report's figures are available at <b><a href="https://github.com/Divyakush2006/OS-Tutor">https://github.com/Divyakush2006/OS-Tutor</a></b>.</p>
+<p class="tcap"><span>Table 7.1</span> Reproducing the results from the repository</p>
+<table>
+  <thead><tr><th style="width:52%">Command</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td><code>python -m ostutor.build</code></td><td>Build the dataset (11 stages, 19 release gates)</td></tr>
+    <tr><td><code>tools/test_pipeline.py</code>, <code>test_rag.py</code>, <code>test_g0.py</code>, <code>test_router.py</code>; <code>serve/test_gateway.py</code></td><td>Run the 355 automated checks (CPU)</td></tr>
+    <tr><td><code>python tools/g0_ablation.py</code></td><td>Problem suite, OOD holdout, fact checker (GPU)</td></tr>
+    <tr><td><code>python tools/rag_eval.py data/rag/corpus --calibrate</code></td><td>Retrieval quality and gate</td></tr>
+    <tr><td><code>python tools/rag_e2e.py data/rag/open</code></td><td>End-to-end retrieval evaluation (GPU)</td></tr>
+    <tr><td><code>python tools/final_review_eval.py</code></td><td>Before/after measurements of the testing fixes (GPU)</td></tr>
+    <tr><td><code>powershell -File serve\start_tutor.ps1</code></td><td>Serve the tutor (with <code>OSTUTOR_RAG=data/rag/open</code>)</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============================== 8 LIMITATIONS ============================== -->
+<section class="pb" id="c8">
+<div class="chap"><h2>8.&nbsp;&nbsp;Limitations<span class="mk">QQc8QQ</span></h2></div>
+<p>The following boundaries of the work apply to the results in Section 6.</p>
+<ul>
+  <li><b>Scope of the simulators.</b> Seven problem kinds are computed by simulators. Formula questions (effective access time, page-table bits, fork counts and similar) are answered by the model, and Solve mode labels such answers "Not computed by a simulator".</li>
+  <li><b>Evaluation sets.</b> The retrieval, short-answer, tutor-attempt and new MCQ items were written in-house, with AI assistance, and have not been reviewed by the instructor. They may be easier than questions written by students.</li>
+  <li><b>Faithfulness of citations.</b> Citations are never invented, but on a strict reading 60–66% of cited claims are supported in full by their passage. The remainder mostly add the model's own elaboration or an example the passage does not contain, and the sources are listed under every answer so that the student can check them.</li>
+  <li><b>Rule-based checks.</b> The fact checker covers ten known misconceptions, the command checker covers known shell pitfalls, and the tutor check compares numerical results for scheduling, paging, disk and address-translation problems, and for every kind blocks step-by-step working. Errors outside these lists are not caught by the checks.</li>
+  <li><b>Wording of tutor hints.</b> The tutor check guarantees that a hint does not give the answer away, state a result or work the problem out, but the hint itself is written by the model. In the 24 hints read by hand, two contained a factual error and two called a wrong answer "plausible" (Section 6.9.1).</li>
+  <li><b>Learning outcomes.</b> All measurements concern the tutor's answers. Whether students using it learn more was not measured in a classroom.</li>
+  <li><b>Serving scale.</b> The deployment serves one request at a time on an 8 GB laptop GPU; concurrent use by a whole class was not load-tested.</li>
+</ul>
+</section>
+
+<!-- ============================== 9 FUTURE WORK ============================== -->
+<section class="pb" id="c9">
+<div class="chap"><h2>9.&nbsp;&nbsp;Future Work<span class="mk">QQc9QQ</span></h2></div>
+<p>The system is complete for its stated scope. The following extensions would widen that scope, and each can be evaluated with the same paired-test method.</p>
+<p class="tcap"><span>Table 9.1</span> Extensions</p>
+<table>
+  <thead><tr><th style="width:28%">Extension</th><th>Description</th><th style="width:28%">How it would be measured</th></tr></thead>
+  <tbody>
+    <tr><td>Question generation</td><td>Labs, MCQs and viva questions generated from the corpus, with numerical items verified by the simulators (the remaining items of the course brief)</td><td>Instructor-rated quality; simulator agreement</td></tr>
+    <tr><td>Adaptive difficulty</td><td>A per-student record of attempts used to choose the next problem's difficulty</td><td>Mastery curves per student</td></tr>
+    <tr><td>Formula calculators</td><td>Calculators for the formula kinds, alongside the seven simulators</td><td>Formula items exact</td></tr>
+    <tr><td>Classroom deployment</td><td>A pilot with pre-test, post-test and a control group, with analytics kept on the local machine</td><td>Learning gain, significance-tested</td></tr>
+    <tr><td>Department-scale serving</td><td>Merged LoRA, speculative decoding with a small draft model, several server slots</td><td>p95 time to first token at 1–8 users</td></tr>
+    <tr><td>Instructor-reviewed evaluation</td><td>Past examination questions (with permission) and an instructor's review of citations</td><td>≥ 300 external items</td></tr>
+    <tr><td>Newer base models</td><td>Newer 4–12B instruct models probed zero-shot on the same suites</td><td>Paired gains on the same benchmarks</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============================== REFERENCES ============================== -->
+<section class="pb refs" id="refs">
+<div class="chap" style="margin-bottom:4mm"><h2>References<span class="mk">QQrefsQQ</span></h2></div>
+<ol>
+  <li>B. S. Bloom, "The 2 Sigma Problem: The Search for Methods of Group Instruction as Effective as One-to-One Tutoring," <i>Educational Researcher</i>, vol. 13, no. 6, pp. 4–16, 1984.</li>
+  <li>E. Kasneci et al., "ChatGPT for good? On opportunities and challenges of large language models for education," <i>Learning and Individual Differences</i>, vol. 103, art. 102274, 2023.</li>
+  <li>P. Lewis, E. Perez, A. Piktus, F. Petroni, V. Karpukhin, N. Goyal, H. Küttler, M. Lewis, W. Yih, T. Rocktäschel, S. Riedel and D. Kiela, "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks," in <i>Advances in Neural Information Processing Systems 33 (NeurIPS)</i>, 2020. arXiv:2005.11401.</li>
+  <li>T. Dettmers, A. Pagnoni, A. Holtzman and L. Zettlemoyer, "QLoRA: Efficient Finetuning of Quantized LLMs," in <i>Advances in Neural Information Processing Systems 36 (NeurIPS)</i>, 2023. arXiv:2305.14314.</li>
+  <li>E. J. Hu, Y. Shen, P. Wallis, Z. Allen-Zhu, Y. Li, S. Wang, L. Wang and W. Chen, "LoRA: Low-Rank Adaptation of Large Language Models," in <i>Proc. ICLR</i>, 2022. arXiv:2106.09685.</li>
+  <li>D. Biderman et al., "LoRA Learns Less and Forgets Less," <i>Transactions on Machine Learning Research</i>, 2024. arXiv:2405.09673.</li>
+  <li>L. Gao, A. Madaan, S. Zhou, U. Alon, P. Liu, Y. Yang, J. Callan and G. Neubig, "PAL: Program-aided Language Models," in <i>Proc. 40th ICML</i>, PMLR vol. 202, pp. 10764–10799, 2023.</li>
+  <li>R. Liu, C. Zenke, C. Liu, A. Holmes, P. Thornton and D. J. Malan, "Teaching CS50 with AI: Leveraging Generative Artificial Intelligence in Computer Science Education," in <i>Proc. 55th ACM Technical Symposium on Computer Science Education (SIGCSE)</i>, pp. 750–756, 2024. doi:10.1145/3626252.3630938.</li>
+  <li>Qwen Team, "Qwen3 Technical Report," arXiv:2505.09388, 2025.</li>
+  <li>J. Macina et al., "MathDial: A Dialogue Tutoring Dataset with Rich Pedagogical Properties Grounded in Math Reasoning Problems," in <i>Findings of EMNLP 2023</i>, pp. 5602–5621, 2023.</li>
+  <li>N. Lambert et al., "Tülu 3: Pushing Frontiers in Open Language Model Post-Training," arXiv:2411.15124, 2024.</li>
+  <li>H. Hazard et al., "SuRe: Surprise-Driven Prioritised Replay for Continual LLM Learning," arXiv:2511.22367, 2025.</li>
+  <li>J. Kirkpatrick et al., "Overcoming catastrophic forgetting in neural networks," <i>Proc. National Academy of Sciences</i>, vol. 114, no. 13, pp. 3521–3526, 2017.</li>
+  <li>Y. Feng, H. Wang, J. Li, X. Chu, Z. Kang, Y. Liu, Y. Wang, P. S. Yu and X.-M. Wu, "FOREVER: Forgetting Curve-Inspired Memory Replay for Language Model Continual Learning," in <i>Proc. 64th Annual Meeting of the ACL</i>, pp. 24945–24965, 2026. arXiv:2601.03938.</li>
+  <li>S. Robertson and H. Zaragoza, "The Probabilistic Relevance Framework: BM25 and Beyond," <i>Foundations and Trends in Information Retrieval</i>, vol. 3, no. 4, pp. 333–389, 2009.</li>
+  <li>A. Z. Broder, "On the Resemblance and Containment of Documents," in <i>Proc. Compression and Complexity of Sequences</i>, pp. 21–29, 1997.</li>
+  <li>G. V. Cormack, C. L. A. Clarke and S. Büttcher, "Reciprocal Rank Fusion Outperforms Condorcet and Individual Rank Learning Methods," in <i>Proc. 32nd ACM SIGIR</i>, pp. 758–759, 2009.</li>
+  <li>R. H. Arpaci-Dusseau and A. C. Arpaci-Dusseau, <i>Operating Systems: Three Easy Pieces</i>. Arpaci-Dusseau Books, 2018.</li>
+  <li>M. Hailperin, <i>Operating Systems and Middleware: Supporting Controlled Interaction</i>, rev. 1.3.1. CC BY-SA 3.0.</li>
+  <li>I. Wienand, <i>Computer Science from the Bottom Up</i>. CC BY-SA 3.0.</li>
+  <li>G. Gerganov et al., "llama.cpp: LLM inference in C/C++," GitHub repository, ggml-org/llama.cpp.</li>
+  <li>Unsloth AI, "Unsloth: fast and memory-efficient fine-tuning," GitHub repository, unslothai/unsloth.</li>
+  <li>Open WebUI, "Open WebUI," GitHub repository, open-webui/open-webui, version 0.11.3.</li>
+  <li>N. Jain et al., "NEFTune: Noisy Embeddings Improve Instruction Finetuning," in <i>Proc. ICLR</i>, 2024. arXiv:2310.05914.</li>
+  <li>N. Reimers and I. Gurevych, "Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks," in <i>Proc. EMNLP-IJCNLP</i>, 2019; model sentence-transformers/all-MiniLM-L6-v2.</li>
+  <li>ACM/IEEE-CS Joint Task Force on Computing Curricula, <i>Computer Science Curricula 2013</i>. ACM and IEEE Computer Society, 2013.</li>
+  <li>Q. McNemar, "Note on the Sampling Error of the Difference Between Correlated Proportions or Percentages," <i>Psychometrika</i>, vol. 12, no. 2, pp. 153–157, 1947.</li>
+  <li>D. Hendrycks, C. Burns, S. Basart, A. Zou, M. Mazeika, D. Song and J. Steinhardt, "Measuring Massive Multitask Language Understanding," in <i>Proc. ICLR</i>, 2021. arXiv:2009.03300.</li>
+  <li>Mixedbread AI, "mxbai-rerank-xsmall-v1," model card, Hugging Face, 2024.</li>
+</ol>
+</section>
+
+</body>
+</html>
