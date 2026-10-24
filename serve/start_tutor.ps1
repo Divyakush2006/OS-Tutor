@@ -53,6 +53,7 @@ Start-Process -WindowStyle Hidden -FilePath $Py -ArgumentList "`"$Serve\gateway.
 Wait-Http "http://127.0.0.1:8090/v1/models" "gateway" 60
 
 Write-Host "[3/3] Open WebUI (first start takes a minute or two)"
+& $Py "$Serve\branding.py"                      # OS Tutor logo, favicon and name (logo.jpg)
 $env:DATA_DIR = Join-Path $Serve "webui-data"
 $env:WEBUI_NAME = "OS Tutor"
 $env:WEBUI_AUTH = "False"                       # single-user, localhost only
@@ -69,6 +70,7 @@ $env:ENABLE_AUTOCOMPLETE_GENERATION = "False"
 $env:ENABLE_RETRIEVAL_QUERY_GENERATION = "False"
 $env:ENABLE_SEARCH_QUERY_GENERATION = "False"
 $env:ENABLE_WEB_SEARCH = "False"
+$env:ENABLE_VERSION_UPDATE_CHECK = "False"        # no "new version available" banner
 $env:ANONYMIZED_TELEMETRY = "False"; $env:SCARF_NO_ANALYTICS = "true"; $env:DO_NOT_TRACK = "true"
 $WebUI = Join-Path $Serve ".venv-webui\Scripts\open-webui.exe"
 Start-Process -WindowStyle Hidden -FilePath $WebUI -ArgumentList @("serve", "--host", "127.0.0.1", "--port", "3000") `

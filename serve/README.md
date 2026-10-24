@@ -87,6 +87,10 @@ py -3.11 -m venv serve/.venv-webui && serve/.venv-webui/Scripts/python -m pip in
 
 After retraining, re-run only the LoRA conversion line on the new adapter.
 
+## Branding
+
+`start_tutor.ps1` runs `branding.py` before it starts the frontend. It draws the favicon, the sidebar and model avatar, the splash screens and the app icons from `assets/logo.jpg`, removes the " (Open WebUI)" suffix from the application name, and sets the page title. It is safe to run again (for example after `pip install -U open-webui`), and `branding.py --restore` puts the original files back. After a logo change, hard-refresh the browser (Ctrl+F5), because browsers cache favicons.
+
 ## Logs
 
 `serve/logs/`: `llama-server.log`, `gateway.log`, `webui.log`.
